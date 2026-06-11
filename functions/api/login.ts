@@ -60,35 +60,36 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Secure PBKDF2 Password Check or legacy plain-text password fallback
-    let isPasswordValid = false;
-    if (user.password_salt) {
-      // Re-hash entered password with stored salt to verify
-      const encoder = new TextEncoder();
-      const passwordKey = await crypto.subtle.importKey(
-        'raw', 
-        encoder.encode(password), 
-        { name: 'PBKDF2' }, 
-        false, 
-        ['deriveBits']
-      );
-      
-      const derivedBits = await crypto.subtle.deriveBits(
-        {
-          name: 'PBKDF2',
-          salt: encoder.encode(user.password_salt),
-          iterations: 100000,
-          hash: 'SHA-256'
-        },
-        passwordKey,
-        256
-      );
+    // Check if password matches plaintext directly (legacy fallback) or hashed PBKDF2
+    let isPasswordValid = (password === user.password);
 
-      const hashedInput = btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
-      isPasswordValid = hashedInput === user.password;
-    } else {
-      // Legacy plaintext password check
-      isPasswordValid = password === user.password;
+    if (!isPasswordValid && user.password_salt) {
+      try {
+        const encoder = new TextEncoder();
+        const passwordKey = await crypto.subtle.importKey(
+          'raw', 
+          encoder.encode(password), 
+          { name: 'PBKDF2' }, 
+          false, 
+          ['deriveBits']
+        );
+        
+        const derivedBits = await crypto.subtle.deriveBits(
+          {
+            name: 'PBKDF2',
+            salt: encoder.encode(user.password_salt),
+            iterations: 100000,
+            hash: 'SHA-256'
+          },
+          passwordKey,
+          256
+        );
+
+        const hashedInput = btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
+        isPasswordValid = (hashedInput === user.password);
+      } catch (hashErr) {
+        isPasswordValid = false;
+      }
     }
 
     if (!isPasswordValid) {
