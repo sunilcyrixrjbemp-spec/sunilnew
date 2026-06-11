@@ -212,7 +212,7 @@ export default function RetrievePage() {
               padding: '32px 20px',
               margin: '20px 0'
             }}>
-              <p style={{ color: 'var(--success)', fontWeight: 700, fontSize: '14px', marginBottom: '12px', uppercase: 'true', letterSpacing: '0.5px' }}>
+              <p style={{ color: 'var(--success)', fontWeight: 700, fontSize: '14px', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Identity Verified
               </p>
               <h2 style={{ color: 'var(--primary-dark)', fontSize: '36px', fontWeight: 900, fontFamily: 'var(--font-mono)', letterSpacing: '2px', margin: 0 }}>
