@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './DashboardPage.css';
 
 interface Expense {
@@ -35,35 +36,83 @@ export default function DashboardPage() {
   const [month, setMonth] = useState('2026-06');
   const [statusFilter, setStatusFilter] = useState('All');
 
+  const navigate = useNavigate();
+  const userId = localStorage.getItem('logged_in_user_id');
+  const userName = localStorage.getItem('display_name') || 'User';
+  const userRole = localStorage.getItem('user_role') || 'Staff';
+
+  // Check login session
   useEffect(() => {
-    // Simulated fetching for offline preview, since API is not connected locally
-    setLoading(true);
-    setTimeout(() => {
-      const mockExpenses: Expense[] = [
-        { exp_id: 'RJ-06/26-0001', full_name: 'Amit Kumar', expense_date: '2026-06-10', total_amount: 1450, status: 'Approved', district: 'Jaipur' },
-        { exp_id: 'RJ-06/26-0002', full_name: 'Sunil Bishnoi', expense_date: '2026-06-09', total_amount: 3200, status: 'Pending L1', district: 'Jodhpur' },
-        { exp_id: 'RJ-06/26-0003', full_name: 'Rahul Sharma', expense_date: '2026-06-08', total_amount: 850, status: 'Pending L2', district: 'Bikaner' },
-        { exp_id: 'RJ-06/26-0004', full_name: 'Priyanka Sen', expense_date: '2026-06-07', total_amount: 2100, status: 'Approved', district: 'Udaipur' },
-        { exp_id: 'RJ-06/26-0005', full_name: 'Vikas Jangid', expense_date: '2026-06-06', total_amount: 1100, status: 'Rejected', district: 'Kota' }
-      ];
+    if (!userId) {
+      navigate('/');
+    }
+  }, [userId, navigate]);
 
-      const mockPenalties: Penalty[] = [
-        { complaint_id: 'CP-99281', hospital_name: 'CH Jodhpur', equipment_name: 'X-Ray Machine', complaint_status: 'Pending', total_penalty: 500, complaint_raise_date: '2026-06-01' },
-        { complaint_id: 'CP-99102', hospital_name: 'SDH Balotra', equipment_name: 'Oxygen Concentrator', complaint_status: 'Resolved', total_penalty: 0, complaint_raise_date: '2026-06-03' },
-        { complaint_id: 'CP-98765', hospital_name: 'DH Barmer', equipment_name: 'CT Scanner', complaint_status: 'Pending', total_penalty: 1200, complaint_raise_date: '2026-06-04' }
-      ];
+  useEffect(() => {
+    if (!userId) return;
 
-      setExpenses(mockExpenses);
-      setPenalties(mockPenalties);
-      setStats({
-        totalExpenses: 8700,
-        pendingExpenses: 4050,
-        totalPenalties: 1700,
-        activeComplaints: 2
-      });
-      setLoading(false);
-    }, 1000);
-  }, [month, statusFilter]);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const startDate = `${month}-01`;
+        const endDate = `${month}-31`;
+
+        // Fetch expenses and penalties concurrently
+        const [expRes, penRes] = await Promise.all([
+          fetch(`/api/dashboard/expenses?user_id=${userId}&start_date=${startDate}&end_date=${endDate}&status=${statusFilter}`, {
+            headers: { 'x-user-id': userId }
+          }),
+          fetch(`/api/dashboard/penalties?user_id=${userId}&start_date=${startDate}&end_date=${endDate}`, {
+            headers: { 'x-user-id': userId }
+          })
+        ]);
+
+        const expData = await expRes.json();
+        const penData = await penRes.json();
+
+        let fetchedExpenses: Expense[] = [];
+        let fetchedPenalties: Penalty[] = [];
+
+        if (expRes.ok && expData.success) {
+          fetchedExpenses = expData.expenses || [];
+          setExpenses(fetchedExpenses);
+        }
+        
+        if (penRes.ok && penData.success) {
+          fetchedPenalties = penData.penalties || [];
+          setPenalties(fetchedPenalties);
+        }
+
+        // Calculate dynamic stats
+        const totalClaimed = fetchedExpenses.reduce((sum, e) => sum + Number(e.total_amount || 0), 0);
+        const pendingClaimed = fetchedExpenses
+          .filter(e => e.status.toLowerCase().startsWith('pending'))
+          .reduce((sum, e) => sum + Number(e.total_amount || 0), 0);
+        
+        const totalPenaltiesVal = fetchedPenalties.reduce((sum, p) => sum + Number(p.total_penalty || 0), 0);
+        const pendingComplaintsCount = fetchedPenalties.filter(p => p.complaint_status.toLowerCase() === 'pending').length;
+
+        setStats({
+          totalExpenses: totalClaimed,
+          pendingExpenses: pendingClaimed,
+          totalPenalties: totalPenaltiesVal,
+          activeComplaints: pendingComplaintsCount
+        });
+
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [userId, month, statusFilter]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
 
   return (
     <div className="dashboard-layout">
@@ -86,9 +135,9 @@ export default function DashboardPage() {
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             Penalties
           </button>
-          <button className="menu-item">
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Settings
+          <button className="menu-item logout-btn" onClick={handleLogout} style={{ marginTop: 'auto', color: '#f87171' }}>
+            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Logout
           </button>
         </nav>
       </aside>
@@ -98,12 +147,12 @@ export default function DashboardPage() {
         {/* Top Navbar */}
         <header className="top-navbar glassmorphism">
           <div className="navbar-title">
-            <h2>Welcome back, Admin</h2>
+            <h2>Welcome back, {userName}</h2>
             <p>Cyrix Healthcare Field Metrics</p>
           </div>
           <div className="user-profile-summary">
-            <div className="avatar">A</div>
-            <span>Administrator</span>
+            <div className="avatar">{userName.charAt(0)}</div>
+            <span>{userRole}</span>
           </div>
         </header>
 
@@ -112,7 +161,7 @@ export default function DashboardPage() {
           <div className="metric-card glassmorphism">
             <div className="metric-icon exp">₹</div>
             <div className="metric-info">
-              <h3>Total Month Expenses</h3>
+              <h3>Total Claims (Month)</h3>
               <p className="value">₹{stats.totalExpenses.toLocaleString('en-IN')}</p>
             </div>
             <div className="metric-glow"></div>
@@ -129,7 +178,7 @@ export default function DashboardPage() {
           <div className="metric-card glassmorphism">
             <div className="metric-icon penalty">⚠️</div>
             <div className="metric-info">
-              <h3>Total Active Penalties</h3>
+              <h3>Total Month Penalty</h3>
               <p className="value">₹{stats.totalPenalties.toLocaleString('en-IN')}</p>
             </div>
           </div>
@@ -137,7 +186,7 @@ export default function DashboardPage() {
           <div className="metric-card glassmorphism">
             <div className="metric-icon complaints">🚨</div>
             <div className="metric-info">
-              <h3>Pending Complaints</h3>
+              <h3>Active Complaints</h3>
               <p className="value">{stats.activeComplaints}</p>
             </div>
           </div>
@@ -196,16 +245,18 @@ export default function DashboardPage() {
                 onChange={(e) => setMonth(e.target.value)} 
                 className="filter-input"
               />
-              <select 
-                value={statusFilter} 
-                onChange={(e) => setStatusFilter(e.target.value)} 
-                className="filter-input"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Approved">Approved</option>
-                <option value="Pending">Pending</option>
-                <option value="Rejected">Rejected</option>
-              </select>
+              {activeTab === 'expenses' && (
+                <select 
+                  value={statusFilter} 
+                  onChange={(e) => setStatusFilter(e.target.value)} 
+                  className="filter-input"
+                >
+                  <option value="All">All Statuses</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Pending">Pending</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              )}
             </div>
           </div>
 
@@ -217,63 +268,71 @@ export default function DashboardPage() {
                 <div className="skeleton-row"></div>
               </div>
             ) : activeTab === 'expenses' ? (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>District</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {expenses.map((e) => (
-                    <tr key={e.exp_id}>
-                      <td className="font-mono">{e.exp_id}</td>
-                      <td>{e.full_name}</td>
-                      <td>{e.expense_date}</td>
-                      <td className="font-bold">₹{e.total_amount}</td>
-                      <td>{e.district}</td>
-                      <td>
-                        <span className={`badge ${e.status.toLowerCase().replace(' ', '-')}`}>
-                          {e.status}
-                        </span>
-                      </td>
+              expenses.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No expenses found for this selection.</div>
+              ) : (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>User</th>
+                      <th>Date</th>
+                      <th>Amount</th>
+                      <th>District</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {expenses.map((e) => (
+                      <tr key={e.exp_id}>
+                        <td className="font-mono">{e.exp_id}</td>
+                        <td>{e.full_name}</td>
+                        <td>{e.expense_date}</td>
+                        <td className="font-bold">₹{e.total_amount}</td>
+                        <td>{e.district}</td>
+                        <td>
+                          <span className={`badge ${e.status.toLowerCase().replace(' ', '-')}`}>
+                            {e.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
             ) : (
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Complaint ID</th>
-                    <th>Hospital</th>
-                    <th>Equipment</th>
-                    <th>Raise Date</th>
-                    <th>Penalty</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {penalties.map((p) => (
-                    <tr key={p.complaint_id}>
-                      <td className="font-mono">{p.complaint_id}</td>
-                      <td>{p.hospital_name}</td>
-                      <td>{p.equipment_name}</td>
-                      <td>{p.complaint_raise_date}</td>
-                      <td className="font-bold">₹{p.total_penalty}</td>
-                      <td>
-                        <span className={`badge ${p.complaint_status.toLowerCase()}`}>
-                          {p.complaint_status}
-                        </span>
-                      </td>
+              penalties.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No penalties found for this selection.</div>
+              ) : (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Complaint ID</th>
+                      <th>Hospital</th>
+                      <th>Equipment</th>
+                      <th>Raise Date</th>
+                      <th>Penalty</th>
+                      <th>Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {penalties.map((p) => (
+                      <tr key={p.complaint_id}>
+                        <td className="font-mono">{p.complaint_id}</td>
+                        <td>{p.hospital_name}</td>
+                        <td>{p.equipment_name}</td>
+                        <td>{p.complaint_raise_date}</td>
+                        <td className="font-bold">₹{p.total_penalty}</td>
+                        <td>
+                          <span className={`badge ${p.complaint_status.toLowerCase()}`}>
+                            {p.complaint_status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )
             )}
           </div>
         </section>

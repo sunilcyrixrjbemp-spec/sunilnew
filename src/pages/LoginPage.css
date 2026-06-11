@@ -3,130 +3,87 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  position: relative;
-  overflow: hidden;
+  width: 100vw;
+  background-color: var(--bg);
+  padding: 20px;
 }
 
-/* Background Animated Shapes */
-.bg-shape {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  z-index: -1;
-  animation: float 10s infinite alternate ease-in-out;
-}
-
-.shape-1 {
-  width: 400px;
-  height: 400px;
-  background: rgba(37, 99, 235, 0.3);
-  top: -100px;
-  left: -100px;
-}
-
-.shape-2 {
-  width: 300px;
-  height: 300px;
-  background: rgba(16, 185, 129, 0.2);
-  bottom: -50px;
-  right: -50px;
-  animation-delay: -5s;
-}
-
-.shape-3 {
-  width: 250px;
-  height: 250px;
-  background: rgba(139, 92, 246, 0.2);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  animation-delay: -2s;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px) scale(1); }
-  100% { transform: translateY(30px) scale(1.1); }
-}
-
-/* Login Card */
 .login-card {
-  width: 100%;
-  max-width: 420px;
+  background: var(--surface);
   padding: 48px 40px;
   border-radius: 24px;
-  z-index: 10;
-  transition: transform 0.3s ease;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  border: 1px solid var(--border);
+  transition: transform var(--t-fast);
 }
 
 .login-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-2px);
 }
 
 .header-text {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
-.logo-placeholder {
-  width: 64px;
-  height: 64px;
-  background: linear-gradient(135deg, var(--primary), #8b5cf6);
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  font-weight: 800;
-  margin: 0 auto 20px;
-  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+.cyrix-img {
+  height: 60px;
+  display: block;
+  margin: 0 auto 20px auto;
 }
 
 .header-text h1 {
-  font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
 }
 
 .header-text p {
-  color: var(--text-secondary);
-  font-size: 15px;
-  font-weight: 400;
+  font-size: 14px;
+  color: var(--text-2);
+  font-weight: 500;
 }
 
-/* Form Styles */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .form-group input {
   width: 100%;
-  padding: 16px 20px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
   border-radius: 12px;
-  color: #fff;
-  font-size: 15px;
-  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
   outline: none;
+  transition: all var(--t-fast);
 }
 
 .form-group input:focus {
   border-color: var(--primary);
-  background: rgba(15, 23, 42, 0.8);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .password-wrapper {
@@ -135,89 +92,100 @@
 
 .toggle-text-btn {
   position: absolute;
-  right: 16px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 13px;
+  color: var(--primary-light);
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: color var(--t-fast);
 }
 
 .toggle-text-btn:hover {
-  color: #fff;
+  color: var(--primary-dark);
 }
 
-/* Button */
 .submit-btn {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, var(--primary), #3b82f6);
-  color: #fff;
+  background: var(--primary);
+  color: white;
   border: none;
+  padding: 16px;
   border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  width: 100%;
+  font-weight: 700;
+  font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 8px;
+  transition: all var(--t-fast);
+  margin-top: 10px;
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
 }
 
 .submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .submit-btn:disabled {
-  opacity: 0.7;
+  background: var(--text-3);
   cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
-/* Spinner */
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Footer Links */
 .form-footer {
-  margin-top: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
+  text-align: center;
+  margin-top: 28px;
+  font-size: 13px;
 }
 
 .form-footer a {
-  color: var(--text-secondary);
+  color: var(--primary-light);
   text-decoration: none;
-  font-size: 14px;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: 600;
+  transition: color var(--t-fast);
 }
 
 .form-footer a:hover {
-  color: #fff;
+  color: var(--primary-dark);
 }
 
 .divider {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--text-secondary);
-  opacity: 0.5;
+  margin: 0 12px;
+  color: var(--border);
+}
+
+footer {
+  margin-top: 36px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+footer a {
+  color: var(--primary-light);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color var(--t-fast);
+}
+
+footer a:hover {
+  color: var(--primary-dark);
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 32px 24px;
+  }
+  .header-text h1 {
+    font-size: 22px;
+  }
 }
