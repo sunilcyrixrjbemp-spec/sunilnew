@@ -1,0 +1,2844 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Month Summary — Cyrix Healthcare</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        :root {
+
+            --primary:       #1e40af;
+
+            --primary-dark:  #002b5e;
+
+            --primary-light: #3b82f6;
+
+            --primary-50:    #eff6ff;
+
+            --accent:        #10b981;
+
+            --danger:        #ef4444;
+
+            --danger-light:  #fee2e2;
+
+            --warning:       #f59e0b;
+
+            --warning-light: #fef3c7;
+
+            --bg:        #f8fafc;
+
+            --surface:   #ffffff;
+
+            --surface-2: #f1f5f9;
+
+            --surface-3: #e2e8f0;
+
+            --border:    #e2e8f0;
+
+            --text:      #0f172a;
+
+            --text-2:    #475569;
+
+            --text-3:    #94a3b8;
+
+            --success:       #059669;
+
+            --success-light: #d1fae5;
+
+            --info:          #3b82f6;
+
+            --info-light:    #dbeafe;
+
+            --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+
+            --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+
+            --font: 'Inter', -apple-system, sans-serif;
+
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --sidebar-w: 240px;
+
+            --bottom-nav-h: 75px;
+
+            --t-fast: 0.15s ease;
+
+            --t-slow: 0.4s ease;
+
+            --z-modal: 1000;
+
+        }
+
+        html, body { overflow-x: clip; width: 100%; margin: 0; padding: 0; background: var(--bg); }
+
+        body.app-page { display: flex; min-height: 100vh; font-family: var(--font); color: var(--text); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+
+        a { color: inherit; text-decoration: none; }
+
+        ul { list-style: none; padding: 0; margin: 0; }
+
+        button { cursor: pointer; font-family: var(--font); border: none; }
+
+        input, select { font-family: var(--font); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+
+        ::-webkit-scrollbar-track { background: var(--surface-2); }
+
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+        .svg-icon { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+
+
+
+        /* LOADER */
+
+        #loadingOverlay { position: fixed; inset: 0; z-index: 9999; background: rgba(255,255,255,0.95); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.5s ease; }
+
+        .loader-wrapper { position: relative; width: 5em; height: 5em; margin-bottom: 20px; }
+
+        .loader { position: absolute; top: calc(50% - 1.25em); left: calc(50% - 1.25em); width: 2.5em; height: 2.5em; transform: rotate(165deg); }
+
+        .loader:before, .loader:after { content: ""; position: absolute; top: 50%; left: 50%; display: block; width: 0.5em; height: 0.5em; border-radius: 0.25em; transform: translate(-50%, -50%); }
+
+        .loader:before { animation: before8 2s infinite; }
+
+        .loader:after  { animation: after6 2s infinite; }
+
+        @keyframes before8 { 0%{width:0.5em;box-shadow:1em -0.5em rgba(225,20,98,0.75),-1em 0.5em rgba(111,202,220,0.75)}35%{width:2.5em;box-shadow:0 -0.5em rgba(225,20,98,0.75),0 0.5em rgba(111,202,220,0.75)}70%{width:0.5em;box-shadow:-1em -0.5em rgba(225,20,98,0.75),1em 0.5em rgba(225,20,98,0.75)}100%{box-shadow:1em -0.5em rgba(225,20,98,0.75),-1em 0.5em rgba(111,202,220,0.75)} }
+
+        @keyframes after6  { 0%{height:0.5em;box-shadow:0.5em 1em rgba(61,184,143,0.75),-0.5em -1em rgba(233,169,32,0.75)}35%{height:2.5em;box-shadow:0.5em 0 rgba(61,184,143,0.75),-0.5em 0 rgba(233,169,32,0.75)}70%{height:0.5em;box-shadow:0.5em -1em rgba(61,184,143,0.75),-0.5em 1em rgba(233,169,32,0.75)}100%{box-shadow:0.5em 1em rgba(61,184,143,0.75),-0.5em -1em rgba(233,169,32,0.75)} }
+
+        #loaderText { font-weight: 700; color: var(--primary-dark); font-size: 16px; letter-spacing: 0.5px; }
+
+
+
+        /* SIDEBAR */
+
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 1000; background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between; box-shadow: 4px 0 24px rgba(15,23,42,.1); }
+
+        .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+
+        .sidebar-logo img { width: 44px; height: auto; border-radius: 8px; background: white; padding: 2px; }
+
+        .logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+
+        .logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+
+        .nav-section { padding: 12px 0; }
+
+        .nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+
+        .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+
+        .nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+
+        .nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+
+        .nav-link-item.nav-logout { color: #f87171 !important; }
+
+        .nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        .nav-icon-wrap svg { stroke-width: 2px; }
+
+        .sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+
+
+        /* MAIN */
+
+        .main-content { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height: 100vh; }
+
+        .bottom-nav { display: none; }
+
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); backdrop-filter: blur(3px); z-index: 90; }
+
+        .sidebar-overlay.active { display: block; }
+
+
+
+        /* HEADER */
+
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 32px 32px 16px; flex-wrap: wrap; gap: 20px; }
+
+        .page-breadcrumb { font-size: 14px; color: #334155; font-weight: 500; margin-bottom: 6px; }
+
+        .page-title { font-size: 30px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; line-height: 1.2; margin: 0; }
+
+        .page-header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: all var(--t-fast); cursor: pointer; border: none; }
+
+        .btn-outline { background: white; color: var(--text-2); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--surface-2); }
+
+        .btn-primary { background: var(--primary); color: white; }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-success { background: var(--success); color: white; }
+
+        .btn-success:hover { background: #047857; }
+
+        .btn-warning { background: var(--warning); color: white; }
+
+        .btn-warning:hover { background: #d97706; }
+
+
+
+        .content-area { padding: 0 32px 40px; }
+
+
+
+        /* FILTER SECTION */
+
+        .filter-card { background: white; border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); padding: 20px 24px; margin-bottom: 24px; }
+
+        .filter-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+
+        .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+
+        .filter-group label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .filter-group select, .filter-group input { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-weight: 500; background: white; color: var(--text); transition: border-color 0.2s; outline: none; box-sizing: border-box; }
+
+        .filter-group select:focus, .filter-group input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+
+        .filter-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+
+
+        /* STATS */
+
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: all 0.3s; display: flex; align-items: center; gap: 16px; }
+
+        .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        .stat-icon svg { width: 24px; height: 24px; stroke-width: 2.5px; }
+
+        .stat-icon.blue { background: var(--info-light); color: var(--info); }
+
+        .stat-icon.green { background: var(--success-light); color: var(--success); }
+
+        .stat-icon.yellow { background: var(--warning-light); color: var(--warning); }
+
+        .stat-icon.purple { background: #f3e8ff; color: #7c3aed; }
+
+        .stat-info p { font-size: 12px; color: var(--text-3); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+
+        .stat-info h3 { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; margin: 0; letter-spacing: -0.5px; }
+
+
+
+        /* CONTROLS */
+
+        .controls-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+
+        .search-box { position: relative; flex: 1; max-width: 360px; }
+
+        .search-box input { width: 100%; padding: 10px 16px 10px 40px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; transition: border-color 0.2s; box-sizing: border-box; outline: none; }
+
+        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+
+        .search-box .input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); width: 15px; height: 15px; }
+
+        .bulk-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+
+
+        /* TABLE */
+
+        .table-card { background: white; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; }
+
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        table { width: 100%; border-collapse: collapse; min-width: 900px; text-align: left; }
+
+        thead th { padding: 14px 20px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface-2); border-bottom: 2px solid var(--border); white-space: nowrap; }
+
+        thead th:first-child { width: 40px; text-align: center; }
+
+        tbody td { padding: 16px 20px; font-size: 14px; color: var(--text); border-bottom: 1px solid var(--border); }
+
+        tbody tr { transition: background 0.2s; }
+
+        tbody tr:hover { background: var(--primary-50); }
+
+        tbody tr.selected { background: rgba(30,64,175,0.06) !important; }
+
+        tbody td:first-child { text-align: center; }
+
+        .table-checkbox { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; background: white; cursor: pointer; position: relative; display: inline-block; vertical-align: middle; transition: all 0.2s; }
+
+        .table-checkbox:checked { background: var(--primary); border-color: var(--primary); }
+
+        .table-checkbox:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 6px; height: 9px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+        .tag { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+        .tag-blue { background: var(--info-light); color: var(--info); }
+
+        .tag-code { background: var(--surface-2); color: var(--primary); border: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; }
+
+        .amount-val { font-weight: 700; color: var(--success); font-family: var(--font-mono); }
+
+        .action-btns { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+        .btn-sm { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; border: 1px solid; display: inline-flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: var(--font); }
+
+        .btn-sm svg { width: 11px; height: 11px; stroke-width: 2.5; }
+
+        .btn-sm-pdf { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+
+        .btn-sm-pdf:hover { background: var(--danger); color: white; }
+
+        .btn-sm-view { background: var(--primary-50); color: var(--primary); border-color: var(--primary-light); }
+
+        .btn-sm-view:hover { background: var(--primary); color: white; }
+
+
+
+        /* EMPTY STATE */
+
+        .empty-state { text-align: center; padding: 60px 20px; }
+
+        .empty-icon { font-size: 48px; margin-bottom: 16px; }
+
+        .empty-text { color: var(--text-3); font-size: 16px; font-weight: 600; }
+
+        .empty-sub { color: var(--text-3); font-size: 13px; margin-top: 8px; }
+
+
+
+        /* DETAIL PANEL */
+
+        .detail-panel { position: fixed; top: 0; right: 0; transform: translateX(100%); width: 520px; max-width: 100vw; height: 100vh; background: white; box-shadow: var(--shadow-lg); z-index: var(--z-modal); display: flex; flex-direction: column; transition: transform var(--t-slow); border-left: 1px solid var(--border); }
+
+        .detail-panel.open { transform: translateX(0); }
+
+        .panel-header { position: sticky; top: 0; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: white; }
+
+        .panel-header h3 { font-size: 18px; font-weight: 800; color: var(--primary-dark); margin: 0; }
+
+        .panel-header p { font-size: 13px; color: var(--text-3); margin-top: 4px; font-weight: 500; }
+
+        .panel-close { background: white; border: 1px solid var(--border); width: 36px; height: 36px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-2); transition: all var(--t-fast); flex-shrink: 0; }
+
+        .panel-close:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger-light); }
+
+        .panel-body { flex: 1; overflow-y: auto; padding: 24px; }
+
+        .panel-footer { position: sticky; bottom: 0; z-index: 10; padding: 16px 24px; border-top: 1px solid var(--border); background: white; display: flex; gap: 12px; }
+
+        .panel-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.5); backdrop-filter: blur(3px); z-index: calc(var(--z-modal) - 1); display: none; }
+
+        .panel-overlay.active { display: block; }
+
+
+
+        .sec-heading { display: flex; align-items: center; font-size: 11px; font-weight: 800; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; margin-top: 28px; }
+
+        .sec-heading:first-child { margin-top: 0; }
+
+        .sec-heading::after { content: ''; flex: 1; height: 1px; background: var(--surface-3); margin-left: 10px; }
+
+        .info-card { background: #f4f7fb; border-radius: 14px; padding: 16px; }
+
+        .info-row { margin-bottom: 12px; }
+
+        .info-row:last-child { margin-bottom: 0; }
+
+        .info-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+
+        .info-val { font-size: 14px; font-weight: 700; color: var(--primary-dark); }
+
+        .info-val-lg { font-size: 20px; font-weight: 800; color: var(--success); }
+
+        .bk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .bk-card { border: 1px solid var(--surface-3); border-radius: 10px; padding: 14px; background: white; text-align: center; }
+
+        .bk-label { font-size: 10px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+        .bk-val { font-size: 15px; font-weight: 800; color: var(--primary-dark); }
+
+        .bk-val.total { color: var(--success); }
+
+
+
+        /* TOAST */
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; pointer-events: none; }
+
+
+
+        /* LOGOUT */
+
+        #logoutOverlay { position: fixed; top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);z-index:9999;display:none; }
+
+        #logoutPopup { position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);padding:32px;border-radius:20px;box-shadow:var(--shadow-lg);z-index:10000;text-align:center;display:none;width:90%;max-width:380px;border:1px solid var(--border); }
+
+
+
+        /* ══════════════════════════════════════════════════════
+
+           PRINT / PDF STYLES — LANDSCAPE A4, EXACT ROWS ONLY
+
+           ══════════════════════════════════════════════════════ */
+
+        #printArea { display: none; }
+
+
+
+        /* ─── Form wrapper ─── */
+
+        .cyrix-form {
+
+            font-family: 'Arial', sans-serif;
+
+            color: #000;
+
+            width: 100%;
+
+            background: #fff;
+
+            font-size: 9pt;
+
+            line-height: 1.35;
+
+        }
+
+        .cyrix-form * {
+
+            -webkit-print-color-adjust: exact !important;
+
+            print-color-adjust: exact !important;
+
+            box-sizing: border-box;
+
+        }
+
+        .cyrix-form table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+
+        }
+
+        .cyrix-form td, .cyrix-form th {
+
+            border: 1.5px solid #1a1a2e;
+
+            padding: 5px 5px;
+
+            vertical-align: middle;
+
+            font-size: 8pt;
+
+            font-weight: 500;
+
+            color: #000;
+
+            word-wrap: break-word;
+
+            overflow-wrap: break-word;
+
+            word-break: break-word;
+
+        }
+
+
+
+        /* ─── Header rows ─── */
+
+        .hdr-main {
+
+            background: #002b5e !important;
+
+            color: #fff !important;
+
+            text-align: center;
+
+            font-size: 13pt !important;
+
+            font-weight: 900 !important;
+
+            padding: 10px 8px !important;
+
+            letter-spacing: 1px;
+
+            border: 2px solid #001a3e !important;
+
+        }
+
+        .hdr-sub {
+
+            background: #1e40af !important;
+
+            color: #fff !important;
+
+            text-align: center;
+
+            font-size: 9pt !important;
+
+            font-weight: 800 !important;
+
+            padding: 5px 8px !important;
+
+            border: 1.5px solid #1630a0 !important;
+
+        }
+
+        .hdr-info {
+
+            background: #f0f4ff !important;
+
+            font-size: 8.5pt !important;
+
+            font-weight: 700 !important;
+
+            padding: 6px 8px !important;
+
+            color: #001840 !important;
+
+            border: 1.5px solid #1a1a2e !important;
+
+        }
+
+        .hdr-info-val {
+
+            background: #f0f4ff !important;
+
+            font-size: 9pt !important;
+
+            font-weight: 800 !important;
+
+            color: #002b5e !important;
+
+            padding: 6px 8px !important;
+
+            border: 1.5px solid #1a1a2e !important;
+
+        }
+
+
+
+        /* ─── Column headers ─── */
+
+        .col-hdr {
+
+            background: #1e3a8a !important;
+
+            color: #fff !important;
+
+            font-weight: 800 !important;
+
+            font-size: 7.5pt !important;
+
+            text-align: center !important;
+
+            padding: 6px 3px !important;
+
+            border: 1.5px solid #162d70 !important;
+
+            line-height: 1.3;
+
+        }
+
+
+
+        /* ─── Data rows ─── */
+
+        .data-row td {
+
+            font-size: 8pt !important;
+
+            font-weight: 600 !important;
+
+            color: #0a0a1a !important;
+
+            padding: 5px 5px !important;
+
+            border: 1.2px solid #444 !important;
+
+        }
+
+        .data-row:nth-child(even) td { background: #f7f9ff !important; }
+
+        .data-row:nth-child(odd)  td { background: #fff !important; }
+
+
+
+        /* ─── Total row ─── */
+
+        .total-row td {
+
+            background: #fef3c7 !important;
+
+            font-weight: 900 !important;
+
+            font-size: 8.5pt !important;
+
+            color: #78350f !important;
+
+            border: 1.5px solid #d97706 !important;
+
+            padding: 6px 5px !important;
+
+        }
+
+        .total-row .grand { background: #d1fae5 !important; color: #065f46 !important; font-size: 9.5pt !important; }
+
+
+
+        /* ─── Amount-in-words / net payable rows ─── */
+
+        .awords-row td {
+
+            background: #eff6ff !important;
+
+            font-size: 8pt !important;
+
+            font-weight: 700 !important;
+
+            font-style: italic;
+
+            color: #1e3a8a !important;
+
+            border: 1.2px solid #93c5fd !important;
+
+            padding: 5px 8px !important;
+
+        }
+
+        .net-row td {
+
+            background: #dcfce7 !important;
+
+            font-size: 9.5pt !important;
+
+            font-weight: 900 !important;
+
+            color: #14532d !important;
+
+            border: 2px solid #16a34a !important;
+
+            padding: 6px 8px !important;
+
+        }
+
+
+
+        /* ─── Approved strip ─── */
+
+        .approved-strip td {
+
+            background: #002b5e !important;
+
+            color: #fff !important;
+
+            font-weight: 900 !important;
+
+            text-align: center;
+
+            font-size: 9pt !important;
+
+            letter-spacing: 0.5px;
+
+            padding: 7px 8px !important;
+
+            border: 2px solid #001a3e !important;
+
+        }
+
+
+
+        /* ─── Signature section — IMPROVED ─── */
+
+        .sig-section table { border: 2px solid #1a1a2e !important; }
+
+        .sig-hdr td {
+
+            background: #1e3a8a !important;
+
+            color: #fff !important;
+
+            font-weight: 800 !important;
+
+            font-size: 8pt !important;
+
+            text-align: center;
+
+            padding: 5px 8px !important;
+
+            border: 1.5px solid #162d70 !important;
+
+        }
+
+        .sig-cell {
+
+            text-align: center;
+
+            vertical-align: top;
+
+            padding: 8px !important;
+
+            background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%) !important;
+
+            border: 1.5px solid #333 !important;
+
+            min-height: 90px;
+
+            position: relative;
+
+        }
+
+        /* CLAIMED BY - Pen/Signature Icon */
+        .sig-cell:nth-child(1)::before {
+
+            content: '✎';
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 8px;
+
+            font-size: 28pt;
+
+            color: #059669;
+
+            font-weight: bold;
+
+        }
+
+        /* APPROVED BY - Checkmark Icon */
+        .sig-cell:nth-child(2)::before {
+
+            content: '✓';
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 8px;
+
+            font-size: 28pt;
+
+            color: #059669;
+
+            font-weight: bold;
+
+        }
+
+        /* CHECKED BY - Double Check Icon */
+        .sig-cell:nth-child(3)::before {
+
+            content: '✔';
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 8px;
+
+            font-size: 28pt;
+
+            color: #059669;
+
+            font-weight: bold;
+
+        }
+
+        /* ACCOUNTED BY - Document Icon */
+        .sig-cell:nth-child(4)::before {
+
+            content: '📋';
+
+            position: absolute;
+
+            top: 12px;
+
+            right: 8px;
+
+            font-size: 26pt;
+
+        }
+
+        .sig-cell .sig-title { 
+
+            font-size: 7.5pt; 
+
+            font-weight: 900; 
+
+            color: #059669; 
+
+            margin-bottom: 32px;
+
+            margin-top: 10px;
+
+            letter-spacing: 0.4px;
+
+            padding-right: 28px;
+
+        }
+
+        .sig-cell .sig-line { border-top: 1.5px solid #333; margin: 0 6px; }
+
+        .sig-cell .sig-name { 
+
+            font-size: 7.5pt; 
+
+            font-weight: 800; 
+
+            color: #000; 
+
+            margin-top: 3px; 
+
+            line-height: 1.2; 
+
+        }
+
+        .sig-cell .sig-date { 
+
+            font-size: 6.5pt; 
+
+            color: #555; 
+
+            margin-top: 2px; 
+
+            font-weight: 600; 
+
+        }
+
+
+
+        /* ─── Attachment pages — IMPROVED ─── */
+
+        .attachment-page { 
+
+            page-break-before: always; 
+
+            break-before: page; 
+
+            width: 100%; 
+
+            background: white; 
+
+            padding: 15px; 
+
+            text-align: center; 
+
+        }
+
+        .attachment-header { 
+
+            font-size: 10pt; 
+
+            font-weight: 800; 
+
+            color: #002b5e; 
+
+            margin-bottom: 12px; 
+
+            border-bottom: 2px solid #1e40af; 
+
+            padding-bottom: 8px; 
+
+        }
+
+        .attachment-container { 
+
+            width: 100%; 
+
+            max-height: 95vh; 
+
+            display: flex; 
+
+            align-items: center; 
+
+            justify-content: center; 
+
+            margin-top: 10px;
+
+        }
+
+        .attachment-image { 
+
+            max-width: 100%; 
+
+            max-height: 95vh; 
+
+            object-fit: contain; 
+
+            border: 1px solid #ccc; 
+
+            border-radius: 2px; 
+
+            background: white;
+
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+        }
+
+
+
+        /* ─── Text alignment utilities ─── */
+
+        .tc  { text-align: center !important; }
+
+        .tr  { text-align: right !important; }
+
+        .tl  { text-align: left !important; }
+
+        .fw9 { font-weight: 900 !important; }
+
+        .fw8 { font-weight: 800 !important; }
+
+
+
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+
+            body.app-page { display: block !important; padding-top: 60px !important; }
+
+            .sidebar { display: none !important; }
+
+            .main-content { margin-left: 0 !important; width: 100% !important; padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; }
+
+            .mobile-topbar { display: flex !important; background: var(--primary-dark) !important; padding: 0 20px !important; align-items: center; justify-content: space-between; position: fixed !important; top: 0; left: 0; right: 0; height: 60px !important; box-sizing: border-box; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+
+            .mobile-topbar h1 { color: white !important; font-size: 18px !important; font-weight: 700 !important; margin: 0; }
+
+            .mobile-topbar img { height: 32px !important; border-radius: 6px; background: white; padding: 2px; }
+
+            .page-header { display: none !important; }
+
+            .content-area { padding: 0 16px 16px !important; }
+
+            .stats-row { grid-template-columns: 1fr 1fr !important; gap: 12px !important; }
+
+            .stat-card { padding: 14px !important; flex-direction: column; align-items: center; text-align: center; gap: 10px !important; }
+
+            .filter-row { flex-direction: column; }
+
+            .filter-group { min-width: auto; width: 100%; }
+
+            .controls-row { flex-direction: column; align-items: stretch; }
+
+            .search-box { max-width: 100%; }
+
+            .bottom-nav { display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h); background: white; border-top: 1px solid var(--border); align-items: center; justify-content: flex-start; overflow-x: auto; z-index: 200; box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none; }
+
+            .bottom-nav::-webkit-scrollbar { display: none; }
+
+            .bn-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; cursor: pointer; }
+
+            .bn-item.active { color: var(--primary); }
+
+            .bn-item.logout { color: var(--danger); }
+
+            .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+            .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+
+            .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+
+            .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1; }
+
+            table { min-width: 700px; }
+
+            .detail-panel { width: 100%; }
+
+            .bulk-actions { justify-content: stretch; }
+
+            .bulk-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 9px 12px; }
+
+        }
+
+        @media (min-width: 769px) { .mobile-topbar { display: none !important; } }
+
+        @media (max-width: 1200px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+
+
+        /* ══════════════════════════════════════════════════════
+
+           PRINT MEDIA — LANDSCAPE A4
+
+           ══════════════════════════════════════════════════════ */
+
+        @media print {
+
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+            body, html { margin: 0; padding: 0; background: white; }
+
+            .sidebar, .bottom-nav, .mobile-topbar, .page-header, .filter-card,
+
+            .stats-row, .controls-row, .table-card, .toast-container,
+
+            #loadingOverlay, .panel-overlay, .detail-panel,
+
+            #logoutOverlay, #logoutPopup { display: none !important; }
+
+            .main-content { margin-left: 0 !important; width: 100% !important; }
+
+            .content-area { padding: 0 !important; }
+
+            #printArea { display: block !important; }
+
+
+
+            /* ── LANDSCAPE A4 ── */
+
+            @page {
+
+                size: A4 landscape;
+
+                margin: 7mm 8mm 7mm 8mm;
+
+            }
+
+            @page :first { margin-top: 7mm; }
+
+
+
+            .cyrix-form { font-size: 8pt !important; }
+
+        }
+
+    </style>
+
+</head>
+
+
+
+<body class="app-page">
+
+
+
+<div id="loadingOverlay">
+
+    <div class="loader-wrapper"><div class="loader"></div></div>
+
+    <div id="loaderText">Loading Month Summary...</div>
+
+</div>
+
+
+
+<!-- DESKTOP SIDEBAR -->
+
+<div class="sidebar" id="desktopSidebar">
+
+    <div>
+
+        <div class="sidebar-logo">
+
+            <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+
+            <div class="logo-text"><h2>Cyrix Healthcare</h2><span>Field Analytics</span></div>
+
+        </div>
+
+        <div class="nav-section">
+
+            <div class="nav-section-label">Main Menu</div>
+
+            <ul class="nav-list" id="sidebarNav"></ul>
+
+        </div>
+
+    </div>
+
+    <div class="sidebar-bottom">
+
+        <ul class="nav-list" id="desktopSidebarBottom"></ul>
+
+    </div>
+
+</div>
+
+
+
+<!-- Mobile Topbar -->
+
+<div class="mobile-topbar" style="display:none;">
+
+    <div style="display:flex;align-items:center;gap:8px;"><h1>Month Summary</h1></div>
+
+    <img src="logo.png" alt="Cyrix" onerror="this.style.display='none';">
+
+</div>
+
+
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+
+
+<!-- MAIN CONTENT -->
+
+<main class="main-content" id="mainContainer" style="display:none;">
+
+    <header class="page-header">
+
+        <div>
+
+            <p class="page-breadcrumb">Cyrix Healthcare / Reports</p>
+
+            <h1 class="page-title">Month Summary</h1>
+
+            <p style="font-size:14px;color:var(--text-3);margin-top:4px;">Approved expense reports — engineer-wise PDF generation</p>
+
+        </div>
+
+        <div class="page-header-right">
+
+            <button class="btn btn-outline" onclick="loadData()">
+
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <div class="content-area">
+
+        <!-- FILTERS -->
+
+        <div class="filter-card">
+
+            <div class="filter-row">
+
+                <div class="filter-group">
+
+                    <label>Month</label>
+
+                    <select id="filterMonth">
+
+                        <option value="">All Months</option>
+
+                        <option value="1">January</option><option value="2">February</option>
+
+                        <option value="3">March</option><option value="4">April</option>
+
+                        <option value="5">May</option><option value="6">June</option>
+
+                        <option value="7">July</option><option value="8">August</option>
+
+                        <option value="9">September</option><option value="10">October</option>
+
+                        <option value="11">November</option><option value="12">December</option>
+
+                    </select>
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>Year</label>
+
+                    <select id="filterYear">
+
+                        <option value="">All Years</option>
+
+                        <option value="2024">2024</option>
+
+                        <option value="2025">2025</option>
+
+                        <option value="2026">2026</option>
+
+                    </select>
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>Engineer / Employee</label>
+
+                    <input type="text" id="filterEngineer" placeholder="Search name or E-code...">
+
+                </div>
+
+                <div class="filter-group">
+
+                    <label>District</label>
+
+                    <select id="filterDistrict">
+
+                        <option value="">All Districts</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="filter-actions">
+
+                <button class="btn btn-primary" onclick="loadData()">
+
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+
+                    Apply Filters
+
+                </button>
+
+                <button class="btn btn-outline" onclick="clearFilters()">Clear</button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STATS -->
+
+        <div class="stats-row">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+
+                <div class="stat-info"><p>Engineers</p><h3 id="stat_engineers">0</h3></div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon green"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+
+                <div class="stat-info"><p>Approved Claims</p><h3 id="stat_approved">0</h3></div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon yellow"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div>
+
+                <div class="stat-info"><p>Total Amount</p><h3 id="stat_amount">₹0</h3></div>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon purple"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+
+                <div class="stat-info"><p>Total KM</p><h3 id="stat_km">0</h3></div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CONTROLS -->
+
+        <div class="controls-row">
+
+            <div class="search-box">
+
+                <svg class="input-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+
+                <input type="text" id="searchInput" placeholder="Search engineer, e-code, district..." oninput="applyLocalFilter()">
+
+            </div>
+
+            <div class="bulk-actions">
+
+                <button class="btn btn-outline" id="selectAllBtn" onclick="toggleSelectAll()">
+
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="9 11 12 14 22 6"/></svg>
+
+                    Select All
+
+                </button>
+
+                <button class="btn btn-success" id="bulkPdfBtn" onclick="bulkDownloadPDFIndividual()" style="display:none;">
+
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+
+                    Bulk PDF (<span id="bulkCount">0</span>)
+
+                </button>
+
+                <button class="btn btn-warning" id="bulkAllBtn" onclick="downloadAllPDF()" style="display:none;">
+
+                    <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+
+                    All PDFs
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TABLE -->
+
+        <div class="table-card">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th><input type="checkbox" class="table-checkbox" id="masterCheck" onchange="masterToggle()"></th>
+
+                            <th>Employee</th>
+
+                            <th>E-Code</th>
+
+                            <th>Grade</th>
+
+                            <th>District</th>
+
+                            <th>Month</th>
+
+                            <th>Claims</th>
+
+                            <th>Total KM</th>
+
+                            <th>Total Amount</th>
+
+                            <th>Actions</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tableBody">
+
+                        <tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-text">Loading data...</div></div></td></tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <div id="pagination"></div>
+
+    </div>
+
+</main>
+
+
+
+<!-- PANEL -->
+
+<div class="panel-overlay" id="panelOverlay" onclick="closePanel()"></div>
+
+<div class="detail-panel" id="detailPanel">
+
+    <div class="panel-header">
+
+        <div><h3 id="panelTitle">Expense Details</h3><p id="panelSub"></p></div>
+
+        <button class="panel-close" onclick="closePanel()">
+
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+
+        </button>
+
+    </div>
+
+    <div class="panel-body" id="panelBody"></div>
+
+    <div class="panel-footer" id="panelFooter"></div>
+
+</div>
+
+
+
+<div id="printArea"></div>
+
+
+
+<!-- LOGOUT -->
+
+<div id="logoutOverlay"></div>
+
+<div id="logoutPopup">
+
+    <div style="width:60px;height:60px;border-radius:50%;background:var(--danger-light);color:var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+
+        <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+
+    </div>
+
+    <h3 style="color:var(--primary-dark);font-size:18px;margin-bottom:8px;font-weight:800;">Log Out</h3>
+
+    <p style="color:var(--text-2);font-size:14px;margin-bottom:24px;">Are you sure you want to securely log out?</p>
+
+    <div style="display:flex;gap:12px;justify-content:center;">
+
+        <button onclick="closeLogoutModal()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:8px;background:white;font-family:var(--font);font-weight:600;cursor:pointer;">Cancel</button>
+
+        <button onclick="confirmLogout()" style="flex:1;padding:12px;border:none;border-radius:8px;background:var(--danger);color:white;font-family:var(--font);font-weight:600;cursor:pointer;">Logout</button>
+
+    </div>
+
+</div>
+
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+
+<script>
+
+// ── CONSTANTS ─────────────────────────────────────────────────
+
+const CURRENT_PAGE   = 'month';
+
+const MONTHS         = ['','January','February','March','April','May','June','July','August','September','October','November','December'];
+
+const ACCOUNTANT_NAME = 'Amit Rawat';
+
+
+
+const ICONS = {
+
+    dashboard:`<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+
+    admin:    `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+
+    approval: `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+
+    expense:  `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+
+    report:   `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+
+    upload:   `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+
+    month:    `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+
+    profile:  `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+
+    logout:   `<svg xmlns="http://www.w3.org/2000/svg" class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+
+};
+
+
+
+const ALL_MENU_ITEMS = [
+
+    { id:'dashboard', label:'Dashboard',       icon:ICONS.dashboard, href:'home.html',     roles:['Admin','Superadmin','Manager','Engineer','Coordinator','Accounts','Divisional Manager','District Incharge'] },
+
+    { id:'admin',     label:'Admin Panel',     icon:ICONS.admin,     href:'admin.html',    roles:['Admin','Superadmin'] },
+
+    { id:'approval',  label:'Approval Center', icon:ICONS.approval,  href:'approval.html', roles:['Admin','Superadmin','Manager','Coordinator','Divisional Manager'] },
+
+    { id:'expense',   label:'Submit Claim',    icon:ICONS.expense,   href:'expense.html',  roles:['Admin','Superadmin','Engineer'] },
+
+    { id:'report',    label:'Analytics',       icon:ICONS.report,    href:'dashboard.html',roles:['Admin','Superadmin','Engineer','Manager','Coordinator','Divisional Manager','District Incharge'] },
+
+    { id:'upload',    label:'Data Sync',       icon:ICONS.upload,    href:'upload.html',   roles:['Admin','Superadmin'] },
+
+    { id:'month',     label:'Month Summary',   icon:ICONS.month,     href:'month.html',    roles:['Admin','Superadmin','Manager','Coordinator','Accounts','Divisional Manager'] }
+
+];
+
+
+
+// ── AUTH ──────────────────────────────────────────────────────
+
+let rawUserId = localStorage.getItem('logged_in_user_id') || localStorage.getItem('user_id') || localStorage.getItem('userId') || sessionStorage.getItem('user_id');
+
+if (!rawUserId) { const m = document.cookie.match(/(?:^|; )(?:logged_in_user_id|user_id)=([^;]*)/); if(m) rawUserId = m[1]; }
+
+let currentUserId = '';
+
+if (rawUserId && rawUserId !== 'null' && rawUserId !== 'undefined') currentUserId = rawUserId.replace(/['"]/g,'').trim();
+
+if (!currentUserId) window.location.href = 'index.html';
+
+const storedRole = localStorage.getItem('user_role') || localStorage.getItem('role') || 'Manager';
+
+
+
+// ── STATE ─────────────────────────────────────────────────────
+
+let ALL_DATA      = [];
+
+let FILTERED_DATA = [];
+
+let selectedEngineers = new Set();
+
+let currentPage = 1;
+
+const PER_PAGE  = 20;
+
+
+
+// ── SIDEBAR / NAV ─────────────────────────────────────────────
+
+function buildSidebar(role) {
+
+    const nav = document.getElementById('sidebarNav');
+
+    const bot = document.getElementById('desktopSidebarBottom');
+
+    if (!nav) return;
+
+    const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+
+    nav.innerHTML = items.map(i => `<li><a href="${i.href}" class="nav-link-item ${i.id===CURRENT_PAGE?'active':''}"><div class="nav-icon-wrap">${i.icon}</div>${i.label}</a></li>`).join('');
+
+    if (bot) bot.innerHTML = `
+
+        <li><a href="profile.html" class="nav-link-item"><div class="nav-icon-wrap">${ICONS.profile}</div>My Profile</a></li>
+
+        <li><a href="#" class="nav-link-item nav-logout" onclick="logout();return false;"><div class="nav-icon-wrap">${ICONS.logout}</div>Logout</a></li>`;
+
+}
+
+function buildBottomNav(role) {
+
+    const nav = document.getElementById('bottom-nav');
+
+    if (!nav) return;
+
+    const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+
+    let html = items.map(i => `<a href="${i.href}" class="bn-item ${i.id===CURRENT_PAGE?'active':''}"><div class="bn-icon-wrap">${i.icon}</div><div class="bn-label">${i.label.split(' ')[0]}</div></a>`).join('');
+
+    html += `<a href="profile.html" class="bn-item"><div class="bn-icon-wrap">${ICONS.profile}</div><div class="bn-label">Profile</div></a>
+
+             <div class="bn-item logout" onclick="logout()"><div class="bn-icon-wrap">${ICONS.logout}</div><div class="bn-label">Logout</div></div>`;
+
+    nav.innerHTML = html;
+
+}
+
+function logout()           { document.getElementById('logoutOverlay').style.display='block'; document.getElementById('logoutPopup').style.display='block'; }
+
+function closeLogoutModal() { document.getElementById('logoutOverlay').style.display='none';  document.getElementById('logoutPopup').style.display='none'; }
+
+function confirmLogout()    { localStorage.clear(); window.location.href='index.html'; }
+
+function toggleSidebar()    { document.getElementById('desktopSidebar').classList.toggle('sidebar-mobile-open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+
+
+
+// ── LOADER ────────────────────────────────────────────────────
+
+function showLoader(msg = 'Loading...') {
+
+    const o = document.getElementById('loadingOverlay');
+
+    document.getElementById('loaderText').textContent = msg;
+
+    o.style.display = 'flex'; o.style.opacity = '1';
+
+}
+
+function finishLoader() {
+
+    const o = document.getElementById('loadingOverlay');
+
+    o.style.opacity = '0';
+
+    setTimeout(() => { o.style.display = 'none'; document.getElementById('mainContainer').style.display = 'block'; }, 500);
+
+}
+
+
+
+// ── INIT ──────────────────────────────────────────────────────
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    buildSidebar(storedRole);
+
+    buildBottomNav(storedRole);
+
+    const now = new Date();
+
+    document.getElementById('filterMonth').value = now.getMonth() + 1;
+
+    document.getElementById('filterYear').value  = now.getFullYear();
+
+    loadData();
+
+});
+
+
+
+// ════════════════════════════════════════════════════════════
+
+//  LOAD DATA
+
+// ════════════════════════════════════════════════════════════
+
+async function loadData() {
+
+    showLoader('Loading approved expenses...');
+
+    selectedEngineers.clear();
+
+    updateBulkButtons();
+
+    const month = document.getElementById('filterMonth').value;
+
+    const year  = document.getElementById('filterYear').value;
+
+    try {
+
+        const params = new URLSearchParams({ user_id: currentUserId, status: 'Approved' });
+
+        if (month) params.append('month', month);
+
+        if (year)  params.append('year',  year);
+
+        const res  = await fetch(`/api/month/summary?${params}`);
+
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) {
+
+            showToast(data.message || 'Failed to load data.', 'error');
+
+            ALL_DATA = [];
+
+        } else {
+
+            ALL_DATA = data.engineers || [];
+
+            const districts = [...new Set(ALL_DATA.map(e => e.district_name).filter(Boolean))].sort();
+
+            const distSel   = document.getElementById('filterDistrict');
+
+            const prevDist  = distSel.value;
+
+            distSel.innerHTML = '<option value="">All Districts</option>' +
+
+                districts.map(d => `<option value="${d}" ${d===prevDist?'selected':''}>${d}</option>`).join('');
+
+        }
+
+    } catch(e) {
+
+        console.error('[loadData]', e);
+
+        showToast('Connection error. Check network or backend.', 'error');
+
+        ALL_DATA = [];
+
+    }
+
+    applyLocalFilter();
+
+    finishLoader();
+
+}
+
+
+
+function applyLocalFilter() {
+
+    const engQ    = document.getElementById('filterEngineer').value.toLowerCase().trim();
+
+    const distQ   = document.getElementById('filterDistrict').value;
+
+    const searchQ = document.getElementById('searchInput').value.toLowerCase().trim();
+
+    FILTERED_DATA = ALL_DATA.filter(eng => {
+
+        const matchEng  = !engQ    || (eng.full_name||'').toLowerCase().includes(engQ)    || (eng.e_code||'').toLowerCase().includes(engQ);
+
+        const matchDist = !distQ   || eng.district_name === distQ;
+
+        const matchSrch = !searchQ || (eng.full_name||'').toLowerCase().includes(searchQ) || (eng.e_code||'').toLowerCase().includes(searchQ) || (eng.district_name||'').toLowerCase().includes(searchQ);
+
+        return matchEng && matchDist && matchSrch;
+
+    });
+
+    updateStats(); currentPage = 1; renderTable();
+
+}
+
+
+
+function clearFilters() {
+
+    document.getElementById('filterEngineer').value = '';
+
+    document.getElementById('filterDistrict').value = '';
+
+    document.getElementById('searchInput').value    = '';
+
+    loadData();
+
+}
+
+
+
+function updateStats() {
+
+    const total_engineers = FILTERED_DATA.length;
+
+    const total_approved  = FILTERED_DATA.reduce((s,e) => s + (e.expense_count||0), 0);
+
+    const total_amount    = FILTERED_DATA.reduce((s,e) => s + parseFloat(e.total_amount||0), 0);
+
+    const total_km        = FILTERED_DATA.reduce((s,e) => s + parseFloat(e.total_km||0), 0);
+
+    document.getElementById('stat_engineers').textContent = total_engineers;
+
+    document.getElementById('stat_approved').textContent  = total_approved;
+
+    document.getElementById('stat_amount').textContent    = '₹' + total_amount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+
+    document.getElementById('stat_km').textContent        = Math.round(total_km).toLocaleString('en-IN');
+
+    document.getElementById('bulkAllBtn').style.display   = FILTERED_DATA.length > 0 ? 'inline-flex' : 'none';
+
+}
+
+
+
+function renderTable() {
+
+    const totalPages = Math.ceil(FILTERED_DATA.length / PER_PAGE) || 1;
+
+    if (currentPage > totalPages) currentPage = 1;
+
+    const pageData = FILTERED_DATA.slice((currentPage-1)*PER_PAGE, currentPage*PER_PAGE);
+
+    const tbody    = document.getElementById('tableBody');
+
+    if (pageData.length === 0) {
+
+        tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No approved expenses found</div><div class="empty-sub">Try changing month/year filters and click Apply Filters</div></div></td></tr>`;
+
+        document.getElementById('pagination').innerHTML = ''; return;
+
+    }
+
+    const month      = document.getElementById('filterMonth').value;
+
+    const year       = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : 'All';
+
+    const yearLabel  = year || '';
+
+    tbody.innerHTML = pageData.map(eng => {
+
+        const sel = selectedEngineers.has(eng.user_id);
+
+        return `<tr class="${sel?'selected':''}" data-uid="${eng.user_id}">
+
+            <td><input type="checkbox" class="table-checkbox" ${sel?'checked':''} onchange="toggleRow('${eng.user_id}')"></td>
+
+            <td><div style="font-weight:700;color:var(--primary-dark);">${eng.full_name||'—'}</div><div style="font-size:12px;color:var(--text-3);margin-top:2px;">${eng.designation||''}</div></td>
+
+            <td><span class="tag tag-code">${eng.e_code||'—'}</span></td>
+
+            <td><span class="tag tag-blue">${eng.grade||'—'}</span></td>
+
+            <td style="font-size:13px;color:var(--text-2);">${eng.district_name||'—'}</td>
+
+            <td style="font-size:13px;font-weight:600;">${monthLabel} ${yearLabel}</td>
+
+            <td style="text-align:center;"><span style="background:var(--success-light);color:var(--success);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;">${eng.expense_count||0} claims</span></td>
+
+            <td style="font-family:var(--font-mono);font-size:13px;font-weight:600;">${parseFloat(eng.total_km||0).toFixed(1)} km</td>
+
+            <td class="amount-val">₹${parseFloat(eng.total_amount||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+
+            <td>
+
+                <div class="action-btns">
+
+                    <button class="btn-sm btn-sm-view" onclick="openPanel('${eng.user_id}')">
+
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> View
+
+                    </button>
+
+                    <button class="btn-sm btn-sm-pdf" onclick="downloadEngineerPDF('${eng.user_id}')">
+
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> PDF
+
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>`;
+
+    }).join('');
+
+    renderPagination(totalPages);
+
+    updateMasterCheck();
+
+}
+
+
+
+function renderPagination(totalPages) {
+
+    const pg = document.getElementById('pagination');
+
+    if (totalPages <= 1) { pg.innerHTML=''; return; }
+
+    let html = `<div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;justify-content:center;">`;
+
+    html += `<button style="background:white;border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>← Prev</button>`;
+
+    for (let i=1;i<=totalPages;i++) html += `<button style="background:${i===currentPage?'var(--primary)':'white'};color:${i===currentPage?'white':'var(--text)'};border:1px solid ${i===currentPage?'var(--primary)':'var(--border)'};padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;" onclick="goPage(${i})">${i}</button>`;
+
+    html += `<button style="background:white;border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next →</button></div>`;
+
+    pg.innerHTML = html;
+
+}
+
+function goPage(p) { const t=Math.ceil(FILTERED_DATA.length/PER_PAGE)||1; if(p<1||p>t)return; currentPage=p; renderTable(); }
+
+
+
+function toggleRow(uid)    { if(selectedEngineers.has(uid)) selectedEngineers.delete(uid); else selectedEngineers.add(uid); updateBulkButtons(); renderTable(); }
+
+function masterToggle()    { const c=document.getElementById('masterCheck').checked; const pd=FILTERED_DATA.slice((currentPage-1)*PER_PAGE,currentPage*PER_PAGE); pd.forEach(e=>{if(c)selectedEngineers.add(e.user_id);else selectedEngineers.delete(e.user_id);}); updateBulkButtons(); renderTable(); }
+
+function toggleSelectAll() { if(selectedEngineers.size===FILTERED_DATA.length)selectedEngineers.clear(); else FILTERED_DATA.forEach(e=>selectedEngineers.add(e.user_id)); updateBulkButtons(); renderTable(); }
+
+function updateMasterCheck(){ const mc=document.getElementById('masterCheck'); if(!mc)return; const pd=FILTERED_DATA.slice((currentPage-1)*PER_PAGE,currentPage*PER_PAGE); mc.checked=pd.length>0&&pd.every(e=>selectedEngineers.has(e.user_id)); }
+
+function updateBulkButtons(){ const n=selectedEngineers.size; const btn=document.getElementById('bulkPdfBtn'); const cnt=document.getElementById('bulkCount'); const sb=document.getElementById('selectAllBtn'); if(n>0){btn.style.display='inline-flex';cnt.textContent=n;}else{btn.style.display='none';} sb.textContent=(selectedEngineers.size===FILTERED_DATA.length&&FILTERED_DATA.length>0)?'Deselect All':'Select All'; }
+
+
+
+// ── PANEL ─────────────────────────────────────────────────────
+
+async function openPanel(uid) {
+
+    document.getElementById('panelTitle').textContent = 'Loading...';
+
+    document.getElementById('panelSub').textContent   = '';
+
+    document.getElementById('panelBody').innerHTML    = '<div style="display:flex;align-items:center;justify-content:center;height:200px;color:var(--text-3);font-weight:600;">Loading details...</div>';
+
+    document.getElementById('panelFooter').innerHTML  = '';
+
+    document.getElementById('detailPanel').classList.add('open');
+
+    document.getElementById('panelOverlay').classList.add('active');
+
+    const eng = ALL_DATA.find(e => e.user_id === uid);
+
+    if (!eng) { document.getElementById('panelBody').innerHTML = '<p style="color:var(--danger);padding:24px;">Engineer not found</p>'; return; }
+
+    try {
+
+        const month  = document.getElementById('filterMonth').value;
+
+        const year   = document.getElementById('filterYear').value;
+
+        const params = new URLSearchParams({ user_id: currentUserId, engineer_id: uid, status: 'Approved' });
+
+        if (month) params.append('month', month);
+
+        if (year)  params.append('year',  year);
+
+        const res  = await fetch(`/api/month/detail?${params}`);
+
+        const data = await res.json();
+
+        if (!res.ok || data.success === false) throw new Error(data.message || 'API error');
+
+        renderPanel(eng, data.expenses || []);
+
+    } catch(e) {
+
+        console.warn('[openPanel] detail API failed, showing summary:', e.message);
+
+        renderPanelSummary(eng);
+
+    }
+
+}
+
+
+
+function renderPanelSummary(eng) {
+
+    document.getElementById('panelTitle').textContent = eng.full_name || 'Employee';
+
+    document.getElementById('panelSub').textContent   = `${eng.e_code||''} · ${eng.district_name||''}`;
+
+    const month      = document.getElementById('filterMonth').value;
+
+    const year       = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : 'All';
+
+    document.getElementById('panelBody').innerHTML = `
+
+    <div class="sec-heading">EMPLOYEE INFORMATION</div>
+
+    <div class="info-card">
+
+        <div class="info-row"><div class="info-label">NAME</div><div class="info-val">${eng.full_name||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">E-CODE</div><div class="info-val">${eng.e_code||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">GRADE</div><div class="info-val">${eng.grade||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">DESIGNATION</div><div class="info-val">${eng.designation||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">DISTRICT</div><div class="info-val">${eng.district_name||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">PERIOD</div><div class="info-val">${monthLabel} ${year||''}</div></div>
+
+    </div>
+
+    <div class="sec-heading">MONTHLY TOTALS</div>
+
+    <div class="bk-grid">
+
+        <div class="bk-card"><div class="bk-label">Total Claims</div><div class="bk-val">${eng.expense_count||0}</div></div>
+
+        <div class="bk-card"><div class="bk-label">Total KM</div><div class="bk-val">${parseFloat(eng.total_km||0).toFixed(1)}</div></div>
+
+        <div class="bk-card"><div class="bk-label">DA Amount</div><div class="bk-val">₹${parseFloat(eng.da_amount||0).toFixed(0)}</div></div>
+
+        <div class="bk-card"><div class="bk-label">Travel Amount</div><div class="bk-val">₹${parseFloat(eng.travel_amount||0).toFixed(0)}</div></div>
+
+        <div class="bk-card"><div class="bk-label">Hotel Amount</div><div class="bk-val">₹${parseFloat(eng.hotel_amount||0).toFixed(0)}</div></div>
+
+        <div class="bk-card"><div class="bk-label">Other Amount</div><div class="bk-val">₹${parseFloat(eng.other_amount||0).toFixed(0)}</div></div>
+
+        <div class="bk-card" style="grid-column:1/-1;"><div class="bk-label">TOTAL AMOUNT</div><div class="bk-val total">₹${parseFloat(eng.total_amount||0).toFixed(2)}</div></div>
+
+    </div>`;
+
+    document.getElementById('panelFooter').innerHTML = `
+
+        <button class="btn btn-outline" style="flex:1;" onclick="closePanel()">Close</button>
+
+        <button class="btn btn-success" style="flex:1;" onclick="downloadEngineerPDF('${eng.user_id}')">
+
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+
+            Download PDF
+
+        </button>`;
+
+}
+
+
+
+function renderPanel(eng, expenses) {
+
+    document.getElementById('panelTitle').textContent = eng.full_name || 'Employee';
+
+    document.getElementById('panelSub').textContent   = `${eng.e_code||''} · ${eng.district_name||''} · ${expenses.length} approved claims`;
+
+    const month      = document.getElementById('filterMonth').value;
+
+    const year       = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : 'All';
+
+    let expHtml = '';
+
+    expenses.forEach((exp, idx) => {
+
+        const legs = exp.itineraries || [];
+
+        expHtml += `<div style="border:1px solid var(--border);border-left:3px solid var(--success);border-radius:10px;padding:14px;margin-bottom:14px;background:white;">
+
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+
+                <div><div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin-bottom:2px;">Claim #${idx+1}</div>
+
+                    <div style="font-size:14px;font-weight:700;color:var(--primary-dark);">${formatDate(exp.expense_date)}</div>
+
+                    <div style="font-size:11px;color:var(--text-2);margin-top:2px;">${exp.district_name||''}</div>
+
+                </div>
+
+                <div style="text-align:right;"><div style="font-size:16px;font-weight:800;color:var(--success);">₹${parseFloat(exp.total_amount||0).toFixed(2)}</div>
+
+                    <span style="background:var(--success-light);color:var(--success);padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;">APPROVED</span></div>
+
+            </div>
+
+            <div class="bk-grid" style="gap:8px;">
+
+                <div class="bk-card" style="padding:10px;"><div class="bk-label">DA</div><div class="bk-val" style="font-size:13px;">₹${parseFloat(exp.da_amount||0).toFixed(0)}</div></div>
+
+                <div class="bk-card" style="padding:10px;"><div class="bk-label">Hotel</div><div class="bk-val" style="font-size:13px;">₹${parseFloat(exp.hotel_amount||0).toFixed(0)}</div></div>
+
+                <div class="bk-card" style="padding:10px;"><div class="bk-label">Other</div><div class="bk-val" style="font-size:13px;">₹${parseFloat(exp.other_expense_amount||0).toFixed(0)}</div></div>
+
+                <div class="bk-card" style="padding:10px;"><div class="bk-label">Travel</div><div class="bk-val" style="font-size:13px;">₹${legs.reduce((s,l)=>s+parseFloat(l.travel_amount||0)+parseFloat(l.sub_amount||0),0).toFixed(0)}</div></div>
+
+            </div>
+
+            ${legs.length>0?`<div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:10px 0 6px;">${legs.length} Leg${legs.length>1?'s':''}</div>
+
+            ${legs.map(leg=>`<div style="background:var(--surface-2);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;"><strong>${leg.from_location||leg.from_district||'—'} → ${leg.to_location||leg.to_district||'—'}</strong><br><span style="color:var(--text-3);">${leg.travel_mode||''} · ${leg.distance_km||0} km · ₹${parseFloat(leg.travel_amount||0).toFixed(0)}</span></div>`).join('')}`:''}
+
+        </div>`;
+
+    });
+
+    document.getElementById('panelBody').innerHTML = `
+
+    <div class="sec-heading">EMPLOYEE INFORMATION</div>
+
+    <div class="info-card">
+
+        <div class="info-row"><div class="info-label">NAME</div><div class="info-val">${eng.full_name||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">E-CODE</div><div class="info-val">${eng.e_code||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">GRADE</div><div class="info-val">${eng.grade||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">DESIGNATION</div><div class="info-val">${eng.designation||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">DISTRICT</div><div class="info-val">${eng.district_name||'—'}</div></div>
+
+        <div class="info-row"><div class="info-label">PERIOD</div><div class="info-val">${monthLabel} ${year||''}</div></div>
+
+        <div class="info-row"><div class="info-label">TOTAL AMOUNT</div><div class="info-val-lg">₹${parseFloat(eng.total_amount||0).toFixed(2)}</div></div>
+
+    </div>
+
+    <div class="sec-heading">APPROVED CLAIMS (${expenses.length})</div>
+
+    ${expHtml || '<p style="color:var(--text-3);font-size:14px;">No detailed claim data available.</p>'}`;
+
+    document.getElementById('panelFooter').innerHTML = `
+
+        <button class="btn btn-outline" style="flex:1;" onclick="closePanel()">Close</button>
+
+        <button class="btn btn-success" style="flex:1;" onclick="downloadEngineerPDF('${eng.user_id}')">
+
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+
+            Download PDF
+
+        </button>`;
+
+}
+
+function closePanel() { document.getElementById('detailPanel').classList.remove('open'); document.getElementById('panelOverlay').classList.remove('active'); }
+
+
+
+// ══════════════════════════════════════════════════════════════
+
+//  PDF GENERATION — UPDATED WITH BETTER SIGNATURES & ATTACHMENTS
+
+// ══════════════════════════════════════════════════════════════
+
+
+
+function getPrintDate() {
+
+    const d = new Date();
+
+    return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+
+}
+
+
+
+const MODE_MAP = { Train:'T', Bus:'B', Bike:'Bi', Car:'C', Metro:'M', Auto:'A', Flight:'FL' };
+
+
+
+/* ── buildFormHTML — with improved signatures & attachments ── */
+
+function buildFormHTML(eng, expenses) {
+
+    const month      = document.getElementById('filterMonth').value;
+
+    const year       = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : '';
+
+    const monthYear  = `${monthLabel}-${year}`;
+
+    const printDate  = getPrintDate();
+
+
+
+    /* ── Get actual approver names ── */
+
+    const firstExp = expenses[0] || {};
+
+    const l1Name   = firstExp.l1_name || eng.l1_name || eng.manager_name || 'L1 Manager';
+
+    const l2Name   = firstExp.l2_name || eng.l2_name || eng.verifier_name || 'L2 Manager';
+
+
+
+    /* ── Flatten all legs ── */
+
+    let allLegs = [], totalTA=0, totalAuto=0, totalDA=0, totalHotel=0, totalOther=0, totalKM=0, grandTotal=0;
+
+    expenses.forEach(exp => {
+
+        (exp.itineraries||[]).forEach(leg => {
+
+            allLegs.push({ ...leg, expense_date: exp.expense_date, exp_district: exp.district_name });
+
+            totalTA   += parseFloat(leg.travel_amount||0);
+
+            totalAuto += parseFloat(leg.sub_amount||0);
+
+            totalKM   += parseFloat(leg.distance_km||0);
+
+        });
+
+        totalDA    += parseFloat(exp.da_amount||0);
+
+        totalHotel += parseFloat(exp.hotel_amount||0);
+
+        totalOther += parseFloat(exp.other_expense_amount||0);
+
+        grandTotal += parseFloat(exp.total_amount||0);
+
+    });
+
+
+
+    /* ── Build data rows ── */
+
+    let rowsHTML = '';
+
+    allLegs.forEach(leg => {
+
+        const ta    = parseFloat(leg.travel_amount||0);
+
+        const sub   = parseFloat(leg.sub_amount||0);
+
+        const km    = parseFloat(leg.distance_km||0);
+
+        const da    = parseFloat(leg.da_amount||0);
+
+        const hotel = parseFloat(leg.hotel_amount||0);
+
+        const other = parseFloat(leg.other_expense_amount||0);
+
+        const mode  = leg.travel_mode || '';
+
+        const modeAbbr  = MODE_MAP[mode] || mode;
+
+        const rowTotal  = ta + sub + da + hotel + other;
+
+        const isBikeOrCar = (mode === 'Bike' || mode === 'Car');
+
+
+
+        rowsHTML += `<tr class="data-row">
+
+            <td class="tc">${formatDate(leg.expense_date)}</td>
+
+            <td class="tl">${leg.from_location||'—'}</td>
+
+            <td class="tl">${leg.to_location||'—'}</td>
+
+            <td class="tc">${leg.from_district||leg.exp_district||'—'}</td>
+
+            <td class="tc fw9">${modeAbbr}</td>
+
+            <td class="tc">${km>0?km.toFixed(1):''}</td>
+
+            <td class="tr">${(!isBikeOrCar && ta>0) ? '₹'+ta.toFixed(0) : ''}</td>
+
+            <td class="tr">${sub>0?'₹'+sub.toFixed(0):''}</td>
+
+            <td class="tr">${da>0?'₹'+da.toFixed(0):''}</td>
+
+            <td class="tc">${leg.ws_pms||leg.lsp_rate||''}</td>
+
+            <td class="tr">${hotel>0?'₹'+hotel.toFixed(0):''}</td>
+
+            <td class="tl">${leg.other_desc||''}</td>
+
+            <td class="tr">${other>0?'₹'+other.toFixed(0):''}</td>
+
+            <td class="tr fw9">₹${rowTotal.toFixed(0)}</td>
+
+            <td class="tl">${leg.visit_purpose||''}</td>
+
+            <td class="tc">${leg.ws_asset||leg.barcode||''}</td>
+
+            <td class="tc">${leg.service_report||''}</td>
+
+            <td class="tl" style="font-size:7pt;">${leg.remarks||''}</td>
+
+        </tr>`;
+
+    });
+
+
+
+    /* ── Totals ── */
+
+    const travelTotal = totalTA + totalAuto;
+
+    rowsHTML += `<tr class="total-row">
+
+        <td class="fw9 tc" colspan="5">TOTAL EXPENSE CLAIMED</td>
+
+        <td class="tc fw9">${totalKM.toFixed(1)}</td>
+
+        <td class="tr fw9">₹${totalTA.toFixed(0)}</td>
+
+        <td class="tr fw9">₹${totalAuto.toFixed(0)}</td>
+
+        <td class="tr fw9">₹${totalDA.toFixed(0)}</td>
+
+        <td></td>
+
+        <td class="tr fw9">₹${totalHotel.toFixed(0)}</td>
+
+        <td>Other</td>
+
+        <td class="tr fw9">₹${totalOther.toFixed(0)}</td>
+
+        <td class="tr fw9 grand">₹${grandTotal.toFixed(2)}</td>
+
+        <td colspan="4"></td>
+
+    </tr>`;
+
+
+
+    rowsHTML += `<tr class="awords-row"><td colspan="5" class="fw8">Advances:</td><td colspan="9" class="tr">—</td><td colspan="4"></td></tr>`;
+
+    rowsHTML += `<tr class="net-row"><td colspan="5" class="fw9">NET PAYABLE</td><td colspan="8"></td><td class="tr fw9 grand">₹${grandTotal.toFixed(2)}</td><td colspan="4"></td></tr>`;
+
+    rowsHTML += `<tr class="awords-row"><td colspan="3" class="fw8">Amount in words:</td><td colspan="15" style="font-style:italic;">Rupees ${numberToWords(Math.round(grandTotal))} Only</td></tr>`;
+
+
+
+    /* ── Main form HTML ── */
+
+    return `<div class="cyrix-form">
+
+
+
+    <!-- HEADER -->
+
+    <table style="margin-bottom:0;">
+
+        <tr><td colspan="18" class="hdr-main">CYRIX HEALTHCARE — EXPENSES REIMBURSEMENT FORM</td></tr>
+
+        <tr>
+
+            <td colspan="10" class="hdr-sub">MONTHLY EXPENSE STATEMENT</td>
+
+            <td colspan="4" class="hdr-info">Month-Year:</td>
+
+            <td colspan="4" class="hdr-info-val">${monthYear}</td>
+
+        </tr>
+
+        <tr>
+
+            <td colspan="18" style="border:1.5px solid #1a1a2e;padding:3px 8px;font-size:7.5pt;font-weight:700;color:#333;">Generated: ${printDate}</td>
+
+        </tr>
+
+        <tr>
+
+            <td colspan="1" class="hdr-info">NAME:</td>
+
+            <td colspan="3" class="hdr-info-val">${eng.full_name||''}</td>
+
+            <td colspan="1" class="hdr-info">EE-CODE:</td>
+
+            <td colspan="2" class="hdr-info-val">${eng.e_code||''}</td>
+
+            <td colspan="1" class="hdr-info">PROJECT:</td>
+
+            <td colspan="2" class="hdr-info-val">${eng.project||'RJBEMP'}</td>
+
+            <td colspan="2" class="hdr-info">BASE LOCATION:</td>
+
+            <td colspan="2" class="hdr-info-val">${eng.district_name||''}</td>
+
+            <td colspan="1" class="hdr-info">GRADE:</td>
+
+            <td colspan="1" class="hdr-info-val">${eng.grade||''}</td>
+
+            <td colspan="1" class="hdr-info">MOBILE:</td>
+
+            <td colspan="1" class="hdr-info-val">${eng.mobile||''}</td>
+
+        </tr>
+
+    </table>
+
+
+
+    <!-- DATA TABLE -->
+
+    <table style="margin-top:-1px;">
+
+        <colgroup>
+
+            <col style="width:6.5%">
+
+            <col style="width:8.5%">
+
+            <col style="width:8.5%">
+
+            <col style="width:6%">
+
+            <col style="width:3.5%">
+
+            <col style="width:4%">
+
+            <col style="width:4.5%">
+
+            <col style="width:4%">
+
+            <col style="width:3.8%">
+
+            <col style="width:3.8%">
+
+            <col style="width:4.2%">
+
+            <col style="width:5.5%">
+
+            <col style="width:4.5%">
+
+            <col style="width:5%">
+
+            <col style="width:8%">
+
+            <col style="width:5.5%">
+
+            <col style="width:4.5%">
+
+            <col style="width:10%">
+
+        </colgroup>
+
+        <thead>
+
+            <tr>
+
+                <th class="col-hdr" rowspan="2">Date</th>
+
+                <th class="col-hdr" colspan="2">Locations</th>
+
+                <th class="col-hdr" rowspan="2">Worked<br>District</th>
+
+                <th class="col-hdr" rowspan="2">Mode</th>
+
+                <th class="col-hdr" rowspan="2">Dist.<br>(KM)</th>
+
+                <th class="col-hdr" rowspan="2">TA Amt</th>
+
+                <th class="col-hdr" rowspan="2">Auto<br>Fare</th>
+
+                <th class="col-hdr" rowspan="2">D.A.</th>
+
+                <th class="col-hdr" rowspan="2">LSP<br>Rate</th>
+
+                <th class="col-hdr" rowspan="2">Hotel</th>
+
+                <th class="col-hdr" colspan="2">Other Expenses</th>
+
+                <th class="col-hdr" rowspan="2">Total</th>
+
+                <th class="col-hdr" rowspan="2">Purpose of Visit</th>
+
+                <th class="col-hdr" rowspan="2">Barcode /<br>Asset No.</th>
+
+                <th class="col-hdr" rowspan="2">Svc Rpt<br>No.</th>
+
+                <th class="col-hdr" rowspan="2">Remarks</th>
+
+            </tr>
+
+            <tr>
+
+                <th class="col-hdr">From</th>
+
+                <th class="col-hdr">To</th>
+
+                <th class="col-hdr">Description</th>
+
+                <th class="col-hdr">Amount</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            ${rowsHTML}
+
+        </tbody>
+
+    </table>
+
+
+
+    <!-- APPROVED STRIP -->
+
+    <table style="margin-top:-1px;">
+
+        <tr class="approved-strip"><td colspan="18">✅ REMARKS: APPROVED &nbsp;|&nbsp; Verified &amp; Cleared for Payment &nbsp;|&nbsp; Date: ${printDate}</td></tr>
+
+    </table>
+
+
+
+    <!-- SIGNATURE SECTION WITH IMPROVED STYLING -->
+
+    <table style="margin-top:-1px;">
+
+        <thead>
+
+            <tr class="sig-hdr">
+
+                <td colspan="18" class="tc" style="font-size:9pt;letter-spacing:0.3px;">AUTHORIZATION &amp; SIGNATURES</td>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr>
+
+                <td colspan="4" class="sig-cell" style="width:25%;">
+
+                    <div class="sig-title">Claimed By:</div>
+
+                    <div style="height:40px;"></div>
+
+                    <div class="sig-line"></div>
+
+                    <div class="sig-name">${eng.full_name||''}</div>
+
+                    <div class="sig-date">Date: ${printDate}</div>
+
+                </td>
+
+                <td colspan="5" class="sig-cell" style="width:30%;">
+
+                    <div class="sig-title">Approved By:</div>
+
+                    <div style="height:40px;"></div>
+
+                    <div class="sig-line"></div>
+
+                    <div class="sig-name">${l1Name}</div>
+
+                    <div class="sig-date">Date: ${printDate}</div>
+
+                </td>
+
+                <td colspan="5" class="sig-cell" style="width:30%;">
+
+                    <div class="sig-title">Checked By:</div>
+
+                    <div style="height:40px;"></div>
+
+                    <div class="sig-line"></div>
+
+                    <div class="sig-name">${l2Name}</div>
+
+                    <div class="sig-date">Date: ${printDate}</div>
+
+                </td>
+
+                <td colspan="4" class="sig-cell" style="width:15%;">
+
+                    <div class="sig-title">Accounted By:</div>
+
+                    <div style="height:40px;"></div>
+
+                    <div class="sig-line"></div>
+
+                    <div class="sig-name">${ACCOUNTANT_NAME}</div>
+
+                    <div class="sig-date">Date: ${printDate}</div>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+
+
+    </div>`;
+
+}
+
+
+
+/* ── buildAttachmentPages — with improved image display ── */
+
+function buildAttachmentPages(expenses, engName) {
+
+    let attachmentHTML = '';
+
+    let attCount = 0;
+
+
+
+    expenses.forEach(exp => {
+
+        (exp.itineraries||[]).forEach(leg => {
+
+            (leg.attachments||[]).forEach(att => {
+
+                attCount++;
+
+                const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(att.url||'');
+
+                const billType = (att.bill_type||'Bill').replace(/_/g,' ');
+
+                
+
+                attachmentHTML += `
+
+                <div class="attachment-page">
+
+                    <div class="attachment-header">📎 BILL / RECEIPT #${attCount} · ${billType}</div>
+
+                    <div class="attachment-container">
+
+                        ${isImg ? `<img src="${att.url}" class="attachment-image" alt="${billType}" style="max-width:95vw; max-height:90vh; object-fit:contain; width:auto; height:auto;">` 
+
+                               : `<div style="text-align:center;color:#999;padding:20px;"><div style="font-size:48px;margin-bottom:10px;">📄</div><div style="font-size:11pt;font-weight:600;">${billType}</div><div style="font-size:9pt;color:#ccc;margin-top:5px;">Document Attachment</div></div>`}
+
+                    </div>
+
+                </div>`;
+
+            });
+
+        });
+
+    });
+
+
+
+    return attachmentHTML;
+
+}
+
+
+
+// ── PDF DOWNLOAD — INDIVIDUAL FILES ───────────────────────────
+
+async function downloadEngineerPDF(uid) {
+
+    const eng = ALL_DATA.find(e => e.user_id === uid);
+
+    if (!eng) return showToast('Engineer not found', 'error');
+
+    
+
+    const month  = document.getElementById('filterMonth').value;
+
+    const year   = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : 'All';
+
+    const filename = `${eng.full_name||'Employee'}_${monthLabel}-${year}`.replace(/\s+/g, '_');
+
+
+
+    showLoader(`Generating PDF for ${eng.full_name}...`);
+
+    try {
+
+        const params = new URLSearchParams({ user_id: currentUserId, engineer_id: uid, status: 'Approved' });
+
+        if (month) params.append('month', month);
+
+        if (year)  params.append('year',  year);
+
+        let expenses = [];
+
+        try {
+
+            const res  = await fetch(`/api/month/detail?${params}`);
+
+            const data = await res.json();
+
+            if (data.success) expenses = data.expenses || [];
+
+        } catch(e) { console.warn('detail fetch failed', e); }
+
+        
+
+        printEngineerForm(eng, expenses, filename);
+
+    } catch(e) {
+
+        showToast('Error generating PDF', 'error');
+
+    } finally {
+
+        finishLoader();
+
+    }
+
+}
+
+
+
+function printEngineerForm(eng, expenses, filename) {
+
+    const printArea = document.getElementById('printArea');
+
+    let formHTML = buildFormHTML(eng, expenses);
+
+    const attachmentHTML = buildAttachmentPages(expenses, eng.full_name);
+
+    printArea.innerHTML = formHTML + attachmentHTML;
+
+    printArea.style.display = 'block';
+
+    
+
+    setTimeout(() => {
+
+        window.print();
+
+        setTimeout(() => { printArea.innerHTML = ''; printArea.style.display = 'none'; }, 1200);
+
+    }, 350);
+
+}
+
+
+
+// ── BULK DOWNLOAD — INDIVIDUAL PDFs (NEW) ──────────────────────
+
+async function bulkDownloadPDFIndividual() {
+
+    if (selectedEngineers.size === 0) return showToast('Please select engineers first', 'warning');
+
+    showLoader(`Preparing ${selectedEngineers.size} PDFs for download...`);
+
+    const month     = document.getElementById('filterMonth').value;
+
+    const year      = document.getElementById('filterYear').value;
+
+    const monthLabel = month ? MONTHS[parseInt(month)] : 'All';
+
+    
+
+    let count = 0;
+
+    for (const uid of selectedEngineers) {
+
+        const eng = ALL_DATA.find(e => e.user_id === uid);
+
+        if (!eng) continue;
+
+        
+
+        let expenses = [];
+
+        try {
+
+            const params = new URLSearchParams({ user_id: currentUserId, engineer_id: uid, status: 'Approved' });
+
+            if (month) params.append('month', month);
+
+            if (year)  params.append('year',  year);
+
+            const res  = await fetch(`/api/month/detail?${params}`);
+
+            const data = await res.json();
+
+            if (data.success) expenses = data.expenses || [];
+
+        } catch(e) {}
+
+        
+
+        // Create individual PDF with delay
+        setTimeout(() => {
+
+            const printArea = document.getElementById('printArea');
+
+            let formHTML = buildFormHTML(eng, expenses);
+
+            const attachmentHTML = buildAttachmentPages(expenses, eng.full_name);
+
+            printArea.innerHTML = formHTML + attachmentHTML;
+
+            printArea.style.display = 'block';
+
+            
+
+            setTimeout(() => {
+
+                window.print();
+
+                setTimeout(() => { printArea.innerHTML = ''; printArea.style.display = 'none'; }, 800);
+
+            }, 250);
+
+        }, count * 2000); // 2 second delay between each
+
+        
+
+        count++;
+
+    }
+
+    
+
+    finishLoader();
+
+    showToast(`${selectedEngineers.size} PDFs ready to download. Print dialogs will open sequentially.`, 'success');
+
+}
+
+
+
+async function downloadAllPDF() {
+
+    if (FILTERED_DATA.length === 0) return showToast('No data to download', 'warning');
+
+    FILTERED_DATA.forEach(e => selectedEngineers.add(e.user_id));
+
+    await bulkDownloadPDFIndividual();
+
+    selectedEngineers.clear(); updateBulkButtons(); renderTable();
+
+}
+
+
+
+// ── HELPERS ───────────────────────────────────────────────────
+
+function formatDate(str) {
+
+    if (!str) return '—';
+
+    try { return new Date(str).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }); } catch { return str; }
+
+}
+
+
+
+function numberToWords(num) {
+
+    if (num === 0) return 'Zero';
+
+    const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+
+    const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+
+    function inWords(n) {
+
+        if (n < 20)       return a[n];
+
+        if (n < 100)      return b[Math.floor(n/10)] + (n%10?' '+a[n%10]:'');
+
+        if (n < 1000)     return a[Math.floor(n/100)]    +' Hundred'   +(n%100   ?' '+inWords(n%100)   :'');
+
+        if (n < 100000)   return inWords(Math.floor(n/1000))   +' Thousand'+(n%1000   ?' '+inWords(n%1000)   :'');
+
+        if (n < 10000000) return inWords(Math.floor(n/100000)) +' Lakh'    +(n%100000 ?' '+inWords(n%100000) :'');
+
+        return inWords(Math.floor(n/10000000)) +' Crore'+(n%10000000?' '+inWords(n%10000000):'');
+
+    }
+
+    return inWords(num);
+
+}
+
+
+
+function showToast(msg, type='info') {
+
+    const container = document.getElementById('toastContainer');
+
+    const toast     = document.createElement('div');
+
+    const colors    = { success:'var(--success)', danger:'var(--danger)', error:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+
+    toast.style.cssText = `background:white;color:${colors[type]||colors.info};padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:var(--shadow-md);border-left:4px solid ${colors[type]||colors.info};pointer-events:auto;`;
+
+    toast.textContent = msg;
+
+    container.appendChild(toast);
+
+    setTimeout(() => { toast.style.transition='opacity 0.3s'; toast.style.opacity='0'; setTimeout(()=>toast.remove(),300); }, 4000);
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Report - Cyrix Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================================
+           CYRIX HEALTHCARE — MASTER NAV STYLES (WITH SCROLLABLE FOOTER)
+        ============================================================ */
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #002b5e; /* Exact deep navy */
+            --primary-light: #3b82f6;
+            --primary-50: #eff6ff;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --surface-3: #e2e8f0;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+            --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+            
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Inter', sans-serif;
+            
+            --sidebar-w: 240px;
+            --bottom-nav-h: 75px; /* Slightly taller for scrollable items */
+            --nav-radius: 12px;
+            --nav-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --t-fast: 0.15s ease;
+            --t-slow: 0.4s ease;
+            --z-modal: 1000;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* OVERFLOW PREVENTER - 'clip' FIXES THE STICKY SCROLL ISSUE */
+        html, body {
+            overflow-x: clip;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background: var(--bg);
+        }
+
+        body.app-page {
+            font-family: var(--font);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        ul { list-style: none; }
+        button { cursor: pointer; font-family: var(--font); border: none; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface-2); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Global SVG Icon Styling */
+        .svg-icon {
+            width: 100%; height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Uiverse Loader */
+        #loadingOverlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+        .loader-wrapper { position: relative; width: 5em; height: 5em; margin-bottom: 20px; }
+        .loader { position: absolute; top: calc(50% - 1.25em); left: calc(50% - 1.25em); width: 2.5em; height: 2.5em; transform: rotate(165deg); }
+        .loader:before, .loader:after { content: ""; position: absolute; top: 50%; left: 50%; display: block; width: 0.5em; height: 0.5em; border-radius: 0.25em; transform: translate(-50%, -50%); }
+        .loader:before { animation: before8 2s infinite; }
+        .loader:after { animation: after6 2s infinite; }
+
+        @keyframes before8 {
+            0% { width: 0.5em; box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+            35% { width: 2.5em; box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75); }
+            70% { width: 0.5em; box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75); }
+            100% { box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+        }
+        @keyframes after6 {
+            0% { height: 0.5em; box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+            35% { height: 2.5em; box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75); }
+            70% { height: 0.5em; box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75); }
+            100% { box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+        }
+        #loaderText { font-weight: 700; color: var(--primary-dark); font-size: 16px; letter-spacing: 0.5px; }
+
+
+        /* ==================== DESKTOP SIDEBAR ==================== */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 100;
+            background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 4px 0 24px rgba(15,23,42,.1); transition: transform var(--nav-transition);
+        }
+        .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+        
+        .sidebar-logo img {
+            width: 44px;
+            height: auto;
+            border-radius: 8px;
+            background: white;
+            padding: 2px;
+        }
+
+        .logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+        .logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+        .nav-section { padding: 12px 0; }
+        .nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+        .nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+        .nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+        .nav-link-item.nav-logout { color: #f87171 !important; }
+        .nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .nav-icon-wrap svg { stroke-width: 2px; }
+        .sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w)); 
+            min-height: 100vh;
+            max-width: 100vw; 
+            overflow-x: hidden; 
+            transition: margin-left var(--nav-transition), width var(--nav-transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+            box-sizing: border-box;
+        }
+
+        .bottom-nav { display: none; }
+
+        /* ==================== MOBILE TOPBAR ==================== */
+        .mobile-topbar { display: none; width: 100%; background: var(--primary-dark); padding: 16px 20px; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; box-sizing: border-box; z-index: 100; box-shadow: var(--shadow-sm); }
+        .mobile-topbar img { height: 32px; border-radius: 6px; background: white; padding: 2px; }
+        .mobile-topbar h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); backdrop-filter: blur(3px); z-index: 90; }
+        .sidebar-overlay.active { display: block; }
+
+        /* ==================== HEADER ==================== */
+        .page-header { margin-bottom: 28px; display: flex; align-items: center; gap: 16px;}
+        .page-header-icon { width: 44px; height: 44px; background: var(--primary-50); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .page-header-icon svg { width: 24px; height: 24px; stroke-width: 2px;}
+        .page-header h1 { font-size: 30px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; line-height: 1.2; margin: 0; }
+        .page-header p { font-size: 14px; color: var(--text-3); margin-top: 6px; font-weight: 500; }
+
+        /* ==================== UPLOAD PAGE ELEMENTS ==================== */
+        .upload-container { max-width: 860px; width: 100%; margin: 0 auto; }
+
+        .tab-bar {
+            display: flex; gap: 8px;
+            background: white; border: 1px solid var(--border);
+            border-radius: var(--nav-radius); padding: 6px;
+            margin-bottom: 24px; box-shadow: var(--shadow-sm);
+        }
+        .tab-btn {
+            flex: 1; padding: 10px 16px; border: none;
+            background: transparent; border-radius: 8px;
+            font-family: var(--font); font-size: 14px; font-weight: 600;
+            color: var(--text-2); cursor: pointer; transition: all var(--t-fast);
+            display: flex; align-items: center; justify-content: center; gap: 7px;
+        }
+        .tab-btn:hover { background: var(--surface-2); color: var(--primary); }
+        .tab-btn.active { background: var(--primary); color: #fff; box-shadow: var(--shadow-sm); }
+        .tab-btn svg { width: 18px; height: 18px; stroke-width: 2px; }
+
+        .upload-card {
+            background: white; border: 1px solid var(--border);
+            border-radius: 16px; box-shadow: var(--shadow-sm); overflow: hidden;
+        }
+        .upload-card-header {
+            padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--surface-2);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
+        }
+        .upload-card-header h2 { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin: 0; display:flex; align-items:center; gap:8px;}
+        .upload-card-header h2 svg { width: 18px; height: 18px; color: var(--primary); }
+
+        .drop-zone {
+            margin: 24px; border: 2px dashed #93c5fd;
+            border-radius: 12px; padding: 48px 24px;
+            text-align: center; cursor: pointer;
+            transition: all var(--t-fast); background: var(--primary-50); position: relative;
+        }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--primary); background: #dbeafe; }
+        .drop-zone input[type="file"] {
+            position: absolute; inset: 0; opacity: 0;
+            cursor: pointer; width: 100%; height: 100%;
+        }
+        .drop-icon {
+            width: 56px; height: 56px; background: white; border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px; color: var(--primary);
+        }
+        .drop-icon svg { width: 28px; height: 28px; stroke-width: 1.5px; }
+        .drop-zone h3 { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin: 0 0 6px 0; }
+        .drop-zone p { font-size: 14px; font-weight: 500; color: var(--text-2); margin: 0 0 4px 0; }
+        .drop-zone small { font-size: 12px; color: var(--text-3); font-weight: 500; }
+
+        .file-preview {
+            display: none; align-items: center; gap: 12px;
+            margin: 0 24px 24px; padding: 16px;
+            background: var(--success-light); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px;
+        }
+        .file-preview.show { display: flex; }
+        .file-preview-info { flex: 1; min-width: 0; }
+        .file-preview-name { font-size: 14px; font-weight: 700; color: var(--success); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-preview-size { font-size: 12px; font-weight: 600; color: var(--text-2); }
+        .file-preview-remove { background: white; border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; color: var(--danger); font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all var(--t-fast); }
+        .file-preview-remove:hover { background: var(--danger-light); }
+        .file-preview-remove svg { width: 16px; height: 16px; stroke-width: 2.5px; }
+
+        .progress-wrap { display: none; margin: 0 24px 24px; }
+        .progress-wrap.show { display: block; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--text-2); margin-bottom: 8px; }
+        .progress-bar-outer { height: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; overflow: hidden; }
+        .progress-bar-inner { height: 100%; background: var(--success); border-radius: 999px; transition: width 0.2s ease; width: 0%; }
+
+        .upload-result { display: none; margin: 0 24px 24px; }
+        .upload-result.show { display: block; }
+        .result-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .result-box { padding: 16px; border-radius: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;}
+        .result-box.success { background: var(--success-light); border: 1px solid rgba(16,185,129,0.3); }
+        .result-box.skip { background: var(--warning-light); border: 1px solid rgba(245,158,11,0.3); }
+        .result-box.error { background: var(--danger-light); border: 1px solid rgba(239,68,68,0.3); }
+        
+        .result-icon-wrap { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white; }
+        .result-box.success .result-icon-wrap { color: var(--success); box-shadow: 0 2px 8px rgba(16,185,129,0.2);}
+        .result-box.skip .result-icon-wrap { color: var(--warning); box-shadow: 0 2px 8px rgba(245,158,11,0.2);}
+        .result-box.error .result-icon-wrap { color: var(--danger); box-shadow: 0 2px 8px rgba(239,68,68,0.2);}
+        .result-icon-wrap svg { width: 18px; height: 18px; stroke-width: 2.5px; }
+
+        .result-box-num { font-size: 24px; font-weight: 800; font-family: var(--font-mono); line-height: 1;}
+        .result-box.success .result-box-num { color: var(--success); }
+        .result-box.skip .result-box-num { color: var(--warning); }
+        .result-box.error .result-box-num { color: var(--danger); }
+        .result-box-label { font-size: 12px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .error-list { background: var(--danger-light); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; max-height: 200px; overflow-y: auto; }
+        .error-list h4 { font-size: 13px; font-weight: 700; color: var(--danger); margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.5px; display:flex; align-items:center; gap:6px; }
+        .error-list h4 svg { width: 16px; height: 16px; }
+        .error-list ul { padding-left: 20px; margin: 0; }
+        .error-list li { font-size: 13px; font-weight: 500; color: var(--danger); margin-bottom: 4px; font-family: var(--font-mono);}
+
+        .upload-footer {
+            padding: 20px 24px; border-top: 1px solid var(--border); background: var(--surface-2);
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        }
+        .upload-footer-note { font-size: 13px; font-weight: 500; color: var(--text-3); }
+
+        .btn-primary {
+            background: var(--primary); color: #fff; border: none;
+            padding: 12px 24px; border-radius: 8px; font-family: var(--font);
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+            display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .btn-ghost {
+            background: white; color: var(--text-2); border: 1.5px solid var(--border);
+            padding: 10px 20px; border-radius: 8px; font-family: var(--font);
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+            display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+        .spinner {
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff;
+            border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; pointer-events: none; }
+        .toast {
+            display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; background: white; box-shadow: var(--shadow-md); animation: slideDown 0.3s ease; pointer-events: auto;
+        }
+        .toast.success { border-left: 4px solid var(--success); color: var(--success); }
+        .toast.error   { border-left: 4px solid var(--danger); color: var(--danger); }
+        .toast.info    { border-left: 4px solid var(--primary); color: var(--primary); }
+        .toast-icon-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+        .toast-icon-wrap svg { width: 100%; height: 100%; stroke-width: 2.5px; }
+        @keyframes slideDown { from{transform:translateY(10px);opacity:0} to{transform:none;opacity:1} }
+
+        /* Custom Popup & Modal Styles */
+        .custom-popup { 
+            position: fixed; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: var(--surface); 
+            padding: 32px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-lg); 
+            z-index: 10000; 
+            text-align: center; 
+            display: none; 
+            width: 90%; 
+            max-width: 380px; 
+            animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); 
+            border: 1px solid var(--border);
+        }
+
+        @keyframes popIn { 
+            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
+
+        .popup-overlay { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(15,23,42,0.5); 
+            backdrop-filter: blur(4px);
+            z-index: 9999; 
+            display: none; 
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+
+        .icon-wrapper.error {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* ==================== MOBILE LAYOUT FIXES ==================== */
+        @media (max-width: 768px) {
+            /* Force exact 60px padding on body so we have room for the fixed topbar */
+            body.app-page { display: block !important; padding-top: 60px !important; }
+            .sidebar      { transform: translateX(-100%); display: flex !important; z-index: 10000; }
+            .sidebar.sidebar-mobile-open { transform: translateX(0); }
+            
+            /* TOPBAR FULLY FIXED - 60px Height */
+            .mobile-topbar { 
+                display: flex !important; 
+                background: var(--primary-dark) !important; 
+                padding: 0 20px !important; 
+                height: 60px !important; 
+                align-items: center; 
+                justify-content: space-between; 
+                position: fixed !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                right: 0 !important; 
+                width: 100% !important; 
+                box-sizing: border-box !important; 
+                z-index: 9999 !important; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            }
+            .mobile-topbar img { height: 32px !important; border-radius: 6px; background: white; padding: 2px; }
+            .mobile-topbar h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.5px; white-space: nowrap; }
+            
+            /* Strictly hide unwanted wrappers */
+            .desktop-only, .page-header { display: none !important; }
+
+            /* Main Content Adjustments to remove ghost gap */
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 0 !important; 
+                padding-top: 16px !important; /* EXACT 16px visual gap below the topbar */
+                padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; 
+            }
+            
+            .upload-container { padding: 0 16px 16px !important; margin: 0 auto; width: 100%; box-sizing: border-box;}
+            
+            .tab-bar { padding: 4px; gap: 4px; }
+            .tab-btn { font-size: 11px; padding: 10px 4px; gap: 4px; flex-direction: column; text-align: center; }
+            .tab-btn svg { width: 20px; height: 20px; margin-bottom: 2px;}
+            
+            .upload-card-header { padding: 16px; flex-direction: column; align-items: flex-start; }
+            .upload-card-header h2 { font-size: 16px; }
+            .upload-card-header .btn-ghost { width: 100%; justify-content: center; }
+            
+            .drop-zone { margin: 0 16px 16px; padding: 32px 16px; }
+            .file-preview { margin: 0 16px 16px; }
+            .progress-wrap { margin: 0 16px 16px; }
+            .upload-result { margin: 0 16px 16px; }
+            
+            .upload-footer { padding: 16px; flex-direction: column; align-items: stretch; gap: 16px; }
+            .upload-footer .btn-primary { width: 100%; justify-content: center; }
+            .upload-footer-note { text-align: center; }
+
+            /* SCROLLABLE BOTTOM NAV */
+            .bottom-nav {
+                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h);
+                background: white; border-top: 1px solid var(--border); align-items: center; justify-content: flex-start;
+                overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; z-index: 200; 
+                box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none;
+            }
+            .bottom-nav::-webkit-scrollbar { display: none; }
+            .bn-item { 
+                flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+                padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; 
+                font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; 
+            }
+            .bn-item.active { color: var(--primary); }
+            .bn-item.logout { color: var(--danger); cursor: pointer;}
+            .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+            .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+            .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+            .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1;}
+        }
+        @media (min-width: 769px) {
+            .mobile-topbar, .bottom-nav { display: none !important; }
+            .sidebar-overlay { display: none !important; }
+        }
+    </style>
+</head>
+<body class="app-page">
+
+    <!-- Uiverse Loader -->
+    <div id="loadingOverlay">
+      <div class="loader-wrapper">
+          <div class="loader"></div>
+      </div>
+      <div id="loaderText">Initializing...</div>
+    </div>
+
+    <!-- ============================================================ DESKTOP SIDEBAR ============================================================ -->
+    <div class="sidebar" id="desktopSidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img src="logo.png" alt="Cyrix" onerror="this.style.display='none';">
+                <div class="logo-text">
+                    <h2>Cyrix Healthcare</h2>
+                    <span>Field Analytics</span>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label">Main Menu</div>
+                <ul class="nav-list" id="sidebarNav">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <ul class="nav-list" id="desktopSidebarBottom">
+                <!-- Profile & Logout Populated by JS -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mobile Topbar: Heading Left, Logo Right -->
+    <div class="mobile-topbar">
+        <h1>Upload Report</h1>
+        <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <!-- ============================================================ MAIN CONTENT ============================================================ -->
+    <main class="main-content" id="mainContainer" style="display:none;">
+
+        <!-- Desktop Header -->
+        <div class="page-header desktop-only">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="page-header-icon" style="width: 44px; height: 44px; background: var(--primary-50); color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <div>
+                    <h1 style="margin:0;">Bulk Data Upload</h1>
+                    <p>Upload CSV files for Asset, Penalty, and Revenue reports directly into the database.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-container">
+            <!-- Tab Bar -->
+            <div class="tab-bar">
+                <button class="tab-btn active" id="tab-asset" onclick="switchTab('asset')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M3 21h18"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M9 14h.01"/><path d="M15 14h.01"/><path d="M9 18h.01"/><path d="M15 18h.01"/></svg>
+                    Asset Report
+                </button>
+                <button class="tab-btn" id="tab-penalty" onclick="switchTab('penalty')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Penalty Report
+                </button>
+                <button class="tab-btn" id="tab-revenue" onclick="switchTab('revenue')">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Revenue Report
+                </button>
+            </div>
+
+            <!-- Upload Card -->
+            <div class="upload-card">
+                <div class="upload-card-header">
+                    <h2 id="card-title">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M3 21h18"/></svg>
+                        Asset Report Upload
+                    </h2>
+                    <button class="btn-ghost" onclick="downloadTemplate()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        CSV Template
+                    </button>
+                </div>
+
+                <!-- Drop Zone -->
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="csvFile" accept=".csv" onchange="handleFileSelect(event)">
+                    <div class="drop-icon">
+                        <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    </div>
+                    <h3>Drop your CSV file here</h3>
+                    <p>or click to browse from your device</p>
+                    <small>Only .csv files accepted • Max size 50MB • Up to 2,00,000 rows at once</small>
+                </div>
+
+                <!-- File Preview -->
+                <div class="file-preview" id="filePreview">
+                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color: var(--success);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    <div class="file-preview-info">
+                        <div class="file-preview-name" id="previewName">filename.csv</div>
+                        <div class="file-preview-size" id="previewSize">0 KB</div>
+                    </div>
+                    <button class="file-preview-remove" onclick="removeFile()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                </div>
+
+                <!-- Progress -->
+                <div class="progress-wrap" id="progressWrap">
+                    <div class="progress-label">
+                        <span id="progressLabel">Initializing Upload...</span>
+                        <span id="progressPct">0%</span>
+                    </div>
+                    <div class="progress-bar-outer">
+                        <div class="progress-bar-inner" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- Result Summary -->
+                <div class="upload-result" id="uploadResult">
+                    <div class="result-summary">
+                        <div class="result-box success">
+                            <div class="result-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <div class="result-box-num" id="resInserted">0</div>
+                            <div class="result-box-label">Rows Inserted</div>
+                        </div>
+                        <div class="result-box success" id="resUpdatedBox" style="display:none;">
+                            <div class="result-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg></div>
+                            <div class="result-box-num" id="resUpdated">0</div>
+                            <div class="result-box-label">Rows Updated</div>
+                        </div>
+                        <div class="result-box skip">
+                            <div class="result-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg></div>
+                            <div class="result-box-num" id="resSkipped">0</div>
+                            <div class="result-box-label">Rows Skipped</div>
+                        </div>
+                        <div class="result-box error">
+                            <div class="result-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                            <div class="result-box-num" id="resErrors">0</div>
+                            <div class="result-box-label">Rows Failed</div>
+                        </div>
+                    </div>
+                    <div class="error-list" id="errorList" style="display:none;">
+                        <h4><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Error Details Log</h4>
+                        <ul id="errorListItems"></ul>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="upload-footer">
+                    <span class="upload-footer-note" id="footerNote">Select a CSV file to proceed with upload</span>
+                    <button class="btn-primary" id="uploadBtn" onclick="uploadCSV()" disabled>
+                        <span id="uploadBtnText" style="display:flex; align-items:center; gap:8px;">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            Upload CSV
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Logout Popup -->
+    <div class="popup-overlay" id="logoutOverlay"></div>
+    <div class="custom-popup" id="logoutPopup">
+        <div class="icon-wrapper error">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </div>
+        <h3 style="color: var(--primary-dark); font-size: 18px; margin-bottom: 8px; font-weight: 800; line-height: 1.2;">Log Out</h3>
+        <p style="color: var(--text-2); font-size: 14px; margin-bottom: 24px; font-weight: 500; line-height: 1.5;">Are you sure you want to securely log out of your account?</p>
+        <div style="display: flex; gap: 12px; justify-content: center; width: 100%;">
+            <button class="btn-ghost" onclick="closeLogoutModal()" style="margin: 0; flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+            <button class="btn-primary" onclick="confirmLogout()" style="margin: 0; background: var(--danger); flex: 1; justify-content: center; padding: 12px; border: none; box-shadow: var(--shadow-sm); color: white;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        const CURRENT_PAGE = 'upload';
+
+        // Master list of all menu items and their allowed roles with High Quality SVGs
+        const ICONS = {
+            dashboard: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+            admin: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+            approval: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            expense: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+            report: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+            upload: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+            month: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+            profile: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+            logout: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+        };
+
+        const ALL_MENU_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard',       icon: ICONS.dashboard, colorCls: 'c-purple', href: 'home.html',      roles: ['Admin','Superadmin','Manager','Engineer','Coordinator','Accounts','Divisional Manager','District Incharge'] },
+            { id: 'admin',     label: 'Admin Panel',     icon: '⚙️',            icon: ICONS.admin, colorCls: 'c-pink',   href: 'admin.html',   roles: ['Admin','Superadmin'] },
+            { id: 'approval',  label: 'Approval Center', icon: ICONS.approval,  colorCls: 'c-green',  href: 'approval.html',  roles: ['Admin','Superadmin','Manager','Coordinator','Divisional Manager'] },
+            { id: 'expense',   label: 'Submit Claim',    icon: ICONS.expense,   colorCls: 'c-teal',   href: 'expense.html',   roles: ['Admin','Superadmin','Engineer'] },
+            { id: 'report',    label: 'Analytics',       icon: ICONS.report,    colorCls: 'c-blue',   href: 'dashboard.html', roles: ['Admin','Superadmin','Engineer','Manager','Coordinator','Divisional Manager','District Incharge'] },
+            { id: 'upload',    label: 'Data Sync',       icon: ICONS.upload,    colorCls: 'c-orange', href: 'upload.html',    roles: ['Admin','Superadmin'] },
+            { id: 'month',     label: 'Month Summary',   icon: ICONS.month,     colorCls: 'c-red',    href: 'month.html',     roles: ['Admin','Superadmin','Manager','Coordinator','Accounts','Divisional Manager'] }
+        ];
+
+        const BOTTOM_NAV_PRIORITY = {
+            Admin:       ['dashboard', 'admin',    'approval', 'expense',  'logout'],
+            Superadmin:  ['dashboard', 'admin',    'approval', 'expense',  'logout'],
+            Manager:     ['dashboard', 'approval', 'month',    'profile',  'logout'],
+            Engineer:    ['dashboard', 'expense',  'report',   'profile',   'logout'],
+            Coordinator: ['dashboard', 'approval', 'report',   'profile',  'logout'],
+            Accounts:    ['dashboard', 'report', 'month',   'profile',  'logout'],
+            'Divisional Manager': ['dashboard','approval','report','profile','logout'],
+            'District Incharge':  ['dashboard','report','month','profile','logout'],
+        };
+
+        function showLoader(msg = "Initializing...") {
+            const overlay = document.getElementById('loadingOverlay');
+            const txt = document.getElementById('loaderText');
+            if(!overlay) return;
+            txt.textContent = msg;
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        }
+
+        function finishLoader() {
+            const overlay = document.getElementById('loadingOverlay');
+            if(!overlay) return;
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    document.getElementById('mainContainer').style.display = 'flex';
+                }, 500);
+            }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoader("Checking Authorization...");
+            const role = localStorage.getItem('user_role');
+            if (!role) { window.location.href = 'index.html'; return; }
+            if (!['Admin', 'Superadmin'].includes(role)) { window.location.href = 'home.html'; return; }
+            
+            buildSidebar(role);
+            buildBottomNav(role);
+            
+            // Set initial tab styling
+            document.getElementById('card-title').innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M3 21h18"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M9 14h.01"/><path d="M15 14h.01"/><path d="M9 18h.01"/><path d="M15 18h.01"/></svg>
+                Asset Report Upload
+            `;
+            
+            finishLoader();
+        });
+
+        function buildSidebar(role) {
+            const nav = document.getElementById('sidebarNav');
+            const bottomNav = document.getElementById('desktopSidebarBottom');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            nav.innerHTML = items.map(item => `
+                <li>
+                    <a href="${item.href}" class="nav-link-item ${item.id === CURRENT_PAGE ? 'active' : ''}">
+                        <div class="nav-icon-wrap">${item.icon}</div> ${item.label}
+                    </a>
+                </li>`).join('');
+                
+            bottomNav.innerHTML = `
+                <li><a href="profile.html" class="nav-link-item"><div class="nav-icon-wrap">${ICONS.profile}</div> My Profile</a></li>
+                <li><a href="#" class="nav-link-item nav-logout" onclick="logout()"><div class="nav-icon-wrap">${ICONS.logout}</div> Logout</a></li>
+            `;
+        }
+
+        function buildBottomNav(role) {
+            const nav = document.getElementById('bottom-nav');
+            if (!nav) return;
+            
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            
+            let html = items.map(item => {
+                const active = item.id === CURRENT_PAGE ? 'active' : '';
+                return `
+                    <a href="${item.href}" class="bn-item ${active}">
+                        <div class="bn-icon-wrap">${item.icon}</div>
+                        <div class="bn-label">${item.label.split(' ')[0]}</div>
+                    </a>`;
+            }).join('');
+
+            const profileActive = CURRENT_PAGE === 'profile' ? 'active' : '';
+            html += `
+                <a href="profile.html" class="bn-item ${profileActive}">
+                    <div class="bn-icon-wrap">${ICONS.profile}</div>
+                    <div class="bn-label">Profile</div>
+                </a>
+                <div class="bn-item logout" onclick="logout()">
+                    <div class="bn-icon-wrap">${ICONS.logout}</div>
+                    <div class="bn-label">Logout</div>
+                </div>
+            `;
+            
+            nav.innerHTML = html;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('desktopSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('sidebar-mobile-open');
+            overlay.classList.toggle('active');
+            if(overlay.classList.contains('active')){
+                overlay.style.display = 'block';
+            }else{
+                overlay.style.display = 'none';
+            }
+        }
+
+        // ── Report Definitions ──────────────────────────────────────
+        const REPORT_TYPES = {
+            asset: {
+                title: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"/><path d="M3 21h18"/><path d="M9 10h.01"/><path d="M15 10h.01"/><path d="M9 14h.01"/><path d="M15 14h.01"/><path d="M9 18h.01"/><path d="M15 18h.01"/></svg> Asset Report Upload', 
+                apiEndpoint: '/api/upload/asset',
+                columns: ['District Name','Hospital Name','Equipment Name','QR Code','Asset Value'],
+                template: 'asset_template.csv'
+            },
+            penalty: {
+                title: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Penalty Report Upload', 
+                apiEndpoint: '/api/upload/penalty',
+                columns: ['District Name','Hospital Type','Hospital Name','Bar Code','Equipment Name','Complaint ID','Complaint Raise Date','Complaint Close date','Complaint Status','Attend Date','Attend Penalty','Penalty','Total Penalty','Attend Engineer ID','Close Engineer ID','Open Month','Close Month'],
+                template: 'penalty_template.csv'
+            },
+            revenue: {
+                title: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Revenue Report Upload', 
+                apiEndpoint: '/api/upload/revenue',
+                columns: ['District Name','DM Name','Facility Type','DI Name','Billing Amount','Open Penalty Feb','Purchase (Spare + Service)','CAMC','Total(Penalty+Purchase+CAMC)','R/M Achieved %','R & M Traget','Eligibility Month'],
+                template: 'revenue_template.csv'
+            }
+        };
+
+        let currentTab = 'asset';
+        let selectedFile = null;
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            document.getElementById('card-title').innerHTML = REPORT_TYPES[tab].title;
+            removeFile();
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.csv')) { showToast('error', 'Only .csv files accepted!'); return; }
+            if (file.size > 50 * 1024 * 1024) { showToast('error', 'File too large. Max 50MB.'); return; }
+            
+            selectedFile = file;
+            document.getElementById('previewName').textContent = file.name;
+            document.getElementById('previewSize').textContent = formatFileSize(file.size);
+            document.getElementById('filePreview').classList.add('show');
+            document.getElementById('dropZone').style.display = 'none';
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('footerNote').textContent = `📄 ${file.name} ready to upload`;
+            document.getElementById('uploadResult').classList.remove('show');
+        }
+
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('csvFile').value = '';
+            document.getElementById('filePreview').classList.remove('show');
+            document.getElementById('dropZone').style.display = 'block';
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('footerNote').textContent = 'Select a CSV file to proceed with upload';
+            document.getElementById('uploadResult').classList.remove('show');
+            document.getElementById('progressWrap').classList.remove('show');
+        }
+
+        const dropZone = document.getElementById('dropZone');
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file) { document.getElementById('csvFile').files = e.dataTransfer.files; handleFileSelect({ target: { files: [file] } }); }
+        });
+
+        function downloadTemplate() {
+            const report = REPORT_TYPES[currentTab];
+            const csv = report.columns.join(',') + '\n';
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = report.template;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+            showToast('success', `${report.template} downloaded successfully!`);
+        }
+
+        async function uploadCSV() {
+            if (!selectedFile) return;
+            const report = REPORT_TYPES[currentTab];
+            const btn = document.getElementById('uploadBtn');
+            const btnText = document.getElementById('uploadBtnText');
+
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> Processing Data...';
+            document.getElementById('progressWrap').classList.add('show');
+            document.getElementById('uploadResult').classList.remove('show');
+            setProgress(0, 'Reading file structure...');
+
+            try {
+                const firstLine = await readFirstLine(selectedFile);
+                const headerCols = firstLine.split(',').map(c => c.trim().replace(/^"|"$/g, '').toLowerCase());
+                const expectedCols = report.columns.map(c => c.trim().toLowerCase());
+                const missing = expectedCols.filter(ec => !headerCols.includes(ec));
+                
+                if (missing.length > 0) {
+                    showToast('error', `Missing columns: ${missing.join(', ')}`);
+                    resetUploadBtn(); return;
+                }
+                
+                setProgress(20, 'Transmitting data to server...');
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                formData.append('report_type', currentTab);
+                
+                const progressInterval = fakeProgress(20, 85, 2000);
+                const response = await fetch(report.apiEndpoint, { method: 'POST', body: formData });
+                clearInterval(progressInterval);
+                setProgress(95, 'Finalizing database injection...');
+                
+                if (!response.ok) { 
+                    const err = await response.json().catch(() => ({})); 
+                    throw new Error(err.error || `HTTP Error ${response.status}`); 
+                }
+                const result = await response.json();
+                setProgress(100, 'Upload Complete!');
+                
+                showResults(result);
+                showToast('success', `Upload complete! ${result.inserted} inserted, ${result.skipped} skipped.`);
+            } catch (err) {
+                showToast('error', 'Upload failed: ' + err.message);
+                setProgress(0, 'Upload failed.');
+            } finally {
+                resetUploadBtn();
+            }
+        }
+
+        function readFirstLine(file) {
+            return new Promise((resolve, reject) => {
+                const blob = file.slice(0, 4096);
+                const reader = new FileReader();
+                reader.onload = e => { const text = e.target.result; const nl = text.indexOf('\n'); resolve(nl === -1 ? text : text.substring(0, nl)); };
+                reader.onerror = reject;
+                reader.readAsText(blob);
+            });
+        }
+
+        function fakeProgress(from, to, duration) {
+            const steps = 30; const stepDur = duration / steps; const stepVal = (to - from) / steps;
+            let current = from;
+            return setInterval(() => { current = Math.min(current + stepVal, to); setProgress(current); }, stepDur);
+        }
+
+        function setProgress(pct, label) {
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressPct').textContent = Math.round(pct) + '%';
+            if (label) document.getElementById('progressLabel').textContent = label;
+        }
+
+        function resetUploadBtn() {
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('uploadBtnText').innerHTML = `
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload CSV
+            `;
+            setTimeout(() => document.getElementById('progressWrap').classList.remove('show'), 2000);
+        }
+
+        function showResults(result) {
+            document.getElementById('resInserted').textContent = result.inserted || 0;
+            document.getElementById('resSkipped').textContent = result.skipped || 0;
+            document.getElementById('resErrors').textContent = result.errors || 0;
+            const updatedBox = document.getElementById('resUpdatedBox');
+            if (result.updated !== undefined) { 
+                document.getElementById('resUpdated').textContent = result.updated || 0; 
+                updatedBox.style.display = 'flex'; 
+            } else {
+                updatedBox.style.display = 'none';
+            }
+            
+            document.getElementById('uploadResult').classList.add('show');
+            const fails = (result.failLog || []).filter(f => f && f.reason && !f.reason.includes('Skipped') && !f.reason.includes('Duplicate'));
+            const errList = document.getElementById('errorList');
+            const errItems = document.getElementById('errorListItems');
+            
+            if (fails.length > 0) {
+                errList.style.display = 'block';
+                errItems.innerHTML = fails.slice(0, 100).map(f => `<li>Row ${f.row} — ${f.id}: ${f.reason}</li>`).join('');
+                if (fails.length > 100) errItems.innerHTML += `<li>...and ${fails.length - 100} more</li>`;
+            } else {
+                errList.style.display = 'none';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function showToast(type, message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { 
+                success: `<div class="toast-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>`, 
+                error: `<div class="toast-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>`, 
+                info: `<div class="toast-icon-wrap"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>` 
+            };
+            
+            toast.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { 
+                toast.style.opacity = '0'; 
+                toast.style.transform = 'translateX(40px)'; 
+                toast.style.transition = '0.3s ease'; 
+                setTimeout(() => toast.remove(), 300); 
+            }, 4000);
+        }
+
+        function logout() {
+            document.getElementById('logoutOverlay').style.display = 'block';
+            document.getElementById('logoutPopup').style.display = 'block';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutOverlay').style.display = 'none';
+            document.getElementById('logoutPopup').style.display = 'none';
+        }
+
+        function confirmLogout() {
+            localStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+    </script>
+</body>
+</html>

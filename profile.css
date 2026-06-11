@@ -1,0 +1,194 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: #f0f4f8;
+    color: #334155;
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: #ffffff;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 0;
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.brand-logo {
+    padding: 0 25px 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.brand-logo img {
+    max-height: 50px;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0 15px;
+}
+
+.nav-item {
+    margin-bottom: 5px;
+}
+
+.nav-link {
+    display: block;
+    padding: 12px 15px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    background-color: #f8fafc;
+    color: #3b82f6;
+}
+
+.nav-item.active .nav-link {
+    background-color: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.sidebar-bottom {
+    border-top: 1px solid #f1f5f9;
+    padding-top: 15px;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 30px 40px;
+    min-height: 100vh;
+}
+
+.top-header {
+    margin-bottom: 25px;
+}
+
+.welcome-text h1 {
+    font-size: 24px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.welcome-text p {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.profile-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    max-width: 900px;
+}
+
+.profile-header-banner {
+    background-color: #3b82f6;
+    padding: 25px 35px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: white;
+}
+
+.profile-avatar {
+    width: 70px;
+    height: 70px;
+    background-color: #ffffff;
+    color: #3b82f6;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 700;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    flex-shrink: 0;
+}
+
+.profile-title h2 {
+    font-size: 22px;
+    margin-bottom: 3px;
+}
+
+.profile-title p {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.status-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.profile-details-grid {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.detail-group {
+    background-color: #f8fafc;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.detail-group:hover {
+    transform: translateY(-2px);
+    border-color: #3b82f6;
+    background-color: #ffffff;
+}
+
+.detail-group label {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+}
+
+.detail-group p {
+    margin: 0;
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main-content { margin-left: 0; padding: 20px; width: 100%; }
+    .profile-details-grid { grid-template-columns: 1fr; }
+    .profile-header-banner { flex-direction: column; text-align: center; }
+}

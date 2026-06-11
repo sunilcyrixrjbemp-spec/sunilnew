@@ -1,0 +1,1885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dashboard — Cyrix Healthcare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Chart.js Core ONLY -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<style>
+:root {
+  --primary: #1e40af;
+  --primary-dark: #002b5e;
+  --primary-light: #3b82f6;
+  --primary-50: #eff6ff;
+  --accent: #10b981;
+  --danger: #ef4444;
+  --danger-light: #fee2e2;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --border: #e2e8f0;
+  --text: #0f172a;
+  --text-2: #475569;
+  --text-3: #94a3b8;
+  
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --info: #3b82f6;
+  --info-light: #dbeafe;
+  
+  --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+  --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+  --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+  
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --sidebar-w: 240px;
+  --bottom-nav-h: 75px;
+  --nav-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  --t-fast: 0.15s ease;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* OVERFLOW PREVENTER - 'clip' FIXES THE STICKY SCROLL ISSUE */
+html, body { overflow-x: clip; width: 100%; margin: 0; padding: 0; position: relative; background: var(--bg); }
+body.app-page {
+  font-family: var(--font);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+button { cursor: pointer; font-family: var(--font); border: none; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--surface-2); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Global SVG Icon Styling */
+.svg-icon { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ============================================================
+   NEW LOADER: Uiverse.io by SchawnnahJ
+============================================================ */
+#loadingOverlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+.loader-wrapper { position: relative; width: 5em; height: 5em; margin-bottom: 20px; }
+.loader { position: absolute; top: calc(50% - 1.25em); left: calc(50% - 1.25em); width: 2.5em; height: 2.5em; transform: rotate(165deg); }
+.loader:before, .loader:after { content: ""; position: absolute; top: 50%; left: 50%; display: block; width: 0.5em; height: 0.5em; border-radius: 0.25em; transform: translate(-50%, -50%); }
+.loader:before { animation: before8 2s infinite; }
+.loader:after { animation: after6 2s infinite; }
+
+@keyframes before8 {
+    0% { width: 0.5em; box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+    35% { width: 2.5em; box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75); }
+    70% { width: 0.5em; box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75); }
+    100% { box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+}
+@keyframes after6 {
+    0% { height: 0.5em; box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+    35% { height: 2.5em; box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75); }
+    70% { height: 0.5em; box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75); }
+    100% { box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+}
+#loaderText { font-weight: 700; color: var(--primary-dark); font-size: 16px; letter-spacing: 0.5px; }
+
+/* Sidebar */
+.sidebar {
+  position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 1000;
+  background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 4px 0 24px rgba(15,23,42,.1); transition: transform var(--nav-transition);
+}
+.sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+.sidebar-logo img { width: 44px; height: auto; border-radius: 8px; background: white; padding: 2px; }
+.logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+.logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+.nav-section { padding: 12px 0; }
+.nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+.nav-list { list-style: none; padding: 0; margin: 0; }
+.nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+.nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+.nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+.nav-link-item.nav-logout { color: #f87171 !important; }
+.nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;}
+.nav-icon-wrap svg { stroke-width: 2px; }
+.sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+/* Mobile Topbar */
+.mobile-topbar { display: none; width: 100%; background: var(--primary-dark); padding: 16px 20px; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 9999; box-shadow: var(--shadow-sm); box-sizing: border-box; }
+.mobile-topbar-left { display: flex; align-items: center; gap: 8px; }
+.mobile-topbar h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; flex: 1; letter-spacing: -0.5px; }
+.mobile-topbar img { height: 32px; border-radius: 6px; background: white; padding: 2px; }
+
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4); backdrop-filter: blur(3px); z-index: 900; }
+.sidebar-overlay.active { display: block; }
+.bottom-nav { display: none; }
+
+/* Main Content */
+.main-content { margin-left: var(--sidebar-w); width: calc(100% - var(--sidebar-w)); min-height: 100vh; display: flex; flex-direction: column; transition: margin-left var(--nav-transition), width var(--nav-transition); }
+
+/* Header */
+.page-header { display: flex; justify-content: space-between; align-items: center; padding: 32px 32px 0; flex-wrap: wrap; gap: 20px; }
+.page-title { font-size: 32px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; line-height: 1.2; margin: 0; }
+.page-header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: all var(--t-fast); }
+.btn-outline { background: white; color: var(--text-2); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+.btn-success { background: var(--success); color: white; box-shadow: var(--shadow-sm); }
+.btn-success:hover { background: #059669; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+.content-area { padding: 24px 32px 40px; flex: 1; max-width: 100%; box-sizing: border-box; }
+
+.dash-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; border-bottom: 2px solid var(--border); padding-bottom: 12px; }
+.tab-btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; background: transparent; color: var(--text-2); transition: all var(--t-fast); position: relative; }
+.tab-btn:hover { background: var(--surface-2); color: var(--text); }
+.tab-btn.active { background: var(--primary-50); color: var(--primary); }
+.tab-btn.active::after { content: ''; position: absolute; bottom: -14px; left: 0; right: 0; height: 2px; background: var(--primary); border-radius: 2px 2px 0 0; }
+
+/* Filters */
+.filter-panel { background: white; border-radius: 12px; padding: 24px; margin-bottom: 32px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+.filter-title { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.filter-grid { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; align-items: flex-end; }
+.filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 150px; }
+.filter-label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.filter-select, .filter-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: white; font-family: var(--font); font-weight: 500; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+.filter-select:focus, .filter-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+.filter-divider { height: 1px; background: var(--border); margin: 20px 0; }
+.role-filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+
+.tab-section { display: none; animation: fadeIn 0.3s ease; }
+.tab-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+/* KPIs */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 32px; width: 100%; }
+.kpi-card { background: white; border-radius: 12px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: all 0.3s; position: relative; overflow: hidden; min-width: 0; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent) 0%, var(--primary) 100%); transform: scaleX(0); transition: transform 0.3s; transform-origin: left; }
+.kpi-card:hover::before { transform: scaleX(1); }
+.kpi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+.kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.kpi-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+.kpi-icon svg { width: 24px; height: 24px; stroke-width: 2px; }
+.kpi-icon.blue { background: var(--info-light); color: var(--info); }
+.kpi-icon.green { background: var(--success-light); color: var(--success); }
+.kpi-icon.orange { background: #fef3c7; color: var(--warning); }
+.kpi-icon.red { background: var(--danger-light); color: var(--danger); }
+.kpi-label { font-size: 12px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+.kpi-value { font-size: 32px; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 6px; letter-spacing: -0.5px;}
+.kpi-subtitle { font-size: 13px; color: var(--text-2); font-weight: 500; }
+
+/* Charts */
+.charts-grid-main { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; width: 100%; }
+.charts-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; width: 100%; }
+.chart-card { background: white; border-radius: 12px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); min-width: 0; }
+.chart-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.chart-title { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin-bottom: 4px; }
+.chart-subtitle { font-size: 13px; color: var(--text-3); }
+.chart-badge { padding: 4px 10px; background: var(--primary-50); color: var(--primary); border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.chart-wrap { position: relative; width: 100%; min-height: 250px; }
+.legend-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); font-weight: 500; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* Shared Tables */
+.table-card { background: white; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px; min-width: 0; width: 100%; }
+.table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); flex-wrap: wrap; gap: 16px; }
+.table-title { font-size: 16px; font-weight: 700; color: var(--primary-dark); }
+.data-count { font-size: 13px; color: var(--text-3); margin-top: 2px; font-weight: 500; }
+
+.table-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%; max-width: 100%; justify-content: flex-end; }
+.table-controls select { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); background: white; font-family: var(--font); font-weight: 500; outline: none; cursor: pointer; }
+.table-search { position: relative; width: 280px; max-width: 100%; }
+.table-search input { width: 100%; padding: 10px 16px 10px 40px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); transition: border-color 0.2s; box-sizing: border-box; }
+.table-search input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+.table-search svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
+
+.table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+.data-table { width: 100%; border-collapse: collapse; min-width: 800px; text-align: left; }
+.data-table thead th { padding: 14px 24px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface-2); border-bottom: 2px solid var(--border); white-space: nowrap; }
+.data-table tbody td { padding: 16px 24px; font-size: 14px; color: var(--text); border-bottom: 1px solid var(--border); }
+.data-table tbody tr { transition: background 0.2s; cursor: pointer; }
+.data-table tbody tr:hover { background: var(--primary-50); }
+
+/* Summary Table */
+.summary-table { min-width: 750px; }
+.summary-table thead th { background: #000; color: #fff; text-align: center; font-size: 11px; border-right: 1px solid #333; }
+.summary-table thead th:nth-child(2) { text-align: left; }
+.summary-table tbody td { text-align: center; border-right: 1px solid var(--border); font-family: var(--font-mono); font-weight: 600; font-size: 13px; }
+.summary-table tbody td:nth-child(2) { text-align: left; font-family: var(--font); color: var(--primary-dark); font-weight: 700; }
+.summary-table tbody tr:hover { background: #f8fafc; }
+
+.id-tag { font-family: var(--font-mono); font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; }
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.status-badge.resolved { background: var(--success-light); color: var(--success); }
+.status-badge.pending { background: var(--warning-light); color: var(--warning); }
+.status-badge.critical { background: var(--danger-light); color: var(--danger); }
+
+.amt-green { font-weight: 700; color: var(--success); font-family: var(--font-mono); }
+.amt-yellow { font-weight: 700; color: var(--warning); font-family: var(--font-mono); }
+.amt-red { font-weight: 700; color: var(--danger); font-family: var(--font-mono); }
+
+.empty-state { text-align: center !important; padding: 60px 20px !important; color: var(--text-3); border-bottom: none !important; justify-content: center !important; display: flex !important; flex-direction: column; align-items: center; width: 100%; grid-column: 1 / -1; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.8; width: 48px; height: 48px; color: var(--text-3); }
+.empty-text { font-size: 15px; font-weight: 500; }
+
+/* Logout Popup CSS */
+.custom-popup { 
+    position: fixed; 
+    top: 50%; left: 50%; 
+    transform: translate(-50%, -50%); 
+    background: var(--surface); 
+    padding: 32px; 
+    border-radius: 20px; 
+    box-shadow: var(--shadow-lg); 
+    z-index: 10000; 
+    text-align: center; 
+    display: none; 
+    width: 90%; 
+    max-width: 380px; 
+    animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); 
+    border: 1px solid var(--border);
+}
+@keyframes popIn { 
+    from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+}
+.popup-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(15,23,42,0.5); backdrop-filter: blur(4px);
+    z-index: 9999; display: none; 
+}
+.icon-wrapper {
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px auto;
+}
+.icon-wrapper.error { background: var(--danger-light); color: var(--danger); }
+.btn-ghost {
+    background: white; color: var(--text-2); border: 1.5px solid var(--border);
+    padding: 10px 20px; border-radius: 8px; font-family: var(--font);
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+    display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+}
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: var(--surface-2); }
+.btn-primary {
+    background: var(--primary); color: #fff; border: none;
+    padding: 12px 24px; border-radius: 8px; font-family: var(--font);
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+    display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+.toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 2000; pointer-events: none; }
+.toast { display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; background: white; box-shadow: var(--shadow-md); animation: slideDown 0.3s ease; pointer-events: auto; }
+.toast.success { border-left: 4px solid var(--success); color: var(--success); }
+.toast.error { border-left: 4px solid var(--danger); color: var(--danger); }
+.toast.info { border-left: 4px solid var(--primary); color: var(--primary); }
+.toast-icon-wrap { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
+.toast-icon-wrap svg { width: 100%; height: 100%; stroke-width: 2.5px; }
+
+/* Modals */
+.modal-overlay-custom { position: fixed; inset: 0; z-index: 1000; background: rgba(15,23,42,.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 16px; }
+.modal-overlay-custom.active { display: flex; animation: fadeIn .2s ease; }
+.modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 600px; padding: 32px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.modal-title { font-size: 18px; font-weight: 700; color: var(--primary-dark); }
+.modal-close { width: 36px; height: 36px; border-radius: 8px; background: var(--surface-2); color: var(--text-2); display: flex; align-items: center; justify-content: center; transition: all var(--t-fast); font-size: 16px; border:none; cursor:pointer;}
+.modal-close:hover { background: var(--danger-light); color: var(--danger); }
+.modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.modal-field { display: flex; flex-direction: column; gap: 6px; }
+.modal-field.full { grid-column: 1/-1; }
+.modal-field label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text-3); }
+.modal-field p { font-size: 14px; font-weight: 500; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; margin: 0; }
+.modal-field p.total-penalty-val { font-size: 24px; font-weight: 800; color: var(--danger); background: var(--danger-light); border-color: rgba(239,68,68,.2); text-align: center; }
+.modal-btn { width: 100%; padding: 14px; background: var(--primary); color: white; font-weight: 700; font-size: 15px; border-radius: 8px; transition: all var(--t-fast); border:none; cursor:pointer;}
+.modal-btn:hover { background: var(--primary-dark); }
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .charts-grid-main { grid-template-columns: 1fr; }
+  .charts-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ==================== MOBILE LAYOUT FIXES ==================== */
+@media (max-width: 768px) {
+  body.app-page { display: block !important; padding-top: 60px !important; }
+  .sidebar { transform: translateX(-100%); display: flex !important; }
+  .sidebar.sidebar-mobile-open { transform: translateX(0); }
+  
+  .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; padding-top: 16px !important; padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; }
+  
+  .desktop-only { display: none !important; }
+
+  /* Topbar - Fixed exactly to 60px */
+  .mobile-topbar { 
+      display: flex !important; background: var(--primary-dark) !important; padding: 0 20px !important; 
+      align-items: center; justify-content: space-between; 
+      position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; height: 60px !important; box-sizing: border-box !important; z-index: 9999 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important; 
+  }
+  .mobile-topbar-left { display: flex; align-items: center; gap: 8px; }
+  .mobile-topbar h1 { color: white !important; font-size: 18px !important; font-weight: 700 !important; margin: 0; letter-spacing: -0.5px; white-space: nowrap; }
+  .mobile-topbar img { height: 32px !important; border-radius: 6px; background: white; padding: 2px; }
+
+  .page-header { display: none !important; }
+  .content-area { padding: 0 16px 16px !important; }
+
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .kpi-card { padding: 16px; flex-direction: column; align-items: center; gap: 8px; text-align: center;}
+  .kpi-icon { width: 44px; height: 44px; font-size: 22px; }
+  .kpi-icon svg { width: 22px; height: 22px; }
+  .kpi-info { display: flex; flex-direction: column; align-items: center; }
+  .kpi-value { font-size: 24px; }
+  .kpi-subtitle { display: none; }
+  
+  /* SCROLLABLE BOTTOM NAV */
+  .bottom-nav {
+      display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h);
+      background: white; border-top: 1px solid var(--border); align-items: center; justify-content: flex-start;
+      overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; z-index: 9999; 
+      box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none;
+  }
+  .bottom-nav::-webkit-scrollbar { display: none; }
+  .bn-item { 
+      flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+      padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; 
+      font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; cursor: pointer;
+  }
+  .bn-item.active { color: var(--primary); }
+  .bn-item.logout { color: var(--danger); }
+  .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+  .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+  .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1;}
+  
+  .charts-grid-main, .charts-grid-2 { grid-template-columns: 1fr; gap: 16px; }
+  .table-controls { flex-direction: column; align-items: stretch; justify-content: flex-start; }
+  .table-controls select { width: 100%; }
+  .table-search { width: 100%; }
+  .table-card { border-radius: 12px; border: none; box-shadow: none; background: transparent; }
+  .table-header { border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
+
+  /* PERFECT MOBILE CARD LAYOUT FOR RECORDS ONLY - CSS GRID FIX */
+  table.data-table:not(.summary-table) { 
+      display: block; 
+      width: 100% !important; 
+      min-width: 0 !important; 
+  }
+  table.data-table:not(.summary-table) thead { display: none; }
+  table.data-table:not(.summary-table) tbody { display: block; width: 100%; }
+  table.data-table:not(.summary-table) tbody tr { 
+      display: flex; 
+      flex-direction: column;
+      border: 1px solid var(--border); 
+      border-radius: 12px; 
+      margin-bottom: 16px; 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+      padding: 0; 
+      background: #fff;
+      width: 100%;
+      box-sizing: border-box;
+  }
+  table.data-table:not(.summary-table) tbody td:first-child {
+      background-color: var(--surface-2);
+      border-bottom: 2px solid var(--border) !important;
+      border-radius: 12px 12px 0 0;
+  }
+  table.data-table:not(.summary-table) tbody td { 
+      display: flex !important; 
+      flex-direction: row;
+      justify-content: space-between; 
+      align-items: flex-start; 
+      padding: 12px 16px !important; 
+      border-bottom: 1px dashed var(--border) !important; 
+      border-right: none !important; 
+      width: 100%;
+      box-sizing: border-box;
+  }
+  table.data-table:not(.summary-table) tbody td:last-child {
+      border-bottom: none !important;
+  }
+  table.data-table:not(.summary-table) tbody td::before { 
+      content: attr(data-label); 
+      font-weight: 700; 
+      font-size: 11px; 
+      color: var(--text-3); 
+      text-transform: uppercase; 
+      text-align: left; 
+      flex: 0 0 35%; /* Left label takes strict 35% space */
+      max-width: 35%;
+      padding-right: 10px;
+      line-height: 1.4;
+  }
+  table.data-table:not(.summary-table) tbody td .cell-val { 
+      flex: 1 1 65%; /* Right value takes exact 65% space */
+      max-width: 65%;
+      text-align: right; 
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      word-wrap: break-word; 
+      overflow-wrap: anywhere; 
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+  }
+  
+  /* SUMMARY TABLES - HORIZONTAL SCROLL ON MOBILE */
+  table.summary-table { min-width: 700px; }
+  table.summary-table thead { display: table-header-group !important; }
+  table.summary-table tbody tr { display: table-row !important; border-radius: 0; box-shadow: none; margin-bottom: 0; border: none; }
+  table.summary-table tbody td { display: table-cell !important; padding: 12px !important; text-align: center !important; }
+  table.summary-table tbody td:nth-child(2) { text-align: left !important; }
+  table.summary-table tbody td::before { content: none !important; }
+  table.summary-table tbody td .cell-val { display: inline !important; text-align: inherit !important; font-size: 13px; }
+  
+  .hide-mobile { display: none !important; }
+  
+  /* Empty State Overrides for Mobile */
+  table.data-table:not(.summary-table) tbody td.empty-state {
+      display: flex !important;
+      text-align: center !important;
+      padding: 40px 20px !important;
+      border-bottom: none !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+  }
+  table.data-table:not(.summary-table) tbody td.empty-state::before { content: none !important; }
+}
+
+@media (min-width: 769px) {
+    .mobile-topbar, .bottom-nav { display: none !important; }
+    .sidebar-overlay { display: none !important; }
+}
+</style>
+</head>
+
+<body class="app-page">
+
+<!-- Unique Uiverse Loader -->
+<div id="loadingOverlay">
+  <div class="loader-wrapper">
+      <div class="loader"></div>
+  </div>
+  <div id="loaderText">Data Loading...</div>
+</div>
+
+<div class="sidebar" id="desktopSidebar">
+  <div>
+    <div class="sidebar-logo">
+      <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+      <div class="logo-text"><h2>Cyrix Healthcare</h2><span>Field Analytics</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Main Menu</div>
+      <ul class="nav-list" id="sidebarNav"></ul>
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <ul class="nav-list" id="desktopSidebarBottom"></ul>
+  </div>
+</div>
+
+<div class="mobile-topbar hide-desktop">
+    <div class="mobile-topbar-left">
+        <h1>Dashboard</h1>
+    </div>
+    <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Only ONE bottom-nav instance is kept here to prevent stacking issues -->
+<nav class="bottom-nav" id="bottom-nav"></nav>
+
+<div class="main-content" id="mainContainer">
+  <div class="page-header desktop-only">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+    </div>
+    <div class="page-header-right">
+      <button class="btn btn-outline" onclick="triggerFetch()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Refresh Data
+      </button>
+      <button class="btn btn-success" onclick="exportCSV()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Export CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="dash-tabs">
+      <button class="tab-btn active" onclick="switchTab('expenseTab', this)">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:16px;height:16px;vertical-align:-2px;margin-right:4px;"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+          Expense Report
+      </button>
+      <button class="tab-btn" onclick="switchTab('penaltyTab', this)">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:16px;height:16px;vertical-align:-2px;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          Penalty & Calls
+      </button>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filter-panel">
+      <div class="filter-title">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filters & Range
+      </div>
+      
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label class="filter-label">Quick Period</label>
+          <select class="filter-select" id="quickPeriod" onchange="handleQuickPeriod()">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="0">All Time</option>
+            <option value="custom">Custom Date Range</option>
+          </select>
+        </div>
+        
+        <div class="filter-group" id="customDateWrap" style="display:none; flex: 2; min-width: 300px;">
+          <div style="display:flex; gap: 10px; width: 100%;">
+            <div style="flex:1;"><label class="filter-label">From Date</label><input type="date" class="filter-input" id="startDate" onchange="applyCustomDate()"></div>
+            <div style="flex:1;"><label class="filter-label">To Date</label><input type="date" class="filter-input" id="endDate" onchange="applyCustomDate()"></div>
+          </div>
+        </div>
+
+        <div class="filter-group" id="statusFilterWrap">
+          <label class="filter-label">Approval Status</label>
+          <select class="filter-select" id="statusSelect" onchange="setStatus(this.value)">
+            <option value="All">All Status</option>
+            <option value="Approved">Approved</option>
+            <option value="Pending">Pending</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+      </div>
+      
+      <div id="roleFiltersWrap" style="display:none;">
+        <div class="filter-divider"></div>
+        <div class="role-filter-grid" id="roleFilters">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Expense Tab -->
+    <div id="expenseTab" class="tab-section active">
+      <!-- Normal KPIs -->
+      <div class="kpi-grid" id="expKpiGrid"></div>
+
+      <!-- NEW TEAM KPI SECTION -->
+      <div id="teamExpSection" style="display: none; margin-bottom: 32px;">
+          <div class="filter-title" style="margin-bottom: 16px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Team Expense Summary
+          </div>
+          <div class="kpi-grid" id="teamExpKpiGrid"></div>
+      </div>
+
+      <div class="charts-grid-main">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Expense Trend Analysis</div><div class="chart-subtitle">Last 7 Days submission</div></div>
+            <span class="chart-badge" id="expTrendBadge">—</span>
+          </div>
+          <div class="chart-wrap"><canvas id="expTrendChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Status Breakdown</div><div class="chart-subtitle">Approval distribution</div></div></div>
+          <div class="chart-wrap" style="min-height: 200px;"><canvas id="expDonutChart"></canvas></div>
+          <div class="legend-list" id="expDonutLegend"></div>
+        </div>
+      </div>
+
+      <div class="charts-grid-2 manager-only" id="expTeamSection">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Top Engineers by Claim</div><div class="chart-subtitle">Highest expense contributors</div></div></div>
+          <div class="chart-wrap"><canvas id="expEngBarChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">District-wise Distribution</div><div class="chart-subtitle">Regional expense breakdown</div></div></div>
+          <div class="chart-wrap"><canvas id="expDistChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div><div class="table-title">District Expense Summary</div></div>
+        </div>
+        <div class="table-container">
+          <table class="data-table summary-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>District</th>
+                <th>Total Claims</th>
+                <th>Approved</th>
+                <th>Pending</th>
+                <th>Approval %</th>
+              </tr>
+            </thead>
+            <tbody id="expSummaryBody">
+              <tr><td colspan="6" class="empty-state">
+                <div class="empty-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="empty-text">Loading summary...</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div><div class="table-title">Expense Log Records</div><div class="data-count" id="expCountLabel">Loading…</div></div>
+          <div class="table-controls">
+            <select id="expLimit" onchange="filterExpTable()" title="Select number of entries to display">
+              <option value="25">25 Entries</option>
+              <option value="50" selected>50 Entries</option>
+              <option value="100">100 Entries</option>
+              <option value="300">300 Entries</option>
+              <option value="1000">1000 Entries</option>
+              <option value="All">All Entries</option>
+            </select>
+            <div class="table-search">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="expSearch" placeholder="Search by ID, Engineer, District..." oninput="filterExpTable()">
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr>
+              <th>Exp ID</th><th>Engineer Name</th><th>Submit Date</th>
+              <th class="hide-mobile">District</th><th>Claim Amount</th><th>Status</th>
+            </tr></thead>
+            <tbody id="expTableBody">
+              <tr><td colspan="6" class="empty-state">
+                <div class="empty-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="empty-text">Loading expense records...</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Penalty Tab -->
+    <div id="penaltyTab" class="tab-section">
+      <div class="kpi-grid" id="penKpiGrid"></div>
+
+      <div class="charts-grid-main">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div><div class="chart-title">Penalty Deduction Trend</div><div class="chart-subtitle">Last 7 Days financial deductions</div></div>
+            <span class="chart-badge" id="penTrendBadge">—</span>
+          </div>
+          <div class="chart-wrap"><canvas id="penTrendChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Call Resolution Status</div><div class="chart-subtitle">Overview of closed vs pending calls</div></div></div>
+          <div class="chart-wrap" style="min-height: 200px;"><canvas id="penStatusChart"></canvas></div>
+          <div class="legend-list" id="penStatusLegend"></div>
+        </div>
+      </div>
+
+      <div class="charts-grid-2">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Equipment Penalties</div><div class="chart-subtitle">Top penalized machine types</div></div></div>
+          <div class="chart-wrap"><canvas id="penEqpChart"></canvas></div>
+          <div class="legend-list" id="penEqpLegend"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Hospital Facilities</div><div class="chart-subtitle">Top facilities by deductions</div></div></div>
+          <div class="chart-wrap"><canvas id="penHospChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="charts-grid-2 manager-only" id="penTeamSection">
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">Penalty by Engineer</div><div class="chart-subtitle">Highest deduction contributors</div></div></div>
+          <div class="chart-wrap"><canvas id="penEngBarChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><div><div class="chart-title">District-wise Penalties</div><div class="chart-subtitle">Regional impact analysis</div></div></div>
+          <div class="chart-wrap"><canvas id="penDistChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header" style="background:var(--surface);">
+          <div><div class="table-title">District Complaint Summary</div><div class="data-count">Aggregated Call Overview</div></div>
+        </div>
+        <div class="table-container">
+          <table class="data-table summary-table">
+            <thead>
+              <tr>
+                <th data-label="#">#</th>
+                <th data-label="District">District</th>
+                <th data-label="Total Complaints">Total Complaints</th>
+                <th data-label="Resolved">Resolved</th>
+                <th data-label="Pending">Pending</th>
+                <th data-label="Resolution %">Resolution %</th>
+              </tr>
+            </thead>
+            <tbody id="penSummaryBody">
+              <tr><td colspan="6" class="empty-state">
+                <div class="empty-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div class="empty-text">Loading summary...</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header" style="background:var(--surface);">
+          <div><div class="table-title">District Penalty Summary</div><div class="data-count">Aggregated Deduction Overview</div></div>
+        </div>
+        <div class="table-container">
+          <table class="data-table summary-table">
+            <thead>
+              <tr>
+                <th data-label="#">#</th>
+                <th data-label="District">District</th>
+                <th data-label="Attend Penalty">Attend Penalty</th>
+                <th data-label="Close Penalty">Close Penalty</th>
+                <th data-label="Total Deduction">Total Deduction</th>
+              </tr>
+            </thead>
+            <tbody id="penAmountSummaryBody">
+              <tr><td colspan="5" class="empty-state">
+                <div class="empty-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="empty-text">Loading penalty summary...</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div><div class="table-title">Complaint & Penalty Records</div><div class="data-count" id="penCountLabel">Loading…</div></div>
+          <div class="table-controls">
+            <select id="penLimit" onchange="filterPenTable()" title="Select number of entries to display">
+              <option value="25">25 Entries</option>
+              <option value="50" selected>50 Entries</option>
+              <option value="100">100 Entries</option>
+              <option value="300">300 Entries</option>
+              <option value="1000">1000 Entries</option>
+              <option value="All">All Entries</option>
+            </select>
+            <div class="table-search">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" id="penSearch" placeholder="Search Hospital, ID, Equipment..." oninput="filterPenTable()">
+            </div>
+          </div>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr>
+              <th>Call ID</th><th class="hide-mobile">Facility Name</th><th class="hide-mobile">Equipment</th>
+              <th class="hide-mobile">Raise Date</th><th>Att. Pen.</th><th>Close Pen.</th><th>Total Deduction</th>
+            </tr></thead>
+            <tbody id="penTableBody">
+              <tr><td colspan="7" class="empty-state">
+                <div class="empty-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><div class="empty-text">Loading penalty records...</div>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================================
+     MODALS FOR ROW CLICK (POPUP)
+============================================================ -->
+<div class="modal-overlay-custom" id="penModal" onclick="if(event.target===this)closePenModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">📋 Comprehensive Call Details</div>
+      <button class="modal-close" onclick="closePenModal()">✕</button>
+    </div>
+    <div class="modal-grid" id="penModalContent"></div>
+    <button class="modal-btn" onclick="closePenModal()">Acknowledge & Close</button>
+  </div>
+</div>
+
+<div class="modal-overlay-custom" id="expModal" onclick="if(event.target===this)closeExpModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">💸 Expense Claim Details</div>
+      <button class="modal-close" onclick="closeExpModal()">✕</button>
+    </div>
+    <div class="modal-grid" id="expModalContent"></div>
+    <button class="modal-btn" onclick="closeExpModal()">Acknowledge & Close</button>
+  </div>
+</div>
+
+<!-- NEW TEAM BREAKDOWN MODAL -->
+<div class="modal-overlay-custom" id="teamBreakdownModal" onclick="if(event.target===this)closeTeamBreakdownModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title" id="teamBreakdownTitle">👥 Team Breakdown</div>
+      <button class="modal-close" onclick="closeTeamBreakdownModal()">✕</button>
+    </div>
+    <div class="table-container">
+      <table class="data-table summary-table" style="min-width: 100%;">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="text-align:left;">Engineer Name</th>
+            <th>Total Claims</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="teamBreakdownBody"></tbody>
+      </table>
+    </div>
+    <button class="modal-btn" style="margin-top:24px;" onclick="closeTeamBreakdownModal()">Close Breakdown</button>
+  </div>
+</div>
+
+<!-- Logout Popup -->
+<div class="custom-popup" id="logoutPopup" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);padding:32px;border-radius:20px;box-shadow:var(--shadow-lg);z-index:10000;text-align:center;display:none;width:90%;max-width:380px;border:1px solid var(--border);">
+    <div style="width:60px;height:60px;border-radius:50%;background:var(--danger-light);color:var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    </div>
+    <h3 style="color:var(--primary-dark);font-size:18px;margin-bottom:8px;font-weight:800;">Log Out</h3>
+    <p style="color:var(--text-2);font-size:14px;margin-bottom:24px;font-weight:500;">Are you sure you want to securely log out?</p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+        <button onclick="closeLogoutModal()" style="flex:1;padding:12px;border:1.5px solid var(--border);border-radius:8px;background:white;color:var(--text-2);font-family:var(--font);font-weight:600;cursor:pointer; transition:all 0.2s;">Cancel</button>
+        <button onclick="confirmLogout()" style="flex:1;padding:12px;border:none;border-radius:8px;background:var(--danger);color:white;font-family:var(--font);font-weight:600;cursor:pointer; transition:all 0.2s;">Logout</button>
+    </div>
+</div>
+<div id="logoutOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);z-index:9999;display:none;"></div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const CURRENT_PAGE = 'report';
+
+// ── SVG Icons ──────────────────────────
+const ICONS = {
+    dashboard: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+    admin: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+    approval:  `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+    expense:   `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+    report:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+    upload:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+    month:     `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    profile:   `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    logout:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+};
+
+const ALL_MENU_ITEMS = [
+  { id:'dashboard', label:'Dashboard',       icon: ICONS.dashboard, href:'home.html',      roles:['Admin','Superadmin','Manager','Engineer','Coordinator','Accounts','Divisional Manager','District Incharge'] },
+  { id:'admin',     label:'Admin Panel',     icon: ICONS.admin,     href:'admin.html',     roles:['Admin','Superadmin'] },
+  { id:'approval',  label:'Approval Center', icon: ICONS.approval,  href:'approval.html',  roles:['Admin','Superadmin','Manager','Coordinator','Divisional Manager'] },
+  { id:'expense',   label:'Submit Claim',    icon: ICONS.expense,   href:'expense.html',   roles:['Admin','Superadmin','Engineer'] },
+  { id:'report',    label:'Analytics',       icon: ICONS.report,    href:'dashboard.html', roles:['Admin','Superadmin','Engineer','Manager','Coordinator','Divisional Manager','District Incharge'] },
+  { id:'upload',    label:'Data Sync',       icon: ICONS.upload,    href:'upload.html',    roles:['Admin','Superadmin'] },
+  { id:'month',     label:'Month Summary',   icon: ICONS.month,     href:'month.html',     roles:['Admin','Superadmin','Manager','Coordinator','Accounts','Divisional Manager'] }
+];
+
+function buildSidebar(role) {
+  const nav = document.getElementById('sidebarNav');
+  const bottomNav = document.getElementById('desktopSidebarBottom');
+  
+  if (nav) {
+    nav.innerHTML = ALL_MENU_ITEMS.filter(m=>m.roles.includes(role))
+      .map(m=>`<li><a href="${m.href}" class="nav-link-item ${m.id===CURRENT_PAGE?'active':''}"><div class="nav-icon-wrap">${m.icon}</div> ${m.label}</a></li>`).join('');
+  }
+  
+  if (bottomNav) {
+    bottomNav.innerHTML = `
+      <li>
+        <a href="profile.html" class="nav-link-item ${CURRENT_PAGE === 'profile' ? 'active' : ''}">
+          <div class="nav-icon-wrap">${ICONS.profile}</div> Profile
+        </a>
+      </li>
+      <li>
+        <a href="#" class="nav-link-item nav-logout" onclick="logout(); return false;">
+          <div class="nav-icon-wrap">${ICONS.logout}</div> Logout
+        </a>
+      </li>
+    `;
+  }
+}
+
+function buildBottomNav(role) {
+  const nav = document.getElementById('bottom-nav');
+  if (!nav) return;
+  
+  const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+  let html = items.map(item => {
+      const active = item.id === CURRENT_PAGE ? 'active' : '';
+      return `
+          <a href="${item.href}" class="bn-item ${active}">
+              <div class="bn-icon-wrap">${item.icon}</div>
+              <div class="bn-label">${item.label.split(' ')[0]}</div>
+          </a>`;
+  }).join('');
+
+  const profileActive = CURRENT_PAGE === 'profile' ? 'active' : '';
+  html += `
+      <a href="profile.html" class="bn-item ${profileActive}">
+          <div class="bn-icon-wrap">${ICONS.profile}</div>
+          <div class="bn-label">Profile</div>
+      </a>
+      <div class="bn-item logout" onclick="logout()">
+          <div class="bn-icon-wrap">${ICONS.logout}</div>
+          <div class="bn-label">Logout</div>
+      </div>
+  `;
+  
+  nav.innerHTML = html;
+}
+
+function logout() {
+  document.getElementById('logoutOverlay').style.display = 'block';
+  document.getElementById('logoutPopup').style.display = 'block';
+}
+function closeLogoutModal() {
+  document.getElementById('logoutOverlay').style.display = 'none';
+  document.getElementById('logoutPopup').style.display = 'none';
+}
+function confirmLogout() {
+  localStorage.clear(); window.location.href='index.html'; 
+}
+
+const ZONE_DISTRICT_MAP = {
+  'Ajmer':   ['Ajmer','Bhilwara','Nagaur','Tonk'],
+  'Bikaner': ['Bikaner','Churu','Ganganagar','Hanumangarh'],
+  'Jodhpur': ['Barmer','Jaisalmer','Jalore','Jodhpur','Pali','Phalodi','Sirohi'],
+  'Udaipur': ['Banswara','Chittorgarh','Dungarpur','Pratapgarh','Rajsamand','Udaipur']
+};
+
+const PAL = {
+  blue: '#2563eb', cyan: '#06b6d4', green: '#059669',
+  orange: '#ea580c', red: '#dc2626', purple: '#7c3aed',
+  yellow: '#ca8a04', pink: '#db2777',
+  grid: 'rgba(15,23,42,0.06)', text: '#475569',
+  primaryDark: '#002b5e'
+};
+const MULTI = ['#2563eb','#059669','#dc2626','#ea580c','#7c3aed','#06b6d4','#f97316','#ec4899','#14b8a6','#6366f1'];
+
+const S = {
+  userId:null, eUpkaranId:null, userName:null, userRole:null,
+  isAdmin:false, isManager:false, isCoordinator:false, isDM:false, isDI:false,
+  period:30, status:'All',
+  zone:'All', district:'All', managerId:'All', engId:'All', hospital:'All',
+  rawUsers: [], rawFacilities: [],
+  upkaranMap: new Map(),
+  expenses:[], penalties:[],
+  expSummary: [], penSummary: [],
+  filteredExp:[], filteredPen:[], teamFilteredExp: [],
+  charts:{}
+};
+
+function showLoader() {
+  const overlay = document.getElementById('loadingOverlay');
+  const txt = document.getElementById('loaderText');
+  if(!overlay) return;
+  txt.textContent = 'Data Loading...';
+  overlay.style.display = 'flex';
+  setTimeout(() => overlay.style.opacity = '1', 10);
+}
+
+function finishLoader() {
+  const overlay = document.getElementById('loadingOverlay');
+  const txt = document.getElementById('loaderText');
+  if(!overlay) return;
+  txt.textContent = 'Dashboard Data';
+  setTimeout(() => {
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 500);
+  }, 700);
+}
+
+const shadow3DPlugin = {
+  id: 'shadow3D',
+  beforeDatasetsDraw: function(chart, args, options) {
+    if(!options.enabled) return;
+    const ctx = chart.ctx;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 6;
+  },
+  afterDatasetsDraw: function(chart, args, options) {
+    if(!options.enabled) return;
+    chart.ctx.restore();
+  }
+};
+
+function setupChartDefaults() {
+  if (typeof Chart === 'undefined') return;
+  Chart.register(shadow3DPlugin);
+  Chart.defaults.font.family = "'Inter', sans-serif";
+  Chart.defaults.color = PAL.text;
+}
+
+function chartDefaults(color = PAL.blue) {
+  return {
+    responsive:true, maintainAspectRatio:false, animation:{ duration:600, easing:'easeInOutQuart' },
+    plugins:{
+      shadow3D: { enabled: true },
+      legend:{ display:false },
+      tooltip:{
+        backgroundColor:'rgba(15,23,42,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1,
+        titleFont:{ family:"'Inter', sans-serif", size:13, weight:'700' }, bodyFont:{ family:"'Inter', sans-serif", size:13 },
+        padding:12, cornerRadius:8, callbacks:{ label: ctx => ` ₹${Number(ctx.raw).toLocaleString('en-IN')}` }
+      }
+    },
+    scales:{
+      x:{ 
+        display: true, 
+        grid:{ display:false }, 
+        ticks:{ 
+          color:PAL.text, 
+          font:{ size:11 },
+          maxRotation: 45, 
+          minRotation: 0,
+          maxTicksLimit: 8
+        } 
+      },
+      y:{ beginAtZero: true, border:{display:false}, grid:{ color:PAL.grid }, ticks:{ color:PAL.text, font:{ size:11 }, callback: v => '₹'+(v>=1000?(v/1000).toFixed(1)+'k':v) } }
+    }
+  };
+}
+
+function barHorizDefaults() {
+  return {
+    responsive:true, maintainAspectRatio:false, indexAxis: 'y', animation:{ duration:600, easing:'easeInOutQuart' },
+    plugins:{ shadow3D: { enabled: true }, legend:{ display:false }, tooltip:{ backgroundColor:'rgba(15,23,42,0.95)', padding:12, cornerRadius:8, callbacks:{ label: ctx => ` ₹${Number(ctx.raw).toLocaleString('en-IN')}`} } },
+    scales:{
+      x:{ beginAtZero: true, border:{display:false}, grid:{ color:PAL.grid }, ticks:{ color:PAL.text, font:{ size:11 }, callback: v => '₹'+(v>=1000?(v/1000).toFixed(1)+'k':v) } },
+      y:{ grid:{ display:false }, ticks:{ color:PAL.text, font:{ size:11 } } }
+    }
+  };
+}
+
+function donutDefaults() {
+  return {
+    responsive:true, maintainAspectRatio:false, animation:{ duration:600 }, cutout:'75%',
+    plugins:{ shadow3D: { enabled: true }, legend:{ display:false }, tooltip:{ backgroundColor:'rgba(15,23,42,0.95)', padding:12, cornerRadius:8 } }
+  };
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  showLoader();
+  try {
+      S.userId     = localStorage.getItem('logged_in_user_id') || localStorage.getItem('user_id');
+      S.eUpkaranId = localStorage.getItem('e_upkaran_id') || '';
+      S.userName   = localStorage.getItem('display_name') || 'User';
+      S.userRole   = (localStorage.getItem('user_role') || '').trim();
+
+      if (!S.userId || !S.userRole) { window.location.href = 'index.html'; return; }
+
+      const r = S.userRole;
+      S.isAdmin        = r === 'Admin' || r === 'Superadmin';
+      S.isCoordinator  = r === 'Coordinator';
+      S.isDM           = r === 'Divisional Manager' || r === 'DM';
+      S.isDI           = r === 'District Incharge'  || r === 'DI';
+      S.isManager      = r === 'Manager' || S.isAdmin || S.isCoordinator || S.isDM || S.isDI;
+
+      setupChartDefaults();
+      buildSidebar(r);
+      buildBottomNav(r);
+
+      if (S.isManager) {
+        document.querySelectorAll('.manager-only').forEach(el => el.style.display = 'grid');
+        document.getElementById('roleFiltersWrap').style.display = 'block';
+      }
+
+      await fetchFilterUsers();
+      renderDropdowns();
+      await fetchDashboardData();
+  } catch(err) {
+      console.error("Init Error: ", err);
+      showToast("Data loading failed. Showing partial interface.", "error");
+      finishLoader();
+  }
+});
+
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  document.getElementById('statusFilterWrap').style.display = tabId === 'expenseTab' ? 'flex' : 'none';
+}
+
+async function fetchFilterUsers() {
+  try {
+    const res = await fetch('/api/dashboard/filters');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.success) return;
+    
+    S.rawUsers = data.users || [];
+    S.rawFacilities = data.facilities || [];
+    
+    S.rawUsers.forEach(u => {
+      if (u.e_upkaran_id) S.upkaranMap.set(String(u.e_upkaran_id).trim(), u.full_name || '');
+    });
+
+    const currentUser = S.rawUsers.find(u => String(u.user_id) === String(S.userId));
+    if (currentUser) {
+      S.userZone = currentUser.zone_name || 'All';
+      S.userDistrict = currentUser.district_name || 'All';
+
+      if (!S.isAdmin) {
+        if (S.isCoordinator || S.isDM) {
+          if (S.zone === 'All') S.zone = S.userZone;
+        }
+        if (S.isDI) {
+          if (S.zone === 'All') S.zone = S.userZone;
+          if (S.district === 'All') S.district = S.userDistrict;
+        }
+      }
+    }
+  } catch(e) {}
+}
+
+function renderDropdowns() {
+  const wrap = document.getElementById('roleFilters');
+  if (!wrap || !S.isManager) return;
+  
+  let currentZoneFilter = S.zone;
+  if (!S.isAdmin && (S.isCoordinator || S.isDM || S.isDI)) {
+     currentZoneFilter = S.userZone;
+  }
+
+  const validFacilities = S.rawFacilities.filter(f => {
+    if (currentZoneFilter !== 'All' && f.zone_name !== currentZoneFilter) return false;
+    if (S.district !== 'All' && f.district_name !== S.district) return false;
+    return true;
+  });
+  
+  const validUsers = S.rawUsers.filter(u => {
+    if (currentZoneFilter !== 'All' && u.zone_name !== currentZoneFilter) return false;
+    if (S.district !== 'All' && u.district_name !== S.district) return false;
+    return true;
+  });
+
+  const zonesSet = new Set(Object.keys(ZONE_DISTRICT_MAP));
+  
+  let distsArray = [];
+  if (S.isAdmin) {
+     distsArray = currentZoneFilter !== 'All' && ZONE_DISTRICT_MAP[currentZoneFilter] ? ZONE_DISTRICT_MAP[currentZoneFilter] : Object.values(ZONE_DISTRICT_MAP).flat();
+  } else if (S.isCoordinator || S.isDM) {
+     distsArray = ZONE_DISTRICT_MAP[S.userZone] || [];
+  } else if (S.isDI) {
+     distsArray = [S.userDistrict];
+  }
+
+  const hospSet = new Set(validFacilities.map(f => f.facility_name).filter(Boolean));
+  const mgrSet = new Set(validFacilities.map(f => f.facility_incharge).filter(Boolean));
+  
+  let html = '';
+  if (S.isAdmin) {
+    html += `<div class="filter-group"><label class="filter-label">Zone</label><select class="filter-select" id="filterZone" onchange="handleDropdownChange('zone')"><option value="All">All Zones</option>${Array.from(zonesSet).sort().map(z=>`<option value="${z}" ${S.zone===z?'selected':''}>${z}</option>`).join('')}</select></div>`;
+  }
+  if (S.isAdmin||S.isCoordinator||S.isDM) {
+    html += `<div class="filter-group"><label class="filter-label">District</label><select class="filter-select" id="filterDistrict" onchange="handleDropdownChange('district')"><option value="All">All Districts</option>${distsArray.sort().map(d=>`<option value="${d}" ${S.district===d?'selected':''}>${d}</option>`).join('')}</select></div>`;
+  }
+  html += `<div class="filter-group"><label class="filter-label">Facility</label><select class="filter-select" id="filterHospital" onchange="handleDropdownChange('hospital')"><option value="All">All Facilities</option>${Array.from(hospSet).sort().map(h=>`<option value="${h}" ${S.hospital===h?'selected':''}>${h}</option>`).join('')}</select></div>`;
+  if (S.isAdmin||S.isCoordinator||S.isDM||S.isDI) {
+    html += `<div class="filter-group"><label class="filter-label">Manager</label><select class="filter-select" id="filterManager" onchange="handleDropdownChange('manager')"><option value="All">All Managers</option>${Array.from(mgrSet).sort().map(n=>`<option value="${n}" ${S.managerId===n?'selected':''}>${n}</option>`).join('')}</select></div>`;
+  }
+  
+  const engMap = new Map();
+  validUsers.forEach(u => { if(u.role==='Engineer' && u.full_name) engMap.set(String(u.user_id), u.full_name); });
+  
+  html += `<div class="filter-group"><label class="filter-label">Engineer</label><select class="filter-select" id="filterEngineer" onchange="handleDropdownChange('engineer')"><option value="All">All Engineers</option>${Array.from(engMap.entries()).map(([id,name])=>`<option value="${id}" ${S.engId===id?'selected':''}>${name}</option>`).join('')}</select></div>`;
+  
+  wrap.innerHTML = html;
+}
+
+function handleDropdownChange(type) {
+  const get = id => { const el = document.getElementById(id); return el ? el.value : 'All'; };
+  if(type==='zone')      { S.zone=get('filterZone'); S.district=S.managerId=S.engId=S.hospital='All'; }
+  else if(type==='district') { S.district=get('filterDistrict'); S.managerId=S.engId=S.hospital='All'; }
+  else if(type==='hospital') { S.hospital=get('filterHospital'); S.engId='All'; }
+  else if(type==='manager')  { S.managerId=get('filterManager'); S.engId='All'; }
+  else if(type==='engineer') { S.engId=get('filterEngineer'); }
+  renderDropdowns(); triggerFetch();
+}
+
+function handleQuickPeriod() {
+  const val = document.getElementById('quickPeriod').value;
+  const customWrap = document.getElementById('customDateWrap');
+  if (val === 'custom') {
+    customWrap.style.display = 'flex';
+  } else {
+    customWrap.style.display = 'none';
+    S.period = val;
+    triggerFetch();
+  }
+}
+
+function applyCustomDate() {
+  const s = document.getElementById('startDate').value;
+  const e = document.getElementById('endDate').value;
+  if(s && e) {
+    S.period = 'custom';
+    triggerFetch();
+  }
+}
+
+function setStatus(val) {
+  S.status = val;
+  processAndRender();
+}
+
+const MON_MAP = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function getDates(period) {
+  if (period === 0 || period === '0') return { start: null, end: null };
+  if (period === 'custom') {
+    return { start: document.getElementById('startDate').value, end: document.getElementById('endDate').value };
+  }
+  const now = new Date(), start = new Date(), end = new Date();
+  if (period === 'yesterday') { start.setDate(start.getDate()-1); end.setDate(end.getDate()-1); }
+  else if (period !== 'today') start.setDate(start.getDate() - parseInt(period));
+  return { start: start.toISOString().slice(0,10), end: end.toISOString().slice(0,10) };
+}
+function parsePenDate(str) {
+  if (!str) return null;
+  const m = str.trim().match(/^(\d{1,2})-([A-Za-z]{3})-(\d{4})/);
+  if (!m) { const d = new Date(str); return isNaN(d) ? null : d; }
+  return new Date(parseInt(m[3]), MON_MAP[m[2]] ?? 0, parseInt(m[1]));
+}
+
+function triggerFetch() { 
+  showLoader(); 
+  fetchDashboardData();
+}
+
+async function fetchDashboardData() {
+  try {
+    const { start, end } = getDates(S.period);
+    const p = new URLSearchParams({ user_id:S.userId, zone:S.zone, district:S.district, manager:S.managerId, engineer:S.engId, facility:S.hospital });
+    if (start) { p.set('start_date', start); p.set('end_date', end); }
+    const [expRes, penRes] = await Promise.all([
+      fetch(`/api/dashboard/expenses?${p}`),
+      fetch(`/api/dashboard/penalties?${p}`)
+    ]);
+    
+    if (expRes.ok) { 
+      const data = await expRes.json(); 
+      S.expenses = data.success ? (data.expenses || []) : []; 
+      S.expSummary = data.success ? (data.summary || []) : [];
+    }
+    if (penRes.ok) { 
+      const data = await penRes.json(); 
+      S.penalties = data.success ? (data.penalties || []) : []; 
+      S.penSummary = data.success ? (data.summary || []) : [];
+    }
+    
+    processAndRender();
+  } catch(err) {
+    showToast('Failed to fetch live data. Syncing error.', 'error');
+  } finally {
+    finishLoader();
+  }
+}
+
+function processAndRender() {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const yestStart  = todayStart - 86400000;
+  const customStart = S.period === 'custom' ? new Date(document.getElementById('startDate').value).getTime() : null;
+  const customEnd = S.period === 'custom' ? new Date(document.getElementById('endDate').value).getTime() + 86400000 : null;
+
+  S.filteredExp = S.expenses.filter(e => {
+    if (S.status !== 'All') {
+      const st = (e.status||'').toLowerCase();
+      if (S.status==='Pending' && !st.includes('pending')) return false;
+      if (S.status==='Approved' && e.status!=='Approved') return false;
+      if (S.status==='Rejected' && e.status!=='Rejected') return false;
+    }
+    const t = new Date(e.expense_date).getTime();
+    if (S.period==='today' && t<todayStart) return false;
+    if (S.period==='yesterday' && (t<yestStart||t>=todayStart)) return false;
+    if (S.period==='custom' && (t<customStart || t>=customEnd)) return false;
+    return true;
+  });
+
+  S.filteredPen = S.penalties.filter(p => {
+    const t = (parsePenDate(p.complaint_raise_date)||{}).getTime?.() || 0;
+    if (S.period==='today' && t<todayStart) return false;
+    if (S.period==='yesterday' && (t<yestStart||t>=todayStart)) return false;
+    if (S.period==='custom' && (t<customStart || t>=customEnd)) return false;
+    return true;
+  });
+
+  renderExpKPIs(S.filteredExp);
+  renderPenKPIs(S.filteredPen);
+  renderExpCharts(S.filteredExp);
+  renderPenCharts(S.filteredPen);
+  
+  filterExpTable();
+  filterPenTable();
+  renderSummaryTables();
+}
+
+function kpiCardHtml(k) {
+  return `<div class="kpi-card">
+    <div class="kpi-header"><div class="kpi-icon ${k.cls}">${k.icon}</div></div>
+    <div class="kpi-info">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.val}</div>
+      <div class="kpi-subtitle">${k.sub}</div>
+    </div>
+  </div>`;
+}
+
+function renderExpKPIs(data) {
+  const total = sum(data,'total_amount');
+  const app   = sum(data.filter(e=>e.status==='Approved'),'total_amount');
+  const pend  = sum(data.filter(e=>(e.status||'').toLowerCase().includes('pending')),'total_amount');
+  const rej   = sum(data.filter(e=>e.status==='Rejected'),'total_amount');
+  
+  const iconTotal = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+  const iconApp   = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  const iconPend  = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const iconRej   = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`;
+
+  const kpis = [
+    { label:'Total Claimed Amount', val:'₹'+fmtINR(total), sub:`${data.length} total claims logged`, icon:iconTotal, cls:'blue' },
+    { label:'Approved Amount',      val:'₹'+fmtINR(app),   sub:`${data.filter(e=>e.status==='Approved').length} claims verified`, icon:iconApp, cls:'green' },
+    { label:'Pending Verification', val:'₹'+fmtINR(pend),  sub:`${data.filter(e=>(e.status||'').toLowerCase().includes('pending')).length} awaiting action`, icon:iconPend, cls:'orange' },
+    { label:'Rejected Claims',      val:'₹'+fmtINR(rej),   sub:`${data.filter(e=>e.status==='Rejected').length} declined`, icon:iconRej, cls:'red' },
+  ];
+  document.getElementById('expKpiGrid').innerHTML = kpis.map(k => kpiCardHtml(k)).join('');
+  document.getElementById('expTrendBadge').textContent = `Total: ₹${fmtINR(total)}`;
+
+  // ==========================================
+  // TEAM EXPENSE KPI LOGIC (MANAGERS/ADMINS)
+  // ==========================================
+  const teamSection = document.getElementById('teamExpSection');
+  if (S.isManager || S.isAdmin || S.isCoordinator || S.isDM || S.isDI) {
+      teamSection.style.display = 'block';
+
+      // 1. Filter out the team according to role (first/second level approver)
+      let strictTeamData = data.filter(e => {
+          // Never include the current user's own claims in the team breakdown
+          if (String(e.user_id) === String(S.userId) || e.full_name === S.userName) return false;
+
+          if (S.userRole === 'Manager') {
+              return e.first_level_approver === S.userName || e.level_first_approver === S.userName || (e.first_level_approver||'').includes(S.userName) || (e.level_first_approver||'').includes(S.userName);
+          } else if (S.userRole === 'Coordinator') {
+              return e.second_level_approver === S.userName || e.level_second_approver === S.userName || (e.second_level_approver||'').includes(S.userName) || (e.level_second_approver||'').includes(S.userName);
+          }
+          // Admins, DM, DI implicitly see all data that isn't their own as team data
+          return true;
+      });
+
+      // Fallback: If strict filtering returns empty but there is other users' data, assume it belongs to their team
+      if (strictTeamData.length === 0 && data.filter(e => String(e.user_id) !== String(S.userId)).length > 0) {
+          strictTeamData = data.filter(e => String(e.user_id) !== String(S.userId) && e.full_name !== S.userName);
+      }
+
+      // Store globally for Modal filtering
+      S.teamFilteredExp = strictTeamData;
+
+      const tTotal = sum(strictTeamData, 'total_amount');
+      const tApp   = sum(strictTeamData.filter(e=>e.status==='Approved'), 'total_amount');
+      const tPend  = sum(strictTeamData.filter(e=>(e.status||'').toLowerCase().includes('pending')), 'total_amount');
+      const tRej   = sum(strictTeamData.filter(e=>e.status==='Rejected'), 'total_amount');
+
+      const tKpis = [
+        { label:'Team Total Claimed', val:'₹'+fmtINR(tTotal), sub:`${strictTeamData.length} total team claims`, icon:iconTotal, cls:'blue', status: 'Total' },
+        { label:'Team Approved',      val:'₹'+fmtINR(tApp),   sub:`${strictTeamData.filter(e=>e.status==='Approved').length} team claims verified`, icon:iconApp, cls:'green', status: 'Approved' },
+        { label:'Team Pending',       val:'₹'+fmtINR(tPend),  sub:`${strictTeamData.filter(e=>(e.status||'').toLowerCase().includes('pending')).length} team claims awaiting`, icon:iconPend, cls:'orange', status: 'Pending' },
+        { label:'Team Rejected',      val:'₹'+fmtINR(tRej),   sub:`${strictTeamData.filter(e=>e.status==='Rejected').length} team claims declined`, icon:iconRej, cls:'red', status: 'Rejected' },
+      ];
+
+      // Render custom clickable cards for Team section
+      document.getElementById('teamExpKpiGrid').innerHTML = tKpis.map(k => {
+          return `<div class="kpi-card" style="cursor:pointer;" onclick="openTeamBreakdownModal('${k.status}')" title="Click to view engineer breakdown">
+            <div class="kpi-header"><div class="kpi-icon ${k.cls}">${k.icon}</div></div>
+            <div class="kpi-info">
+              <div class="kpi-label">${k.label}</div>
+              <div class="kpi-value">${k.val}</div>
+              <div class="kpi-subtitle" style="display:flex; align-items:center;">
+                  ${k.sub} <span style="color:var(--primary); font-weight:700; margin-left:6px; font-size:12px;">• View Team</span>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+  } else {
+      if(teamSection) teamSection.style.display = 'none';
+  }
+}
+
+function renderPenKPIs(data) {
+  const calls    = data.length;
+  const resolved = data.filter(p => ['resolve','close','closed'].some(x => (p.complaint_status||'').toLowerCase().includes(x))).length;
+  const pending  = calls - resolved;
+  const uptime   = calls ? ((resolved / calls) * 100).toFixed(2) : 100;
+  const totalPen = sum(data,'total_penalty');
+  
+  const iconCalls = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`;
+  const iconRes   = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+  const iconPend  = `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+  const iconPen   = `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+
+  const kpis = [
+    { label:'Total Complaints',    val:String(calls),        sub:'Logged during period', icon:iconCalls, cls:'blue' },
+    { label:'Uptime / Resolution', val:uptime+'%',           sub:'System availability', icon:iconRes, cls:'green' },
+    { label:'Active Pending',      val:String(pending),      sub:'Awaiting resolution', icon:iconPend, cls:'orange' },
+    { label:'Total Deductions',    val:'₹'+fmtINR(totalPen), sub:'Cumulative financial impact', icon:iconPen, cls:'red' },
+  ];
+  document.getElementById('penKpiGrid').innerHTML = kpis.map(k => kpiCardHtml(k)).join('');
+  document.getElementById('penTrendBadge').textContent = `Total: ₹${fmtINR(totalPen)}`;
+}
+
+function renderExpCharts(data) {
+  if (typeof Chart === 'undefined') return;
+  try {
+      const byDate = groupSum(data, e=>(e.expense_date||'').slice(0,10), 'total_amount');
+      const allLabels = Object.keys(byDate).filter(Boolean).sort();
+      const labels = allLabels.slice(-7); 
+      const vals   = labels.map(d=>byDate[d]);
+      
+      const ctx1   = getCtx('expTrendChart');
+      if (ctx1) {
+        destroyChart('expTrendChart');
+        S.charts.expTrendChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ data: vals, backgroundColor: PAL.blue, borderRadius: 20, borderSkipped: false }]
+            },
+            options: chartDefaults(PAL.blue)
+        });
+      }
+      
+      const appC=data.filter(e=>e.status==='Approved').length;
+      const rejC=data.filter(e=>e.status==='Rejected').length;
+      const penC=data.filter(e=>(e.status||'').toLowerCase().includes('pending')).length;
+      const ctx2 = getCtx('expDonutChart');
+      if (ctx2) {
+        destroyChart('expDonutChart');
+        S.charts.expDonutChart = new Chart(ctx2, {
+          type:'doughnut',
+          data:{ labels:['Approved','Rejected','Pending'], datasets:[{ data:[appC,rejC,penC], backgroundColor:[PAL.green,PAL.red,PAL.yellow], borderWidth:0, hoverOffset:10 }] },
+          options: donutDefaults()
+        });
+      }
+      document.getElementById('expDonutLegend').innerHTML = buildLegend(['Approved','Rejected','Pending'],[PAL.green,PAL.red,PAL.yellow],[appC,rejC,penC]);
+      
+      if (S.isManager) {
+        const engData = groupSum(data, e=>e.full_name||'Unknown','total_amount');
+        const engTop  = Object.entries(engData).sort((a,b)=>b[1]-a[1]).slice(0,8);
+        const engLabels = engTop.map(x => x[0].split(' (')[0]); 
+        const engVals = engTop.map(x=>x[1]);
+        
+        const ctx3 = getCtx('expEngBarChart');
+        if (ctx3) {
+          destroyChart('expEngBarChart');
+          S.charts.expEngBarChart = new Chart(ctx3, {
+            type:'bar', data:{ labels:engLabels, datasets:[{ data:engVals, backgroundColor:PAL.blue, borderRadius:20, borderSkipped:false }] },
+            options: chartDefaults(PAL.blue)
+          });
+        }
+        const distData = groupSum(data, e=>e.user_district||e.district||'Unknown','total_amount');
+        const distTop  = Object.entries(distData).sort((a,b)=>b[1]-a[1]).slice(0,7);
+        const ctx4 = getCtx('expDistChart');
+        if (ctx4) {
+          destroyChart('expDistChart');
+          S.charts.expDistChart = new Chart(ctx4, {
+            type:'bar', data:{ labels:distTop.map(x=>x[0]), datasets:[{ data:distTop.map(x=>x[1]), backgroundColor:PAL.cyan, borderRadius:20 }] },
+            options: barHorizDefaults()
+          });
+        }
+      }
+  } catch(e) {}
+}
+
+function renderPenCharts(data) {
+  if (typeof Chart === 'undefined') return;
+  try {
+      const byDate = groupSum(data, p=>{ const d=parsePenDate(p.complaint_raise_date); return d?d.toISOString().slice(0,10):null; },'total_penalty');
+      const allLabels = Object.keys(byDate).filter(Boolean).sort();
+      const labels = allLabels.slice(-7); 
+      const vals   = labels.map(d=>byDate[d]);
+      
+      const ctx1 = getCtx('penTrendChart');
+      if (ctx1) {
+        destroyChart('penTrendChart');
+        S.charts.penTrendChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ data: vals, backgroundColor: PAL.red, borderRadius: 20, borderSkipped: false }]
+            },
+            options: chartDefaults(PAL.red)
+        });
+      }
+      
+      const resolved = data.filter(p=>['resolve','close','closed'].some(x=>(p.complaint_status||'').toLowerCase().includes(x))).length;
+      const pending  = data.length - resolved;
+      const ctx2 = getCtx('penStatusChart');
+      if (ctx2) {
+        destroyChart('penStatusChart');
+        S.charts.penStatusChart = new Chart(ctx2, {
+          type:'doughnut',
+          data:{ labels:['Resolved','Pending'], datasets:[{ data:[resolved,pending], backgroundColor:[PAL.green,PAL.yellow], borderWidth:0, hoverOffset:10 }] },
+          options: donutDefaults()
+        });
+      }
+      document.getElementById('penStatusLegend').innerHTML = buildLegend(['Resolved','Pending'],[PAL.green,PAL.yellow],[resolved,pending]);
+      
+      const eqpData = groupSum(data, p=>p.equipment_name||'Unknown','total_penalty');
+      const eqpTop  = Object.entries(eqpData).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      const ctx3 = getCtx('penEqpChart');
+      if (ctx3) {
+        destroyChart('penEqpChart');
+        S.charts.penEqpChart = new Chart(ctx3, {
+          type:'doughnut', data:{ labels:eqpTop.map(x=>x[0]), datasets:[{ data:eqpTop.map(x=>x[1]), backgroundColor:MULTI, borderWidth:0, hoverOffset:10 }] },
+          options: donutDefaults()
+        });
+      }
+      document.getElementById('penEqpLegend').innerHTML = buildLegend(eqpTop.map(x=>x[0]),MULTI,eqpTop.map(x=>x[1]),true);
+      
+      const hospData = groupSum(data, p=>p.hospital_name||'Unknown','total_penalty');
+      const hospTop  = Object.entries(hospData).sort((a,b)=>b[1]-a[1]).slice(0,7);
+      const ctx4 = getCtx('penHospChart');
+      if (ctx4) {
+        destroyChart('penHospChart');
+        S.charts.penHospChart = new Chart(ctx4, {
+          type:'bar', data:{ labels:hospTop.map(x=>x[0]), datasets:[{ data:hospTop.map(x=>x[1]), backgroundColor:PAL.red, borderRadius:20 }] },
+          options: barHorizDefaults()
+        });
+      }
+      
+      if (S.isManager) {
+        const engData = groupSum(data, p=>getEngName(p.attend_engineer_id||p.close_engineer_id),'total_penalty');
+        const engTop  = Object.entries(engData).sort((a,b)=>b[1]-a[1]).slice(0,8);
+        const engLabels = engTop.map(x => x[0].split(' (')[0]);
+        const engVals = engTop.map(x=>x[1]);
+        
+        const ctx5 = getCtx('penEngBarChart');
+        if (ctx5) {
+          destroyChart('penEngBarChart');
+          S.charts.penEngBarChart = new Chart(ctx5, {
+            type:'bar', data:{ labels:engLabels, datasets:[{ data:engVals, backgroundColor:PAL.orange, borderRadius:20, borderSkipped:false }] },
+            options: chartDefaults(PAL.orange)
+          });
+        }
+        const distData = groupSum(data, p=>p.district_name||'Unknown','total_penalty');
+        const distTop  = Object.entries(distData).sort((a,b)=>b[1]-a[1]).slice(0,7);
+        const ctx6 = getCtx('penDistChart');
+        if (ctx6) {
+          destroyChart('penDistChart');
+          S.charts.penDistChart = new Chart(ctx6, {
+            type:'bar', data:{ labels:distTop.map(x=>x[0]), datasets:[{ data:distTop.map(x=>x[1]), backgroundColor:PAL.purple, borderRadius:20 }] },
+            options: barHorizDefaults()
+          });
+        }
+      }
+  } catch(e) {}
+}
+
+function renderSummaryTables() {
+  const penTbody = document.getElementById('penSummaryBody');
+  const penAmtTbody = document.getElementById('penAmountSummaryBody');
+  const iconEmpty = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+
+  if (!S.penSummary || !S.penSummary.length) {
+    penTbody.innerHTML = `<tr><td colspan="6" class="empty-state"><div class="empty-icon">${iconEmpty}</div><div class="empty-text">No call summary data available.</div></td></tr>`;
+    penAmtTbody.innerHTML = `<tr><td colspan="5" class="empty-state"><div class="empty-icon">${iconEmpty}</div><div class="empty-text">No penalty summary data available.</div></td></tr>`;
+  } else {
+    penTbody.innerHTML = S.penSummary.map((d, i) => {
+      const total = d.total_complaints || 0;
+      const res = d.resolved || 0;
+      const pct = total > 0 ? ((res/total)*100).toFixed(1) : 100;
+      return `<tr>
+        <td data-label="#"><div class="cell-val">${i+1}</div></td>
+        <td data-label="District"><div class="cell-val"><strong>${d.district || 'Unknown'}</strong></div></td>
+        <td data-label="Total Complaints"><div class="cell-val">${total}</div></td>
+        <td data-label="Resolved"><div class="cell-val">${res}</div></td>
+        <td data-label="Pending"><div class="cell-val">${d.pending || 0}</div></td>
+        <td data-label="Resolution %"><div class="cell-val"><strong>${pct}%</strong></div></td>
+      </tr>`;
+    }).join('');
+
+    penAmtTbody.innerHTML = S.penSummary.map((d, i) => {
+      return `<tr>
+        <td data-label="#"><div class="cell-val">${i+1}</div></td>
+        <td data-label="District"><div class="cell-val"><strong>${d.district || 'Unknown'}</strong></div></td>
+        <td data-label="Attend Penalty"><div class="cell-val amt-yellow">₹${fmtINR(d.attend_penalty || 0)}</div></td>
+        <td data-label="Close Penalty"><div class="cell-val amt-yellow">₹${fmtINR(d.close_penalty || 0)}</div></td>
+        <td data-label="Total Deduction"><div class="cell-val amt-red">₹${fmtINR(d.total_penalty || 0)}</div></td>
+      </tr>`;
+    }).join('');
+  }
+
+  const expTbody = document.getElementById('expSummaryBody');
+  if (!S.expSummary || !S.expSummary.length) {
+    expTbody.innerHTML = `<tr><td colspan="6" class="empty-state"><div class="empty-icon">${iconEmpty}</div><div class="empty-text">No expense summary data available.</div></td></tr>`;
+  } else {
+    expTbody.innerHTML = S.expSummary.map((d, i) => {
+      const total = d.total_complaints || 0;
+      const res = d.resolved || 0;
+      const pct = total > 0 ? ((res/total)*100).toFixed(1) : 100;
+      return `<tr>
+        <td data-label="#"><div class="cell-val">${i+1}</div></td>
+        <td data-label="District"><div class="cell-val"><strong>${d.district || 'Unknown'}</strong></div></td>
+        <td data-label="Total Claims"><div class="cell-val">${total}</div></td>
+        <td data-label="Approved"><div class="cell-val">${res}</div></td>
+        <td data-label="Pending"><div class="cell-val">${d.pending || 0}</div></td>
+        <td data-label="Approval %"><div class="cell-val"><strong>${pct}%</strong></div></td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function filterExpTable() {
+  const q = document.getElementById('expSearch').value.toLowerCase();
+  const limit = document.getElementById('expLimit').value;
+  
+  let res = S.filteredExp.filter(e => (e.exp_id||'').toLowerCase().includes(q)||(e.full_name||'').toLowerCase().includes(q)||(e.user_district||e.district||'').toLowerCase().includes(q));
+  const totalMatches = res.length;
+  
+  if (limit !== 'All') {
+    res = res.slice(0, parseInt(limit));
+  }
+  
+  renderExpTable(res, totalMatches);
+}
+
+function renderExpTable(data, totalCount) {
+  const tbody = document.getElementById('expTableBody');
+  document.getElementById('expCountLabel').textContent = `Showing ${data.length} of ${totalCount || data.length} records`;
+  const iconEmpty = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`;
+  
+  if (!data.length) { tbody.innerHTML=`<tr><td colspan="6" class="empty-state"><div class="empty-icon">${iconEmpty}</div><div class="empty-text">No expense records found</div></td></tr>`; return; }
+  
+  tbody.innerHTML = data.map((e,i) => {
+    const s=e.status||'';
+    const cls = s==='Approved'?'resolved':s==='Rejected'?'critical':'pending';
+    const lbl = s==='Approved'?'Approved':s==='Rejected'?'Rejected':'Pending';
+    return `<tr onclick="openExpModal('${e.exp_id}')">
+      <td data-label="Exp ID"><div class="cell-val"><span class="id-tag">${e.exp_id||'—'}</span></div></td>
+      <td data-label="Engineer"><div class="cell-val"><strong>${e.full_name||S.userName}</strong></div></td>
+      <td data-label="Date"><div class="cell-val">${fmtDate(e.expense_date)}</div></td>
+      <td data-label="District" class="hide-mobile"><div class="cell-val">${e.user_district||e.district||'—'}</div></td>
+      <td data-label="Amount"><div class="cell-val amt-green">₹${fmtINR(e.total_amount)}</div></td>
+      <td data-label="Status"><div class="cell-val"><span class="status-badge ${cls}">${lbl}</span></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterPenTable() {
+  const q = document.getElementById('penSearch').value.toLowerCase();
+  const limit = document.getElementById('penLimit').value;
+  
+  let res = S.filteredPen.filter(p => (p.complaint_id||'').toLowerCase().includes(q)||(p.hospital_name||'').toLowerCase().includes(q)||(p.equipment_name||'').toLowerCase().includes(q)||(p.district_name||'').toLowerCase().includes(q));
+  const totalMatches = res.length;
+  
+  if (limit !== 'All') {
+    res = res.slice(0, parseInt(limit));
+  }
+  
+  renderPenTable(res, totalMatches);
+}
+
+function renderPenTable(data, totalCount) {
+  const tbody = document.getElementById('penTableBody');
+  document.getElementById('penCountLabel').textContent = `Showing ${data.length} of ${totalCount || data.length} records`;
+  const iconEmpty = `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+
+  if (!data.length) { tbody.innerHTML=`<tr><td colspan="7" class="empty-state"><div class="empty-icon">${iconEmpty}</div><div class="empty-text">No penalty records found</div></td></tr>`; return; }
+  
+  tbody.innerHTML = data.map((p,i) => `
+    <tr onclick="openPenModal('${p.complaint_id}')">
+      <td data-label="Call ID"><div class="cell-val"><span class="id-tag">${p.complaint_id||'—'}</span></div></td>
+      <td data-label="Facility" class="hide-mobile"><div class="cell-val" style="text-align:right;"><strong>${p.hospital_name||'—'}</strong><br><span style="font-size:12px;color:var(--text-3)">${p.district_name||''}</span></div></td>
+      <td data-label="Equipment" class="hide-mobile"><div class="cell-val">${p.equipment_name||'—'}</div></td>
+      <td data-label="Raise Date" class="hide-mobile"><div class="cell-val" style="font-size:13px;color:var(--text-2)">${p.complaint_raise_date||'—'}</div></td>
+      <td data-label="Att. Pen."><div class="cell-val amt-yellow">₹${fmtINR(p.attend_penalty||0)}</div></td>
+      <td data-label="Close Pen."><div class="cell-val amt-yellow">₹${fmtINR(p.penalty||0)}</div></td>
+      <td data-label="Total Deduction"><div class="cell-val amt-red">₹${fmtINR(p.total_penalty||0)}</div></td>
+    </tr>`).join('');
+}
+
+function exportCSV() {
+  const isExp = document.getElementById('expenseTab').classList.contains('active');
+  if (isExp) {
+    downloadCSV([['Exp ID','Engineer','Date','District','Amount','Status'],...S.filteredExp.map(e=>[e.exp_id||'',e.full_name||'',e.expense_date||'',e.user_district||'',e.total_amount||0,e.status||''])],'expense_report.csv');
+  } else {
+    downloadCSV([['Call ID','Hospital','Equipment','Raise Date','Close Date','Attend Penalty','Close Penalty','Total Penalty'],...S.filteredPen.map(p=>[p.complaint_id||'',p.hospital_name||'',p.equipment_name||'',p.complaint_raise_date||'',p.complaint_close_date||'',p.attend_penalty||0,p.penalty||0,p.total_penalty||0])],'penalty_report.csv');
+  }
+}
+function downloadCSV(rows, filename) {
+  const csv = rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = filename; a.click();
+  showToast('File exported successfully!','success');
+}
+function sum(arr, key) { return arr.reduce((s,x) => s+(parseFloat(x[key])||0), 0); }
+function groupSum(arr, keyFn, valKey) { return arr.reduce((acc,x) => { const k=keyFn(x); if(!k) return acc; acc[k]=(acc[k]||0)+(parseFloat(x[valKey])||0); return acc; },{}); }
+function fmtINR(n) { return (parseFloat(n)||0).toLocaleString('en-IN'); }
+function fmtDate(d) { if(!d) return '—'; try { return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); } catch{return d;} }
+function getCtx(id) { const c=document.getElementById(id); return c?c.getContext('2d'):null; }
+function destroyChart(id) { if(S.charts[id]){S.charts[id].destroy();delete S.charts[id];} }
+function getEngName(id) {
+  if(!id||id==='—') return '—';
+  const name = S.upkaranMap.get(String(id).trim());
+  return name ? `${name} (${id})` : String(id);
+}
+function buildLegend(labels, colors, values, showVal=false) {
+  return labels.map((l,i) => `<div class="legend-item"><div class="legend-dot" style="background:${colors[i]||'#999'}"></div><span>${l}${showVal?` — ₹${fmtINR(values[i]||0)}`:` (${values[i]||0})`}</span></div>`).join('');
+}
+function showToast(msg, type='info') {
+  const wrap = document.getElementById('toastWrap');
+  const el   = document.createElement('div');
+  el.className = `toast ${type}`;
+  
+  const icon = type === 'success' ? `<svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>` : 
+               type === 'error' ? `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>` : 
+               `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+               
+  el.innerHTML = `<div style="width:20px;height:20px;flex-shrink:0;">${icon}</div> ${msg}`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),350); },3500);
+}
+function toggleSidebar() {
+  document.getElementById('desktopSidebar').classList.toggle('sidebar-mobile-open');
+  document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+
+// ==========================================
+// TEAM BREAKDOWN MODAL LOGIC (NEW)
+// ==========================================
+function openTeamBreakdownModal(status) {
+    const data = S.teamFilteredExp || [];
+    let filtered = [];
+    let titleStatus = "";
+
+    if (status === 'Total') {
+        filtered = data;
+        titleStatus = "All Claims";
+    } else if (status === 'Pending') {
+        filtered = data.filter(e => (e.status||'').toLowerCase().includes('pending'));
+        titleStatus = "Pending Claims";
+    } else {
+        filtered = data.filter(e => e.status === status);
+        titleStatus = `${status} Claims`;
+    }
+
+    document.getElementById('teamBreakdownTitle').innerHTML = `👥 Team Breakdown - ${titleStatus}`;
+
+    // Group by Engineer
+    const grouped = {};
+    filtered.forEach(e => {
+        const engName = e.full_name || 'Unknown Engineer';
+        if (!grouped[engName]) grouped[engName] = { count: 0, amount: 0 };
+        grouped[engName].count += 1;
+        grouped[engName].amount += (parseFloat(e.total_amount) || 0);
+    });
+
+    // Convert to array and sort by amount descending
+    const sorted = Object.entries(grouped).sort((a,b) => b[1].amount - a[1].amount);
+    const tbody = document.getElementById('teamBreakdownBody');
+
+    if (sorted.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><div class="empty-text">No team data found for this status.</div></td></tr>`;
+    } else {
+        tbody.innerHTML = sorted.map((item, i) => {
+            const [name, stats] = item;
+            return `<tr>
+                <td>${i+1}</td>
+                <td style="text-align:left;"><strong>${name}</strong></td>
+                <td>${stats.count}</td>
+                <td style="color:var(--primary); font-weight:700;">₹${fmtINR(stats.amount)}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    document.getElementById('teamBreakdownModal').classList.add('active');
+}
+
+function closeTeamBreakdownModal() { 
+    document.getElementById('teamBreakdownModal').classList.remove('active'); 
+}
+
+// ==========================================
+// MODALS FOR ROW CLICK (POPUP)
+// ==========================================
+function openPenModal(id) {
+  const p = S.filteredPen.find(x => x.complaint_id === id);
+  if (!p) return;
+  const aName = getEngName(p.attend_engineer_id);
+  const cName = getEngName(p.close_engineer_id);
+  document.getElementById('penModalContent').innerHTML = `
+    <div class="modal-field full"><label>Complaint ID</label><p style="font-family:var(--font-mono);color:var(--primary-dark)">${p.complaint_id||'—'}</p></div>
+    <div class="modal-field"><label>District Location</label><p>${p.district_name||'—'}</p></div>
+    <div class="modal-field"><label>Resolution Status</label><p>${p.complaint_status||'—'}</p></div>
+    <div class="modal-field full"><label>Hospital / Healthcare Facility</label><p>${p.hospital_name||'—'}</p></div>
+    <div class="modal-field full"><label>Impacted Equipment</label><p>${p.equipment_name||'—'} ${p.bar_code?`<span style="color:var(--text-3);font-size:12px">(${p.bar_code})</span>`:''}</p></div>
+    <div class="modal-field"><label>Raised On</label><p>${p.complaint_raise_date||'—'}</p></div>
+    <div class="modal-field"><label>Attended On</label><p>${p.attend_date||'—'}</p></div>
+    <div class="modal-field full"><label>Attending Engineer</label><p>${aName}</p></div>
+    <div class="modal-field"><label>Attendance Deduction</label><p style="color:var(--warning)">₹${fmtINR(p.attend_penalty||0)}</p></div>
+    <div class="modal-field"><label>Closed On</label><p>${p.complaint_close_date||'⏳ Action Pending'}</p></div>
+    <div class="modal-field full"><label>Closing Engineer</label><p>${cName}</p></div>
+    <div class="modal-field"><label>Closure Deduction</label><p style="color:var(--warning)">₹${fmtINR(p.penalty||0)}</p></div>
+    <div class="modal-field full"><label>Cumulative Portal Penalty</label><p class="total-penalty-val">₹${fmtINR(p.total_penalty||0)}</p></div>`;
+  document.getElementById('penModal').classList.add('active');
+}
+function closePenModal() { document.getElementById('penModal').classList.remove('active'); }
+
+function openExpModal(id) {
+  const e = S.filteredExp.find(x => x.exp_id === id);
+  if (!e) return;
+  document.getElementById('expModalContent').innerHTML = `
+    <div class="modal-field full"><label>System Expense ID</label><p style="font-family:var(--font-mono);color:var(--primary-dark)">${e.exp_id||'—'}</p></div>
+    <div class="modal-field"><label>Claim Date</label><p>${fmtDate(e.expense_date)}</p></div>
+    <div class="modal-field"><label>Approval Status</label><p>${e.status||'—'}</p></div>
+    <div class="modal-field full"><label>Submitting Engineer</label><p>${e.full_name||S.userName}</p></div>
+    <div class="modal-field"><label>Operations Zone</label><p>${e.zone_name||'—'}</p></div>
+    <div class="modal-field"><label>Operating District</label><p>${e.user_district||e.district||'—'}</p></div>
+    <div class="modal-field"><label>Distance Traveled</label><p>${e.total_km||0} km</p></div>
+    <div class="modal-field"><label>Primary Approver</label><p>${e.level_first_approver||'—'}</p></div>
+    <div class="modal-field full"><label>Total Claim Value</label><p class="total-penalty-val" style="color:var(--success); background:var(--success-light); border-color:rgba(16,185,129,.2);">₹${fmtINR(e.total_amount||0)}</p></div>`;
+  document.getElementById('expModal').classList.add('active');
+}
+function closeExpModal() { document.getElementById('expModal').classList.remove('active'); }
+</script>
+
+</body>
+</html>

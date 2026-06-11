@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Help - Cyrix Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           CYRIX HEALTHCARE — MASTER VARIABLES
+        ============================================================ */
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #002b5e; /* Exact deep navy */
+            --primary-light: #3b82f6;
+            --primary-50: #eff6ff;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            
+            --bg: #f0f4f8; /* Softer background matching image */
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+            --shadow-sm: 0 2px 8px rgba(15,23,42,0.06);
+            
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --t-fast: 0.15s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); }
+        
+        body { 
+            background-color: var(--bg); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .login-card { 
+            background: var(--surface); 
+            padding: 48px 40px; 
+            border-radius: 24px; 
+            box-shadow: var(--shadow-lg); 
+            width: 100%; 
+            max-width: 440px; 
+            position: relative; 
+            border: 1px solid var(--border);
+        }
+
+        .header-text { 
+            text-align: center; 
+            margin-bottom: 24px; 
+        }
+
+        .cyrix-img {
+            height: 60px;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+
+        h1 { 
+            font-size: 26px; 
+            font-weight: 800;
+            color: var(--primary-dark); 
+            margin-bottom: 6px; 
+            letter-spacing: -0.5px;
+        }
+
+        p { 
+            font-size: 14px; 
+            color: var(--text-2); 
+            font-weight: 500;
+        }
+
+        /* Modern Segmented Tabs */
+        .tab-container {
+            display: flex;
+            background: var(--surface-2);
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-2);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all var(--t-fast);
+        }
+
+        .tab-btn.active {
+            background: var(--surface);
+            color: var(--primary-dark);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        .form-group label { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: var(--text-3); 
+            margin-bottom: 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 1.5px solid var(--border); 
+            border-radius: 12px; 
+            font-size: 14px; 
+            font-weight: 500;
+            color: var(--text);
+            background: var(--surface);
+            outline: none; 
+            transition: all var(--t-fast);
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+        .submit-btn { 
+            background: var(--primary-dark); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 12px; 
+            width: 100%; 
+            font-weight: 700; 
+            font-size: 15px;
+            cursor: pointer; 
+            transition: all var(--t-fast); 
+            margin-top: 10px; 
+            box-shadow: var(--shadow-sm);
+        }
+
+        .submit-btn:hover:not(:disabled) { 
+            background: #111827; 
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .submit-btn:disabled { 
+            background: var(--text-3); 
+            cursor: not-allowed; 
+            box-shadow: none;
+            transform: none;
+        }
+
+        .form-footer { 
+            text-align: center; 
+            margin-top: 28px; 
+            font-size: 13px; 
+        }
+
+        .form-footer a { 
+            color: var(--primary-light); 
+            text-decoration: none; 
+            font-weight: 600; 
+            transition: color var(--t-fast);
+        }
+        .form-footer a:hover {
+            color: var(--primary-dark);
+        }
+
+        .hidden { display: none; }
+
+        /* Error Popup Styling */
+        .custom-popup { 
+            position: fixed; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: var(--surface); 
+            padding: 32px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-lg); 
+            z-index: 10000; 
+            text-align: center; 
+            display: none; 
+            width: 90%; 
+            max-width: 360px; 
+            animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); 
+            border: 1px solid var(--border);
+        }
+
+        @keyframes popIn { 
+            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
+
+        .popup-overlay { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(15,23,42,0.5); 
+            backdrop-filter: blur(4px);
+            z-index: 9999; 
+            display: none; 
+        }
+
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+
+        .icon-wrapper.error {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .icon-wrapper.success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .error-msg {
+            background: var(--danger-light);
+            color: var(--danger);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            margin-bottom: 16px;
+        }
+
+        /* OTP Timer & Resend Button */
+        .otp-actions-wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding: 0 4px;
+        }
+
+        .timer-text {
+            font-size: 12px;
+            color: var(--text-2);
+            font-weight: 600;
+        }
+
+        .timer-countdown {
+            color: var(--danger);
+            font-family: var(--font-mono);
+            font-weight: 700;
+            margin-left: 4px;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: var(--primary-light);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            transition: color var(--t-fast);
+        }
+
+        .resend-btn:hover:not(:disabled) {
+            color: var(--primary-dark);
+        }
+
+        .resend-btn:disabled {
+            color: var(--text-3);
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 32px 24px; border-radius: 20px;}
+            h1 { font-size: 22px; }
+            .cyrix-img { height: 50px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-overlay" id="overlay"></div>
+    
+    <div class="custom-popup" id="messagePopup">
+        <div id="popupIcon" class="icon-wrapper error">
+            <!-- Icon injected via JS -->
+        </div>
+        <h3 id="popupTitle" style="color: var(--primary-dark); font-size: 18px; margin-bottom: 8px; font-weight: 800; line-height: 1.2;">Message</h3>
+        <p id="popupText" style="color: var(--text-2); font-size: 14px; margin-bottom: 24px; font-weight: 500; line-height: 1.5;"></p>
+        <button class="submit-btn" id="popupActionBtn" onclick="closePopup()" style="margin: 0;">OK, Understood</button>
+    </div>
+
+    <div class="login-card">
+        <div class="header-text">
+            <img src="logo.png" alt="Cyrix Logo" class="cyrix-img" onerror="this.style.display='none';">
+
+            <h1>Account Help</h1>
+            <p id="subtitle">Verify identity to proceed</p>
+        </div>
+
+        <div class="tab-container">
+            <button class="tab-btn active" id="t-forgot" onclick="switchTab('forgot')">Forgot Password</button>
+            <button class="tab-btn" id="t-unlock" onclick="switchTab('unlock')">Unlock Account</button>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <form id="forgotForm">
+            <div id="f-identity">
+                <div class="form-group">
+                    <label>User ID <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="f_user" required placeholder="RJ001">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth <span style="color:var(--danger)">*</span></label>
+                    <input type="date" id="f_dob" required>
+                </div>
+                <div class="form-group">
+                    <label>Date of Joining <span style="color:var(--danger)">*</span></label>
+                    <input type="date" id="f_doj" required>
+                </div>
+            </div>
+            
+            <div id="f-otp-section" class="otp-area" style="display: none;">
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <label>Verification Code <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="f_otp" maxlength="6" placeholder="000000" style="text-align: center; letter-spacing: 8px; font-weight: 800; font-size: 18px; font-family: var(--font-mono);">
+                </div>
+                
+                <div class="otp-actions-wrap">
+                    <div id="f_timerTextContainer" class="timer-text">
+                        Expires in: <span id="f_countdownTimer" class="timer-countdown">05:00</span>
+                    </div>
+                    <button type="button" id="f_resendOtpBtn" class="resend-btn" onclick="requestForgotOTP(true)" disabled>Resend OTP</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 16px;">
+                    <label>New Password <span style="color:var(--danger)">*</span></label>
+                    <input type="password" id="f_pass" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password <span style="color:var(--danger)">*</span></label>
+                    <input type="password" id="f_conf" placeholder="Confirm new password">
+                </div>
+                <p id="f_error" class="error-msg" style="display: none;">Passwords do not match!</p>
+            </div>
+            
+            <button type="submit" id="f_btn" class="submit-btn" style="margin-top: 10px;">Send OTP</button>
+        </form>
+
+        <!-- Unlock Account Form -->
+        <form id="unlockForm" class="hidden">
+            <div id="u-identity">
+                <div class="form-group">
+                    <label>User ID <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="u_user" required placeholder="RJ001">
+                </div>
+                <div class="form-group">
+                    <label>E-Code <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="u_ecode" required placeholder="EMP-XXX">
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth <span style="color:var(--danger)">*</span></label>
+                    <input type="date" id="u_dob" required>
+                </div>
+                <div class="form-group">
+                    <label>Date of Joining <span style="color:var(--danger)">*</span></label>
+                    <input type="date" id="u_doj" required>
+                </div>
+            </div>
+            
+            <div id="u-otp-section" class="otp-area" style="display: none;">
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <label>Verification Code <span style="color:var(--danger)">*</span></label>
+                    <input type="text" id="u_otp" maxlength="6" placeholder="000000" style="text-align: center; letter-spacing: 8px; font-weight: 800; font-size: 18px; font-family: var(--font-mono);">
+                </div>
+
+                <div class="otp-actions-wrap">
+                    <div id="u_timerTextContainer" class="timer-text">
+                        Expires in: <span id="u_countdownTimer" class="timer-countdown">05:00</span>
+                    </div>
+                    <button type="button" id="u_resendOtpBtn" class="resend-btn" onclick="requestUnlockOTP(true)" disabled>Resend OTP</button>
+                </div>
+            </div>
+            
+            <button type="submit" id="u_btn" class="submit-btn" style="margin-top: 10px;">Send OTP</button>
+        </form>
+
+        <div class="form-footer">
+            <a href="index.html">&larr; Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        let f_step = 1, u_step = 1;
+        let activeTimerInterval;
+
+        const errorSVG = `<svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        const successSVG = `<svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+        function showPopup(title, text, type = 'error', redirect = false) {
+            const icon = document.getElementById('popupIcon');
+            const btn = document.getElementById('popupActionBtn');
+            
+            document.getElementById('popupTitle').innerText = title;
+            document.getElementById('popupText').innerText = text;
+            
+            if(type === 'success') {
+                icon.innerHTML = successSVG;
+                icon.className = "icon-wrapper success";
+                btn.innerText = "Login Now";
+                if(redirect) btn.onclick = () => window.location.href = "index.html";
+            } else {
+                icon.innerHTML = errorSVG;
+                icon.className = "icon-wrapper error";
+                btn.innerText = "OK, Understood";
+                btn.onclick = closePopup;
+            }
+
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('messagePopup').style.display = 'block';
+        }
+
+        function closePopup() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('messagePopup').style.display = 'none';
+        }
+
+        function switchTab(t) {
+            clearInterval(activeTimerInterval); // Stop timer on tab switch
+            
+            f_step = 1; u_step = 1;
+            document.querySelectorAll('.otp-area').forEach(a => a.style.display = 'none');
+            document.querySelectorAll('.submit-btn').forEach(b => { 
+                if(b.id !== 'popupActionBtn') { b.innerText = "Send OTP"; b.disabled = false; }
+            });
+            document.getElementById('f-identity').style.display = 'block';
+            document.getElementById('u-identity').style.display = 'block';
+            
+            if(t === 'forgot') {
+                document.getElementById('forgotForm').classList.remove('hidden');
+                document.getElementById('unlockForm').classList.add('hidden');
+                document.getElementById('t-forgot').classList.add('active');
+                document.getElementById('t-unlock').classList.remove('active');
+            } else {
+                document.getElementById('forgotForm').classList.add('hidden');
+                document.getElementById('unlockForm').classList.remove('hidden');
+                document.getElementById('t-forgot').classList.remove('active');
+                document.getElementById('t-unlock').classList.add('active');
+            }
+        }
+
+        // Generic Timer Function
+        function startTimer(durationInSeconds, timerContainerId, countdownId, resendBtnId) {
+            clearInterval(activeTimerInterval);
+            
+            const timerContainer = document.getElementById(timerContainerId);
+            const resendBtn = document.getElementById(resendBtnId);
+            
+            timerContainer.innerHTML = `Expires in: <span id="${countdownId}" class="timer-countdown"></span>`;
+            resendBtn.disabled = true;
+            
+            let timeLeft = durationInSeconds;
+            
+            function updateDisplay() {
+                const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                const s = (timeLeft % 60).toString().padStart(2, '0');
+                const countdownSpan = document.getElementById(countdownId);
+                
+                if (countdownSpan) {
+                    countdownSpan.innerText = `${m}:${s}`;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(activeTimerInterval);
+                    timerContainer.innerHTML = `<span style="color: var(--danger); font-weight: 700;">OTP Expired</span>`;
+                    resendBtn.disabled = false;
+                }
+                timeLeft--;
+            }
+            
+            updateDisplay(); // initial call
+            activeTimerInterval = setInterval(updateDisplay, 1000);
+        }
+
+        // ── Forgot Password Logic ──
+        async function requestForgotOTP(isResend = false) {
+            const btn = document.getElementById('f_btn');
+            const resendBtn = document.getElementById('f_resendOtpBtn');
+            
+            if (!isResend) {
+                btn.disabled = true; 
+                btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" style="animation:spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Verifying...';
+            } else {
+                resendBtn.disabled = true;
+                resendBtn.innerText = 'Sending...';
+            }
+            
+            try {
+                const res = await fetch('/api/forgot', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ 
+                        user_id: document.getElementById('f_user').value, 
+                        dob: document.getElementById('f_dob').value, 
+                        doj: document.getElementById('f_doj').value, 
+                        action: 'SEND_OTP' 
+                    }) 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    f_step = 2;
+                    document.getElementById('f-otp-section').style.display = 'block';
+                    document.getElementById('f-identity').style.display = 'none'; // Hide identity fields
+                    btn.innerText = "Reset Password";
+                    
+                    if(isResend) {
+                        showPopup("OTP Sent", "A new verification code has been sent to your registered email.", "success");
+                    }
+                    startTimer(300, 'f_timerTextContainer', 'f_countdownTimer', 'f_resendOtpBtn');
+                } else { 
+                    showPopup("Verification Failed", data.message); 
+                    if (!isResend) btn.innerText = "Send OTP";
+                }
+            } catch(e) { 
+                showPopup("Error", "Connection Error"); 
+                if (!isResend) btn.innerText = "Send OTP"; 
+            }
+            
+            btn.disabled = false;
+            if(isResend) resendBtn.innerText = "Resend OTP";
+        }
+
+        document.getElementById('forgotForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('f_btn');
+            
+            if (f_step === 1) {
+                await requestForgotOTP(false);
+            } else {
+                const p1 = document.getElementById('f_pass').value;
+                const p2 = document.getElementById('f_conf').value;
+                
+                if(p1 !== p2) { 
+                    document.getElementById('f_error').style.display = 'block'; 
+                    return; 
+                } else {
+                    document.getElementById('f_error').style.display = 'none';
+                }
+                
+                btn.disabled = true; 
+                btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" style="animation:spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Updating...';
+                
+                try {
+                    const res = await fetch('/api/forgot', { 
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'}, 
+                        body: JSON.stringify({ 
+                            user_id: document.getElementById('f_user').value, 
+                            dob: document.getElementById('f_dob').value, 
+                            doj: document.getElementById('f_doj').value, 
+                            otp: document.getElementById('f_otp').value, 
+                            new_password: p1, 
+                            action: 'VERIFY_RESET' 
+                        }) 
+                    });
+                    const data = await res.json();
+                    if(data.success) { 
+                        clearInterval(activeTimerInterval);
+                        showPopup("Password Reset!", "Your password has been changed successfully.", "success", true);
+                    } else { 
+                        showPopup("Failed", data.message); 
+                        btn.innerText = "Reset Password"; 
+                        btn.disabled = false; 
+                    }
+                } catch(e) { 
+                    showPopup("Error", "Update Failed"); 
+                    btn.innerText = "Reset Password"; 
+                    btn.disabled = false; 
+                }
+            }
+        });
+
+        // ── Unlock Account Logic ──
+        async function requestUnlockOTP(isResend = false) {
+            const btn = document.getElementById('u_btn');
+            const resendBtn = document.getElementById('u_resendOtpBtn');
+            
+            if (!isResend) {
+                btn.disabled = true; 
+                btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" style="animation:spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Verifying...';
+            } else {
+                resendBtn.disabled = true;
+                resendBtn.innerText = 'Sending...';
+            }
+            
+            try {
+                const res = await fetch('/api/unlock', { 
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json'}, 
+                    body: JSON.stringify({ 
+                        user_id: document.getElementById('u_user').value, 
+                        e_code: document.getElementById('u_ecode').value, 
+                        dob: document.getElementById('u_dob').value, 
+                        doj: document.getElementById('u_doj').value, 
+                        action: 'SEND_OTP' 
+                    }) 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    u_step = 2;
+                    document.getElementById('u-otp-section').style.display = 'block';
+                    document.getElementById('u-identity').style.display = 'none'; // Clean UI
+                    btn.innerText = "Unlock Account";
+                    
+                    if(isResend) {
+                        showPopup("OTP Sent", "A new verification code has been sent to your registered email.", "success");
+                    }
+                    startTimer(300, 'u_timerTextContainer', 'u_countdownTimer', 'u_resendOtpBtn');
+                } else { 
+                    showPopup("Verification Failed", data.message); 
+                    if (!isResend) btn.innerText = "Send OTP";
+                }
+            } catch(e) { 
+                showPopup("Error", "Connection Error"); 
+                if (!isResend) btn.innerText = "Send OTP"; 
+            }
+            
+            btn.disabled = false;
+            if(isResend) resendBtn.innerText = "Resend OTP";
+        }
+
+        document.getElementById('unlockForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('u_btn');
+            
+            if(u_step === 1) {
+                await requestUnlockOTP(false);
+            } else {
+                btn.disabled = true; 
+                btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24" style="animation:spin 1s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px;"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Unlocking...';
+                
+                try {
+                    const res = await fetch('/api/unlock', { 
+                        method: 'POST', 
+                        headers: {'Content-Type': 'application/json'}, 
+                        body: JSON.stringify({ 
+                            user_id: document.getElementById('u_user').value, 
+                            e_code: document.getElementById('u_ecode').value, 
+                            dob: document.getElementById('u_dob').value, 
+                            doj: document.getElementById('u_doj').value, 
+                            otp: document.getElementById('u_otp').value, 
+                            action: 'VERIFY_UNLOCK' 
+                        }) 
+                    });
+                    const data = await res.json();
+                    if(data.success) { 
+                        clearInterval(activeTimerInterval);
+                        showPopup("Account Unlocked!", "Your account is now active. You can login.", "success", true);
+                    } else { 
+                        showPopup("Failed", data.message); 
+                        btn.innerText = "Unlock Account"; 
+                        btn.disabled = false; 
+                    }
+                } catch(e) { 
+                    showPopup("Error", "Unlock Failed"); 
+                    btn.innerText = "Unlock Account"; 
+                    btn.disabled = false; 
+                }
+            }
+        });
+    </script>
+</body>
+</html>

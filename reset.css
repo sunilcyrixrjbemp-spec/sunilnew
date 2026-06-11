@@ -1,0 +1,234 @@
+/* =========================================
+   RESET PASSWORD PAGE — APPLE-INSPIRED DESIGN
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --color-bg:           #f5f5f7;
+  --color-surface:      #ffffff;
+  --color-surface-2:    #f5f5f7;
+  --color-border:       rgba(0,0,0,0.08);
+  --color-border-focus: #0071e3;
+  --color-text:         #1d1d1f;
+  --color-text-2:       #6e6e73;
+  --color-text-3:       #aeaeb2;
+  --color-accent:       #0071e3;
+  --color-success:      #34c759;
+  --color-success-bg:   #f0fdf4;
+  --color-success-dark: #15803d;
+  --color-danger:       #ff3b30;
+  --radius-sm:          10px;
+  --radius:             18px;
+  --radius-lg:          22px;
+  --shadow:             0 2px 20px rgba(0,0,0,0.08), 0 8px 40px rgba(0,0,0,0.05);
+  --font:               'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition:         0.22s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--color-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: var(--color-text);
+  padding: 24px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.login-card {
+  background: var(--color-surface);
+  width: 100%;
+  max-width: 400px;
+  padding: 44px 40px 36px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+  animation: cardIn 0.5s cubic-bezier(0.34,1.2,0.64,1) both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.header-text { text-align: center; margin-bottom: 28px; }
+
+.cyrix-img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.10));
+}
+
+.header-text h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 5px;
+  letter-spacing: -0.3px;
+}
+
+.header-text p {
+  font-size: 13.5px;
+  color: var(--color-text-2);
+  font-weight: 400;
+}
+
+/* ─── Tab Navigation ─────────────────────────── */
+.tab-container {
+  display: flex;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border);
+  gap: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--color-text-2);
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.tab-btn.active {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+}
+
+.hidden { display: none; }
+
+/* ─── Form Elements ──────────────────────────── */
+.form-group { margin-bottom: 16px; position: relative; }
+
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-2);
+  margin-bottom: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: var(--font);
+  color: var(--color-text);
+  background: var(--color-surface-2);
+  transition: all var(--transition);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.form-group input:focus {
+  border-color: var(--color-border-focus);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 4px rgba(0,113,227,0.12);
+}
+
+#f-identity, #u-identity { transition: opacity 0.4s ease; }
+
+/* ─── OTP Area ───────────────────────────────── */
+.otp-area {
+  display: none;
+  margin-top: 18px;
+  padding: 22px;
+  background: #f0f7ff;
+  border-radius: var(--radius);
+  border: 1.5px dashed rgba(0,113,227,0.3);
+  animation: slideUp 0.35s cubic-bezier(0.34,1.1,0.64,1) forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Status Message ─────────────────────────── */
+#statusMsg {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 14px;
+  min-height: 20px;
+}
+
+.error-msg {
+  color: var(--color-danger);
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 5px;
+  display: none;
+}
+
+/* ─── Buttons ────────────────────────────────── */
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 14px;
+}
+
+.submit-btn:hover {
+  background: #0077ed;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0,113,227,0.3);
+}
+
+.submit-btn:active { transform: translateY(0); box-shadow: none; }
+
+.submit-btn:disabled {
+  background: var(--color-text-3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ─── Footer Links ───────────────────────────── */
+.form-footer { margin-top: 22px; text-align: center; }
+
+.form-footer a {
+  color: var(--color-text-2);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color var(--transition);
+}
+
+.form-footer a:hover { color: var(--color-accent); }
+
+/* ─── Responsive ─────────────────────────────── */
+@media (max-width: 480px) {
+  body { padding: 16px; align-items: flex-start; padding-top: 48px; }
+  .login-card { padding: 36px 22px 28px; border-radius: var(--radius); }
+  .header-text h1 { font-size: 20px; }
+}

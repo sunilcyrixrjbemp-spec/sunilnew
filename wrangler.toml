@@ -1,3 +1,8 @@
+name = "sunil"
+main = "main.js"
+compatibility_date = "2024-03-20"
+compatibility_flags = ["nodejs_compat"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "cyrixapp_modern"
@@ -6,3 +11,13 @@ database_id = "a09095fa-6105-4fa5-84f8-9b05c6d8cca7"
 [[r2_buckets]]
 binding = "BILLS_BUCKET"
 bucket_name = "cyrixapp-modern"
+
+[[rules]]
+type = "Text"
+globs = ["**/*.html", "**/*.css"]
+fallthrough = true
+
+[[rules]]
+type = "Data"
+globs = ["**/*.png", "**/*.jpg"]
+fallthrough = true

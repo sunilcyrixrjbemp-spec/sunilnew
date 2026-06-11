@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Cyrix Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================================
+           CYRIX HEALTHCARE — MASTER NAV STYLES (WITH SCROLLABLE FOOTER)
+        ============================================================ */
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #002b5e; 
+            --primary-light: #3b82f6;
+            --primary-50: #eff6ff;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --surface-3: #e2e8f0;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+            --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+            
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Inter', sans-serif;
+            
+            --sidebar-w: 240px;
+            --bottom-nav-h: 75px; 
+            --nav-radius: 12px;
+            --nav-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --t-fast: 0.15s ease;
+            --t-slow: 0.4s ease;
+            --z-modal: 1000;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        html, body {
+            overflow-x: clip;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background: var(--bg);
+        }
+
+        body.app-page {
+            font-family: var(--font);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        ul { list-style: none; }
+        button { cursor: pointer; font-family: var(--font); border: none; background: transparent; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface-2); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .svg-icon {
+            width: 100%; height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ============================================================
+           LOADER
+        ============================================================ */
+        #loadingOverlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .loader-wrapper { position: relative; width: 5em; height: 5em; margin-bottom: 20px; }
+        .loader { position: absolute; top: calc(50% - 1.25em); left: calc(50% - 1.25em); width: 2.5em; height: 2.5em; transform: rotate(165deg); }
+        .loader:before, .loader:after { content: ""; position: absolute; top: 50%; left: 50%; display: block; width: 0.5em; height: 0.5em; border-radius: 0.25em; transform: translate(-50%, -50%); }
+        .loader:before { animation: before8 2s infinite; }
+        .loader:after { animation: after6 2s infinite; }
+
+        @keyframes before8 {
+            0% { width: 0.5em; box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+            35% { width: 2.5em; box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75); }
+            70% { width: 0.5em; box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75); }
+            100% { box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+        }
+        @keyframes after6 {
+            0% { height: 0.5em; box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+            35% { height: 2.5em; box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75); }
+            70% { height: 0.5em; box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75); }
+            100% { box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+        }
+        #loaderText { font-weight: 700; color: var(--primary-dark); font-size: 16px; letter-spacing: 0.5px; }
+
+        /* ==================== DESKTOP SIDEBAR ==================== */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 100;
+            background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 4px 0 24px rgba(15,23,42,.1); transition: transform var(--nav-transition);
+        }
+        .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo img { width: 44px; height: auto; border-radius: 8px; background: white; padding: 2px; }
+        .logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+        .logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+        .nav-section { padding: 12px 0; }
+        .nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+        .nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+        .nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+        .nav-link-item.nav-logout { color: #f87171 !important; }
+        .nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w)); 
+            min-height: 100vh;
+            max-width: 100vw; 
+            overflow-x: hidden; 
+            transition: margin-left var(--nav-transition), width var(--nav-transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+            box-sizing: border-box;
+            align-items: center; 
+        }
+
+        .bottom-nav { display: none; }
+
+        /* ==================== MOBILE TOPBAR ==================== */
+        .mobile-topbar { display: none; width: 100%; background: var(--primary-dark); padding: 16px 20px; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow-sm); box-sizing: border-box; }
+        .mobile-topbar h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; flex: 1; letter-spacing: -0.5px; }
+        .mobile-topbar img { height: 32px; border-radius: 6px; background: white; padding: 2px; }
+
+        /* ==================== ENTERPRISE PROFILE UI ==================== */
+        .profile-container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Breadcrumbs */
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-2);
+            flex-wrap: wrap;
+        }
+        .bc-item { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: color var(--t-fast); }
+        .bc-item:hover { color: var(--primary); }
+        .bc-separator { color: var(--text-3); }
+        .bc-current { color: var(--primary-dark); font-weight: 800; cursor: default; pointer-events: none; }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: white; border: 1px solid var(--border); border-radius: 6px;
+            padding: 6px 12px; font-size: 12px; font-weight: 700; color: var(--text);
+            box-shadow: var(--shadow-xs); transition: all var(--t-fast); margin-right: 8px;
+        }
+        .back-btn:hover { background: var(--surface-2); border-color: var(--text-3); }
+
+        /* CONTACT STYLE PROFILE CARD */
+        .contact-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            width: 100%;
+            overflow: hidden;
+            margin-bottom: 32px;
+            transition: box-shadow var(--t-fast);
+        }
+        .contact-card:hover { box-shadow: var(--shadow-md); }
+        
+        .cc-banner {
+            height: 120px;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            position: relative;
+        }
+        .cc-banner::after {
+            content: ''; position: absolute; inset: 0; opacity: 0.05; pointer-events: none;
+            background-image: radial-gradient(white 1px, transparent 1px); background-size: 20px 20px;
+        }
+        
+        .cc-header {
+            padding: 0 32px 24px;
+            display: flex;
+            align-items: flex-end;
+            gap: 24px;
+            margin-top: -45px;
+            position: relative;
+            z-index: 2;
+        }
+        .cc-avatar-wrapper {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: #fff;
+            border: 4px solid #fff;
+            box-shadow: var(--shadow-md);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+        .cc-avatar-wrapper svg { width: 50px; height: 50px; stroke-width: 1.5px; }
+        
+        .cc-title { flex: 1; padding-top: 45px;}
+        .cc-title h2 { font-size: 24px; font-weight: 800; color: var(--text); margin: 0; letter-spacing: -0.5px;}
+        .cc-title p { font-size: 14px; font-weight: 500; color: var(--text-2); margin: 4px 0 10px; }
+        .cc-role-badge { display: inline-block; padding: 6px 12px; background: var(--primary-50); color: var(--primary-dark); font-size: 11px; font-weight: 700; border-radius: 8px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(30,64,175,0.1); }
+        
+        .cc-body {
+            padding: 24px 32px;
+            border-top: 1px solid var(--border);
+            background: #f8fafc;
+        }
+        .cc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+        }
+        .cc-item label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;}
+        .cc-item p { font-size: 15px; font-weight: 600; color: var(--text); margin: 0; word-break: break-word;}
+        .cc-item .mono { font-family: var(--font-mono); color: var(--primary-dark); font-weight: 700; }
+        .approvers-block { display: flex; flex-direction: column; gap: 6px; }
+        .approvers-block span { font-size: 13px; font-weight: 500; color: var(--text-2); }
+        .approvers-block strong { color: var(--primary-dark); font-weight: 700; }
+
+        /* TEAM SECTION (AVATAR GRID) */
+        .team-container { width: 100%; margin-top: 10px; }
+        .org-group { margin-bottom: 32px; background: white; border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        .org-group-title { font-size: 16px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; margin-bottom: 24px; border-bottom: 2px solid var(--surface-2); padding-bottom: 12px; }
+        
+        .team-avatar-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px 24px;
+            justify-content: flex-start;
+        }
+        
+        .team-member-circle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            text-align: center;
+            width: 110px;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+        .team-member-circle:hover { transform: translateY(-4px); }
+        
+        .tmc-avatar {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            border: 2.5px solid #334155;
+            background: #f8fafc;
+            display: flex; align-items: flex-end; justify-content: center;
+            overflow: hidden;
+            margin: 0 auto 10px;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+        .team-member-circle:hover .tmc-avatar {
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+            border-color: #2196f3;
+        }
+        .tmc-avatar svg {
+            width: 56px; height: 56px;
+            margin-bottom: -4px;
+            fill: #2196f3;
+            stroke: #334155;
+            stroke-width: 2px;
+            stroke-linejoin: round;
+        }
+        
+        .tmc-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.3;
+            max-width: 110px;
+            word-wrap: break-word;
+        }
+        .tmc-ecode {
+            font-size: 14px;
+            color: #333;
+            margin-top: 2px;
+        }
+        
+        /* New reportee indicator */
+        .reportee-indicator {
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 2px solid #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #334155;
+            z-index: 2;
+            transition: all 0.2s;
+        }
+        .team-member-circle:hover .reportee-indicator {
+            border-color: #2196f3;
+            color: #2196f3;
+        }
+
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 768px) {
+            body.app-page { display: block !important; }
+            .sidebar      { transform: translateX(-100%); display: flex !important; }
+            
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; }
+            .desktop-only { display: none !important; }
+            .mobile-topbar { display: flex !important; }
+            .profile-container { padding: 16px; }
+
+            .contact-card { margin-bottom: 24px; }
+            .cc-banner { height: 90px; }
+            .cc-header { flex-direction: column; align-items: center; text-align: center; padding: 0 20px 20px; }
+            .cc-title { padding-top: 16px; }
+            .cc-body { padding: 20px; }
+            .cc-grid { grid-template-columns: 1fr; gap: 16px; }
+            .cc-item { text-align: center; border-bottom: 1px dashed var(--border); padding-bottom: 12px;}
+            .cc-item:last-child { border-bottom: none; padding-bottom: 0;}
+            .approvers-block { align-items: center; }
+
+            .org-group { padding: 16px; }
+            .team-avatar-grid { justify-content: space-around; gap: 24px 16px; }
+
+            /* Bottom Nav */
+            .bottom-nav {
+                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h);
+                background: white; border-top: 1px solid var(--border); align-items: center; justify-content: flex-start;
+                overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; z-index: 200; 
+                box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none;
+            }
+            .bottom-nav::-webkit-scrollbar { display: none; }
+            .bn-item { 
+                flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+                padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; 
+                font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; cursor: pointer;
+            }
+            .bn-item.active { color: var(--primary); }
+            .bn-item.logout { color: var(--danger); }
+            .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+            .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+            .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+            .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1;}
+        }
+
+        @media (min-width: 769px) {
+            .mobile-topbar, .bottom-nav { display: none !important; }
+        }
+    </style>
+</head>
+<body class="app-page">
+
+    <div id="loadingOverlay">
+        <div class="loader-wrapper"><div class="loader"></div></div>
+        <div id="loaderText">Fetching Profile...</div>
+    </div>
+
+    <!-- DESKTOP SIDEBAR -->
+    <div class="sidebar" id="desktopSidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+                <div class="logo-text"><h2>Cyrix Healthcare</h2><span>Field Analytics</span></div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label">Main Menu</div>
+                <ul class="nav-list" id="sidebarNav"></ul>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <ul class="nav-list" id="desktopSidebarBottom">
+                <li><a href="profile.html" class="nav-link-item active"><div class="nav-icon-wrap"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div> My Profile</a></li>
+                <li><a href="#" class="nav-link-item nav-logout" onclick="logout(); return false;"><div class="nav-icon-wrap"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mobile Topbar (No Hamburger Menu) -->
+    <div class="mobile-topbar hide-desktop">
+        <div class="mobile-topbar-left">
+            <h1>My Profile</h1>
+        </div>
+        <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContainer" style="display:none;">
+        <div class="profile-container">
+            
+            <div class="breadcrumb-nav" id="breadcrumbContainer"></div>
+
+            <!-- CONTACT STYLE PROFILE CARD -->
+            <div class="contact-card">
+                <div class="cc-banner"></div>
+                <div class="cc-header">
+                    <div class="cc-avatar-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div class="cc-header-info cc-title">
+                        <h2 id="dispFullName">Loading...</h2>
+                        <p id="dispDesignation">...</p>
+                        <span id="dispRole" class="cc-role-badge">...</span>
+                    </div>
+                </div>
+                <div class="cc-body">
+                    <div class="cc-grid">
+                        <div class="cc-item">
+                            <label>Employee Code</label>
+                            <p id="dispEcode" class="mono">--</p>
+                        </div>
+                        <div class="cc-item">
+                            <label>Mobile Number</label>
+                            <p id="dispMobile">--</p>
+                        </div>
+                        <div class="cc-item">
+                            <label>Email Address</label>
+                            <p id="dispMail">--</p>
+                        </div>
+                        <div class="cc-item">
+                            <label>Zone & District</label>
+                            <p id="dispLocation">--</p>
+                        </div>
+                        <div class="cc-item" style="grid-column: 1 / -1; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px;">
+                            <label>Reporting Managers</label>
+                            <div class="approvers-block">
+                                <span>L1: <strong id="dispL1Approver">--</strong></span>
+                                <span>L2: <strong id="dispL2Approver">--</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Team Organogram Container -->
+            <div class="team-container" id="teamSectionContainer" style="display: none;">
+                <!-- Rendered via JS -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <!-- Logout Popup -->
+    <div class="modal-overlay" id="logoutOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.5);backdrop-filter:blur(4px);z-index:9999;display:none;"></div>
+    <div class="custom-popup" id="logoutPopup" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--surface);padding:32px;border-radius:20px;box-shadow:var(--shadow-lg);z-index:10000;text-align:center;display:none;width:90%;max-width:380px;border:1px solid var(--border);">
+        <div style="width:60px;height:60px;border-radius:50%;background:var(--danger-light);color:var(--danger);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+        <h3 style="color:var(--primary-dark);font-size:18px;margin-bottom:8px;font-weight:800;line-height:1.2;">Log Out</h3>
+        <p style="color:var(--text-2);font-size:14px;margin-bottom:24px;font-weight:500;line-height:1.5;">Are you sure you want to securely log out of your account?</p>
+        <div style="display:flex;gap:12px;justify-content:center;width:100%;">
+            <button onclick="closeLogoutModal()" style="margin:0;flex:1;justify-content:center;padding:12px;background:white;color:var(--text-2);border:1.5px solid var(--border);border-radius:8px;font-family:var(--font);font-weight:600;cursor:pointer;transition:all var(--t-fast);">Cancel</button>
+            <button onclick="confirmLogout()" style="margin:0;background:var(--danger);flex:1;justify-content:center;padding:12px;border:none;border-radius:8px;box-shadow:var(--shadow-sm);color:white;font-family:var(--font);font-weight:600;cursor:pointer;transition:all var(--t-fast);">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        const CURRENT_PAGE = 'profile';
+        
+        const ICONS = {
+            dashboard: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+            admin: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+            approval:  `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            expense:   `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+            report:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+            upload:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+            month:     `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+            profile:   `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+            logout:    `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+        };
+
+        const ALL_MENU_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard',       icon: ICONS.dashboard, href: 'home.html',      roles: ['Admin','Manager','Coordinator','Account','Travel Desk','Project Head','HR','Engineer'] },
+            { id: 'admin',     label: 'Admin Panel',     icon: ICONS.admin,     href: 'admin.html',     roles: ['Admin','HR'] },
+            { id: 'approval',  label: 'Approval Center', icon: ICONS.approval,  href: 'approval.html',  roles: ['Admin','Manager','Coordinator','Project Head','HR'] },
+            { id: 'expense',   label: 'Submit Claim',    icon: ICONS.expense,   href: 'expense.html',   roles: ['Admin','Manager','Coordinator','Engineer','Project Head'] },
+            { id: 'report',    label: 'Analytics',       icon: ICONS.report,    href: 'dashboard.html', roles: ['Admin','Manager','Coordinator','Account','Project Head','HR'] },
+            { id: 'upload',    label: 'Data Sync',       icon: ICONS.upload,    href: 'upload.html',    roles: ['Admin','HR'] },
+            { id: 'month',     label: 'Month Summary',   icon: ICONS.month,     href: 'month.html',     roles: ['Admin','Manager','Coordinator','Account','Project Head','HR'] }
+        ];
+
+        let profileHistory = [];
+        let LOGGED_IN_ID = '';
+        let USER_ROLE = '';
+
+        function showLoader(msg = "Fetching Data...") {
+            const overlay = document.getElementById('loadingOverlay');
+            document.getElementById('loaderText').textContent = msg;
+            if(overlay) {
+                overlay.style.display = 'flex';
+                setTimeout(() => overlay.style.opacity = '1', 10);
+            }
+        }
+
+        function finishLoader() {
+            const overlay = document.getElementById('loadingOverlay');
+            if(overlay) {
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => { 
+                        overlay.style.display = 'none'; 
+                        document.getElementById('mainContainer').style.display = 'flex';
+                    }, 300);
+                }, 400);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            LOGGED_IN_ID = localStorage.getItem('logged_in_user_id') || localStorage.getItem('user_id');
+            USER_ROLE = localStorage.getItem('user_role');
+
+            if (!LOGGED_IN_ID || !USER_ROLE) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            buildSidebar(USER_ROLE);
+            buildBottomNav(USER_ROLE);
+
+            profileHistory = [{ id: LOGGED_IN_ID, name: 'My Profile' }];
+            renderCurrentView();
+        });
+
+        async function renderCurrentView() {
+            const currentObj = profileHistory[profileHistory.length - 1];
+            showLoader(`Loading ${currentObj.name}...`);
+            renderBreadcrumbs();
+
+            try {
+                // Fetch full profile info
+                const pRes = await fetch(`/api/profile?user_id=${currentObj.id}`);
+                const pData = await pRes.json();
+                
+                if (pData.success) {
+                    populateProfile(pData.profile);
+                    
+                    if (currentObj.name === 'My Profile' && pData.profile.full_name) {
+                        currentObj.name = pData.profile.full_name;
+                        renderBreadcrumbs();
+                    }
+
+                    // Fetch Team dynamically using relative path
+                    await fetchAndRenderTeam(currentObj.id);
+                } else {
+                    alert('Could not load profile: ' + pData.message);
+                }
+            } catch (err) {
+                console.error("Error fetching profile:", err);
+            }
+            finishLoader();
+        }
+
+        async function fetchAndRenderTeam(targetId) {
+            const teamContainer = document.getElementById('teamSectionContainer');
+            
+            try {
+                const res = await fetch(`/api/team?manager_id=${targetId}`);
+                const data = await res.json();
+                
+                if (data.success && data.team && data.team.length > 0) {
+                    const distinctManagers = [...new Set(data.team.map(emp => emp.manager_name))];
+            
+            if (distinctManagers.length > 1 || (USER_ROLE === 'Admin' || USER_ROLE === 'HR' || USER_ROLE === 'Superadmin')) {
+                // Admin grouping by manager name
+                const groups = {};
+                data.team.forEach(emp => {
+                    const managerName = emp.manager_name || 'No Manager Assigned';
+                    if (!groups[managerName]) groups[managerName] = [];
+                    groups[managerName].push(emp);
+                });
+
+                let html = '';
+                for (const [mName, emps] of Object.entries(groups)) {
+                    html += `
+                        <div class="org-group">
+                            <div class="org-group-title">Reporting to: ${mName} (${emps.length})</div>
+                            <div class="team-avatar-grid">
+                                ${emps.map(emp => buildCardHTML(emp)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+                teamContainer.innerHTML = html;
+            } else {
+                // Standard List for Manager/Coordinator/Project Head
+                teamContainer.innerHTML = `
+                    <div class="org-group">
+                        <div class="org-group-title">My Team (${data.team.length})</div>
+                        <div class="team-avatar-grid">
+                            ${data.team.map(emp => buildCardHTML(emp)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            teamContainer.style.display = 'block';
+                } else {
+                    teamContainer.style.display = 'none';
+                    teamContainer.innerHTML = '';
+                }
+            } catch (err) {
+                console.error(err);
+                teamContainer.style.display = 'none';
+            }
+        }
+
+        // Generates the circular avatar card mimicking the provided image perfectly
+        function buildCardHTML(emp) {
+            // Determine if we should show the '+' indicator based on role
+            const rolesWithReportees = ['Manager', 'Coordinator', 'Divisional Manager', 'Project Head'];
+            const hasReportees = rolesWithReportees.includes(emp.role);
+            
+            return `
+            <div class="team-member-circle" onclick="drillDown('${emp.user_id}', '${(emp.full_name||'').replace(/'/g, "\\'")}')">
+                <div class="tmc-avatar">
+                    <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
+                        <path d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v1.5h16V17c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                    ${hasReportees ? `<div class="reportee-indicator">+</div>` : ''}
+                </div>
+                <div class="tmc-name">${emp.full_name || 'Unknown'}</div>
+                <div class="tmc-ecode">(${emp.e_code || 'N/A'})</div>
+            </div>`;
+        }
+
+        function populateProfile(p) {
+            document.getElementById('dispFullName').textContent    = p.full_name      || 'N/A';
+            document.getElementById('dispDesignation').textContent = p.designation    || 'N/A';
+            document.getElementById('dispRole').textContent        = p.role           || 'N/A';
+            document.getElementById('dispEcode').textContent       = p.e_code         || 'N/A';
+            document.getElementById('dispMobile').textContent      = p.mobile_number  || 'N/A';
+            document.getElementById('dispMail').textContent        = p.mail_id        || 'N/A';
+            document.getElementById('dispL1Approver').textContent  = p.l1_name || p.level_first_approver || 'None';
+            document.getElementById('dispL2Approver').textContent  = p.l2_name || p.level_second_approver || 'None';
+            
+            const loc = [];
+            if(p.district_name) loc.push(p.district_name);
+            if(p.zone_name) loc.push(p.zone_name);
+            document.getElementById('dispLocation').textContent = loc.join(', ') || 'N/A';
+        }
+
+        function renderBreadcrumbs() {
+            const bcContainer = document.getElementById('breadcrumbContainer');
+            if (profileHistory.length <= 1) {
+                bcContainer.innerHTML = `<div class="bc-item bc-current">My Profile</div>`;
+                return;
+            }
+
+            let html = `<button class="back-btn" onclick="goBack(${profileHistory.length - 2})">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                Back
+            </button>`;
+
+            html += profileHistory.map((item, index) => {
+                const isLast = index === profileHistory.length - 1;
+                const label = index === 0 ? 'My Profile' : item.name.split(' ')[0]; // Short name
+                if (isLast) {
+                    return `<span class="bc-separator">/</span> <span class="bc-item bc-current">${label}</span>`;
+                }
+                return `${index > 0 ? '<span class="bc-separator">/</span>' : ''} <span class="bc-item" onclick="goBack(${index})">${label}</span>`;
+            }).join(' ');
+
+            bcContainer.innerHTML = html;
+        }
+
+        // Clicking a team member drills down directly into their profile
+        function drillDown(id, name) {
+            profileHistory.push({ id, name });
+            renderCurrentView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goBack(index) {
+            profileHistory = profileHistory.slice(0, index + 1);
+            renderCurrentView();
+        }
+
+        // ====== Layout / Utilities ======
+        function buildSidebar(role) {
+            const nav = document.getElementById('sidebarNav');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            nav.innerHTML = items.map(item => `
+                <li>
+                    <a href="${item.href}" class="nav-link-item ${item.id === CURRENT_PAGE ? 'active' : ''}">
+                        <div class="nav-icon-wrap">${item.icon}</div> ${item.label}
+                    </a>
+                </li>`).join('');
+        }
+
+        function buildBottomNav(role) {
+            const nav = document.getElementById('bottom-nav');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            let html = items.map(item => {
+                const active = item.id === CURRENT_PAGE ? 'active' : '';
+                return `
+                    <a href="${item.href}" class="bn-item ${active}">
+                        <div class="bn-icon-wrap">${item.icon}</div>
+                        <div class="bn-label">${item.label.split(' ')[0]}</div>
+                    </a>`;
+            }).join('');
+
+            const profileActive = CURRENT_PAGE === 'profile' ? 'active' : '';
+            html += `
+                <a href="profile.html" class="bn-item ${profileActive}">
+                    <div class="bn-icon-wrap">${ICONS.profile}</div>
+                    <div class="bn-label">Profile</div>
+                </a>
+                <div class="bn-item logout" onclick="logout()">
+                    <div class="bn-icon-wrap">${ICONS.logout}</div>
+                    <div class="bn-label">Logout</div>
+                </div>`;
+            nav.innerHTML = html;
+        }
+
+        function logout() {
+            document.getElementById('logoutOverlay').style.display = 'block';
+            document.getElementById('logoutPopup').style.display = 'block';
+        }
+        function closeLogoutModal() {
+            document.getElementById('logoutOverlay').style.display = 'none';
+            document.getElementById('logoutPopup').style.display = 'none';
+        }
+        function confirmLogout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Cyrix Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #002b5e; /* Exact deep navy */
+            --primary-light: #3b82f6;
+            --primary-50: #eff6ff;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --surface-3: #e2e8f0;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+            --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+            
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Inter', sans-serif;
+            
+            --sidebar-w: 240px;
+            --bottom-nav-h: 75px; /* Slightly taller for scrollable items */
+            --nav-radius: 12px;
+            --nav-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --t-fast: 0.15s ease;
+            --t-slow: 0.4s ease;
+            --z-modal: 1000;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        /* OVERFLOW PREVENTER - 'clip' FIXES THE STICKY SCROLL ISSUE */
+        html, body {
+            overflow-x: clip;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background: var(--bg);
+        }
+
+        body.app-page {
+            font-family: var(--font);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        ul { list-style: none; }
+        button { cursor: pointer; font-family: var(--font); border: none; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--surface-2); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Global SVG Icon Styling */
+        .svg-icon {
+            width: 100%; height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* ============================================================
+           NEW LOADER: Uiverse.io by SchawnnahJ
+        ============================================================ */
+        #loadingOverlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        .loader-wrapper {
+            position: relative;
+            width: 5em;
+            height: 5em;
+            margin-bottom: 20px;
+        }
+
+        .loader {
+            position: absolute;
+            top: calc(50% - 1.25em);
+            left: calc(50% - 1.25em);
+            width: 2.5em;
+            height: 2.5em;
+            transform: rotate(165deg);
+        }
+
+        .loader:before, .loader:after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: block;
+            width: 0.5em;
+            height: 0.5em;
+            border-radius: 0.25em;
+            transform: translate(-50%, -50%);
+        }
+
+        .loader:before { animation: before8 2s infinite; }
+        .loader:after { animation: after6 2s infinite; }
+
+        @keyframes before8 {
+            0% { width: 0.5em; box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+            35% { width: 2.5em; box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75), 0 0.5em rgba(111, 202, 220, 0.75); }
+            70% { width: 0.5em; box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75), 1em 0.5em rgba(111, 202, 220, 0.75); }
+            100% { box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75), -1em 0.5em rgba(111, 202, 220, 0.75); }
+        }
+
+        @keyframes after6 {
+            0% { height: 0.5em; box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+            35% { height: 2.5em; box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75), -0.5em 0 rgba(233, 169, 32, 0.75); }
+            70% { height: 0.5em; box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75), -0.5em 1em rgba(233, 169, 32, 0.75); }
+            100% { box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75), -0.5em -1em rgba(233, 169, 32, 0.75); }
+        }
+
+        #loaderText { 
+            font-weight: 700; 
+            color: var(--primary-dark); 
+            font-size: 16px; 
+            letter-spacing: 0.5px; 
+        }
+
+        /* ==================== DESKTOP SIDEBAR ==================== */
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 100;
+            background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 4px 0 24px rgba(15,23,42,.1); transition: transform var(--nav-transition);
+        }
+        .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+        
+        .sidebar-logo img {
+            width: 44px;
+            height: auto;
+            border-radius: 8px;
+            background: white;
+            padding: 2px;
+        }
+
+        .logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+        .logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+        .nav-section { padding: 12px 0; }
+        .nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+        .nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+        .nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+        .nav-link-item.nav-logout { color: #f87171 !important; }
+        .nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .nav-icon-wrap svg { stroke-width: 2px; }
+        .sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w)); 
+            min-height: 100vh;
+            max-width: 100vw; 
+            overflow-x: hidden; 
+            transition: margin-left var(--nav-transition), width var(--nav-transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bottom-nav { display: none; }
+
+        /* ==================== DESKTOP HEADER ==================== */
+        .page-header { display: flex; justify-content: space-between; align-items: center; padding: 32px 32px 20px; flex-wrap: wrap; gap: 20px; }
+        .page-breadcrumb { font-size: 14px; color: #334155; font-weight: 500; margin-bottom: 4px; }
+        .page-title { font-size: 30px; font-weight: 800; color: var(--primary-dark); letter-spacing: -0.5px; line-height: 1.2; margin: 0;}
+        .page-header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: all var(--t-fast); text-decoration: none;}
+        .btn-primary { background: var(--primary); color: white; box-shadow: var(--shadow-sm); border: none; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+        .search-input { width: 100%; padding: 10px 16px 10px 40px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); transition: border-color 0.2s; box-sizing: border-box; min-width: 280px; }
+        .search-input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .search-wrap { position: relative; }
+        .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-3); }
+
+        .content-area { padding: 0 32px 40px; flex: 1; width: 100%; box-sizing: border-box;}
+
+        /* ==================== TABLE ==================== */
+        .table-card { background: white; border-radius: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow: hidden; width: 100%; min-width: 0; }
+        .table-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--surface-2); flex-wrap: wrap; gap: 16px; }
+        .table-title { font-size: 16px; font-weight: 700; color: var(--primary-dark); margin: 0; }
+        
+        .table-container { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+        .data-table { width: 100%; border-collapse: collapse; min-width: 1400px; text-align: left; }
+        .data-table thead th { padding: 14px 24px; font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; background: var(--surface-2); border-bottom: 2px solid var(--border); white-space: nowrap; }
+        .data-table tbody td { padding: 16px 24px; font-size: 14px; color: var(--text); border-bottom: 1px solid var(--border); white-space: nowrap;}
+        .data-table tbody tr { transition: background 0.2s; cursor: pointer; }
+        .data-table tbody tr:hover { background: var(--primary-50); }
+
+        .user-id-tag { font-family: var(--font-mono); font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 6px; }
+        
+        .status-select { padding: 6px 10px; border-radius: 6px; border: 1.5px solid var(--border); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); background: var(--surface-2); color: var(--text); outline: none;}
+        .status-select:focus { border-color: var(--primary); }
+
+        .action-btns { display: flex; gap: 8px; align-items: center; }
+        .btn-edit { background: var(--primary-50); color: var(--primary); border: 1px solid var(--primary-light); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: background var(--t-fast); font-family: var(--font);}
+        .btn-edit:hover { background: var(--info-light); }
+        .btn-delete { background: var(--danger-light); color: var(--danger); border: 1px solid rgba(239,68,68,0.3); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-weight: 600; transition: background var(--t-fast); font-family: var(--font);}
+        .btn-delete:hover { background: #fecaca; }
+
+        .failed-count { background: var(--danger-light); color: var(--danger); padding: 4px 10px; border-radius: 99px; font-weight: 700; font-size: 12px; }
+        .pass-text { font-family: var(--font-mono); color: var(--text); background: var(--surface-2); padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 12px; border: 1px solid var(--border); }
+        
+        /* Empty State */
+        .empty-state { text-align: center !important; padding: 60px 20px !important; color: var(--text-3); border-bottom: none !important; justify-content: center !important; display: flex !important; flex-direction: column; width: 100%; grid-column: 1 / -1; }
+        .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.8; }
+        .empty-text { font-size: 15px; font-weight: 500; }
+
+        /* ==================== MODALS ==================== */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,23,42,.5); backdrop-filter: blur(4px); z-index: var(--z-modal); align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.active { display: flex; animation: fadeIn .2s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal { background: var(--surface); border-radius: 16px; padding: 32px; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); position: relative; }
+        .modal-title { font-size: 20px; font-weight: 800; color: var(--primary-dark); margin: 0 0 24px 0; border-bottom: 1px solid var(--border); padding-bottom: 16px;}
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); color: var(--text); background: var(--surface); outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        .readonly-id { background: var(--surface-2) !important; color: var(--text-3) !important; font-weight: 600; font-family: var(--font-mono) !important; cursor: not-allowed;}
+
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .btn-secondary { background: transparent; color: var(--text-2); border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--t-fast); }
+        .btn-secondary:hover { background: var(--surface-2); color: var(--text); }
+
+        /* Detail Grid for View Modal */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .detail-item { display: flex; flex-direction: column; gap: 4px; }
+        .detail-item label { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+        .detail-item p { font-size: 14px; font-weight: 600; color: var(--text); background: var(--surface-2); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin: 0; word-break: break-all; }
+
+        /* Toast Container */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none;}
+
+        /* Custom Popup for Logout */
+        .custom-popup { 
+            position: fixed; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: var(--surface); 
+            padding: 32px; 
+            border-radius: 20px; 
+            box-shadow: var(--shadow-lg); 
+            z-index: 10000; 
+            text-align: center; 
+            display: none; 
+            width: 90%; 
+            max-width: 380px; 
+            animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); 
+            border: 1px solid var(--border);
+        }
+        @keyframes popIn { 
+            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } 
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; } 
+        }
+        .icon-wrapper {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px auto;
+        }
+        .icon-wrapper.error { background: var(--danger-light); color: var(--danger); }
+        .icon-wrapper.success { background: var(--success-light); color: var(--success); }
+        
+        .btn-ghost {
+            background: white; color: var(--text-2); border: 1.5px solid var(--border);
+            padding: 10px 20px; border-radius: 8px; font-family: var(--font);
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--t-fast);
+            display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);
+        }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* ==================== MOBILE LAYOUT FIXES ==================== */
+        @media (max-width: 768px) {
+            /* Force exact 60px padding on body so we have room for the fixed topbar */
+            body.app-page { display: block !important; padding-top: 60px !important; }
+            .sidebar      { display: none !important; } 
+            
+            /* TOPBAR FULLY FIXED - 60px Height */
+            .mobile-topbar { 
+                display: flex !important; 
+                background: var(--primary-dark) !important; 
+                padding: 0 20px !important; 
+                height: 60px !important; 
+                align-items: center;
+                justify-content: space-between;
+                position: fixed !important; 
+                top: 0 !important; 
+                left: 0 !important; 
+                right: 0 !important; 
+                width: 100% !important; 
+                box-sizing: border-box !important;
+                z-index: 9999 !important; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            }
+
+            .mobile-topbar img {
+                height: 32px !important;
+                border-radius: 6px;
+                background: white;
+                padding: 2px;
+            }
+
+            .mobile-topbar h1 { color: #fff; font-size: 18px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+
+            /* Strictly hide unwanted wrappers */
+            .desktop-only, .page-header { display: none !important; }
+
+            /* Main Content Adjustments to remove ghost gap */
+            .main-content { 
+                margin-left: 0 !important; 
+                width: 100% !important; 
+                padding: 0 !important; 
+                padding-top: 16px !important; /* EXACT 16px visual gap below the topbar */
+                padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; 
+            }
+            
+            .content-area { padding: 0 16px 16px !important; }
+            
+            /* Action Bar (Search & Button) Margin Fix */
+            .hide-desktop { margin-top: 0 !important; margin-bottom: 16px !important; }
+            .search-wrap { width: 100%; margin-bottom: 0 !important; }
+
+            /* PERFECT MOBILE CARD LAYOUT FOR RECORDS ONLY - CSS GRID FIX */
+            .table-card { border-radius: 12px; border: none; box-shadow: none; background: transparent; }
+            .table-header { border-radius: 12px; margin-bottom: 16px; border: 1px solid var(--border); }
+            
+            table.data-table { display: block; width: 100% !important; min-width: 0 !important; }
+            table.data-table thead { display: none; }
+            table.data-table tbody { display: block; width: 100%; }
+            table.data-table tbody tr { 
+                display: flex; 
+                flex-direction: column;
+                border: 1px solid var(--border); 
+                border-radius: 12px; 
+                margin-bottom: 16px; 
+                box-shadow: 0 4px 8px rgba(0,0,0,0.05); 
+                padding: 0; 
+                background: #fff;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            table.data-table tbody td:first-child {
+                background-color: var(--surface-2);
+                border-bottom: 2px solid var(--border) !important;
+                border-radius: 12px 12px 0 0;
+            }
+            table.data-table tbody td { 
+                display: flex !important; 
+                flex-direction: row;
+                justify-content: space-between; 
+                align-items: flex-start; 
+                padding: 12px 16px !important; 
+                border-bottom: 1px dashed var(--border) !important; 
+                border-right: none !important; 
+                width: 100%;
+                box-sizing: border-box;
+            }
+            table.data-table tbody td:last-child {
+                border-bottom: none !important;
+            }
+            table.data-table tbody td::before { 
+                content: attr(data-label); 
+                font-weight: 700; 
+                font-size: 11px; 
+                color: var(--text-3); 
+                text-transform: uppercase; 
+                text-align: left; 
+                flex: 0 0 35%; /* Fixed width for left labels */
+                max-width: 35%;
+                padding-right: 10px;
+                line-height: 1.4;
+            }
+            table.data-table tbody td .cell-val { 
+                flex: 1 1 65%; /* Rest of the space for values */
+                max-width: 65%;
+                text-align: right; 
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                word-wrap: break-word; 
+                overflow-wrap: anywhere; 
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text);
+                line-height: 1.4;
+            }
+
+            .action-btns { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; justify-content: stretch; }
+            .action-btns button { width: 100%; justify-content: center; padding: 10px 8px; }
+
+            .modal { max-width: calc(100vw - 32px) !important; padding: 20px 16px; border-radius: 12px;}
+            .form-grid, .detail-grid { grid-template-columns: 1fr; gap: 12px;}
+            .modal-actions { flex-direction: column-reverse; gap: 10px; }
+            .modal-actions button { width: 100%; justify-content: center;}
+
+            /* SCROLLABLE BOTTOM NAV */
+            .bottom-nav {
+                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h);
+                background: white; border-top: 1px solid var(--border); align-items: center; justify-content: flex-start;
+                overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; z-index: 200; 
+                box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none;
+            }
+            .bottom-nav::-webkit-scrollbar { display: none; }
+            .bn-item { 
+                flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; 
+                padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; 
+                font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; cursor: pointer;
+            }
+            .bn-item.active { color: var(--primary); }
+            .bn-item.logout { color: var(--danger); }
+            .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+            .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+            .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+            .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1;}
+            
+            /* Empty State Overrides for Mobile */
+            table.data-table tbody td.empty-state {
+                display: flex !important;
+                text-align: center !important;
+                padding: 40px 20px !important;
+                border-bottom: none !important;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+            table.data-table tbody td.empty-state::before { content: none !important; }
+        }
+        @media (min-width: 769px) {
+            .mobile-topbar, .bottom-nav { display: none !important; }
+            .sidebar-overlay { display: none !important; }
+        }
+    </style>
+</head>
+<body class="app-page">
+
+    <!-- New Full Screen Loader -->
+    <div id="loadingOverlay">
+        <div class="loader-wrapper">
+            <div class="loader"></div>
+        </div>
+        <div id="loaderText">Processing...</div>
+    </div>
+
+    <!-- ============================================================ DESKTOP SIDEBAR ============================================================ -->
+    <div class="sidebar" id="desktopSidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img src="logo.png" alt="Cyrix" onerror="this.style.display='none';">
+                <div class="logo-text">
+                    <h2>Cyrix Healthcare</h2>
+                    <span>Field Analytics</span>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label">Main Menu</div>
+                <ul class="nav-list" id="sidebarNav">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <ul class="nav-list" id="desktopSidebarBottom">
+                <!-- Profile & Logout Populated by JS -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mobile Topbar -->
+    <div class="mobile-topbar">
+        <h1>Admin Panel</h1>
+        <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+    </div>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Mobile Bottom Nav -->
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <!-- ============================================================ MAIN CONTENT ============================================================ -->
+    <main class="main-content" id="mainContainer" style="display:none;">
+
+        <!-- Desktop Page Header -->
+        <div class="page-header desktop-only">
+            <div>
+                <p class="page-breadcrumb">Cyrix Healthcare / System</p>
+                <h1 class="page-title">⚙️ User Management</h1>
+            </div>
+            <div class="page-header-right">
+                <div class="search-wrap">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInputDesktop" class="search-input" placeholder="Search ID, Name, District..." oninput="filterUsers(this.value)">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Add New User
+                </button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Mobile Action Bar -->
+            <div style="display:flex; gap:12px;" class="hide-desktop">
+                <div class="search-wrap" style="flex:1;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" id="searchInputMobile" class="search-input" placeholder="Search users..." oninput="filterUsers(this.value)">
+                </div>
+                <button class="btn btn-primary" onclick="openAddModal()" style="padding: 10px; flex-shrink:0;">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                </button>
+            </div>
+
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">All System Users</h2>
+                    <span id="user-count" style="font-size: 12px; color: var(--text-2); background: var(--surface-2); padding: 4px 12px; border-radius: 999px; font-weight: 600; border: 1px solid var(--border);">Loading...</span>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Full Name</th>
+                                <th>E-Code</th>
+                                <th>Designation</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Upkaran ID</th>
+                                <th>DOB</th>
+                                <th>Joining</th>
+                                <th>Zone</th>
+                                <th>District</th>
+                                <th>Grade</th>
+                                <th>Role</th>
+                                <th>L1 Approver</th>
+                                <th>L2 Approver</th>
+                                <th>Failed Attempts</th>
+                                <th>Status</th>
+                                <th class="sticky-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userList">
+                            <tr><td colspan="18" class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Loading users...</div></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================ ADD / EDIT MODAL ============================================================ -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <h2 id="modalTitle" class="modal-title">Add New User</h2>
+            <form id="adminForm">
+                <div class="form-grid">
+                    <div class="form-group"><label>User ID</label><input type="text" id="display_user_id" readonly class="readonly-id"></div>
+                    <div class="form-group"><label>Full Name <span style="color:var(--danger)">*</span></label><input type="text" id="full_name" name="full_name" required placeholder="Enter full name"></div>
+                    <div class="form-group"><label>E-Code <span style="color:var(--danger)">*</span></label><input type="text" id="e_code" name="e_code" required placeholder="EMP-001"></div>
+                    <div class="form-group"><label>Designation <span style="color:var(--danger)">*</span></label><input type="text" id="designation" name="designation" required placeholder="Field Engineer"></div>
+                    <div class="form-group"><label>Mobile Number <span style="color:var(--danger)">*</span></label><input type="text" id="mobile_number" name="mobile_number" required placeholder="9876543210"></div>
+                    <div class="form-group"><label>Email Address <span style="color:var(--danger)">*</span></label><input type="email" id="mail_id" name="mail_id" required placeholder="user@cyrix.com"></div>
+                    <div class="form-group"><label>E-Upkaran ID</label><input type="text" id="e_upkaran_id" name="e_upkaran_id" placeholder="Optional"></div>
+                    <div class="form-group"><label>Date of Birth <span style="color:var(--danger)">*</span></label><input type="date" id="date_of_birth" name="date_of_birth" required></div>
+                    <div class="form-group"><label>Date of Joining <span style="color:var(--danger)">*</span></label><input type="date" id="date_joining" name="date_joining" required></div>
+                    <div class="form-group"><label>Grade <span style="color:var(--danger)">*</span></label><select id="grade_select" name="grade" required></select></div>
+                    <div class="form-group"><label>Role <span style="color:var(--danger)">*</span></label><select id="role_select" name="role" required></select></div>
+                    <div class="form-group"><label>Zone <span style="color:var(--danger)">*</span></label><select id="zone_select" name="zone_name" required onchange="loadDistricts(this.value)"></select></div>
+                    <div class="form-group"><label>District <span style="color:var(--danger)">*</span></label><select id="district_select" name="district_name" required></select></div>
+                    <div class="form-group"><label>L1 Approver</label><select id="level_first_approver" name="level_first_approver"><option value="">Select Approver</option></select></div>
+                    <div class="form-group"><label>L2 Approver</label><select id="level_second_approver" name="level_second_approver"><option value="">Select Approver</option></select></div>
+                    <div class="form-group" id="passField"><label>Password</label><input type="password" id="password" name="password" placeholder="Leave blank to keep current"></div>
+                    <input type="hidden" id="account_status_hidden" name="account_status" value="Active">
+                </div>
+                <input type="hidden" id="editUserId">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        Save User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================================ VIEW USER DETAILS MODAL ============================================================ -->
+    <div class="modal-overlay" id="viewUserModal">
+        <div class="modal">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+                <h2 class="modal-title" style="border:none; padding:0; margin:0;">User Details</h2>
+                <button type="button" onclick="closeViewModal()" style="background:var(--surface-2);border:none;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text-2);cursor:pointer; transition:all var(--t-fast);">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div id="viewUserDetailsContent" class="detail-grid">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Popup -->
+    <div class="popup-overlay" id="logoutOverlay"></div>
+    <div class="custom-popup" id="logoutPopup">
+        <div class="icon-wrapper error">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        </div>
+        <h3 style="color: var(--primary-dark); font-size: 18px; margin-bottom: 8px; font-weight: 800; line-height: 1.2;">Log Out</h3>
+        <p style="color: var(--text-2); font-size: 14px; margin-bottom: 24px; font-weight: 500; line-height: 1.5;">Are you sure you want to securely log out of your account?</p>
+        <div style="display: flex; gap: 12px; justify-content: center; width: 100%;">
+            <button class="btn-ghost" onclick="closeLogoutModal()" style="margin: 0; flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+            <button class="btn-primary" onclick="confirmLogout()" style="margin: 0; background: var(--danger); flex: 1; justify-content: center; padding: 12px; border: none; box-shadow: var(--shadow-sm); color: white;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ============================================================ SCRIPTS ============================================================ -->
+    <script>
+        const CURRENT_PAGE = 'admin';
+        window.USERS_DATA = [];
+
+        // Master list of all menu items and their allowed roles with High Quality SVGs
+        const ICONS = {
+            dashboard: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+            admin: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+            approval: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            expense: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+            report: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+            upload: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+            month: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+            profile: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+            logout: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+        };
+
+        const ALL_MENU_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard',       icon: ICONS.dashboard, colorCls: 'c-purple', href: 'home.html',      roles: ['Admin','Superadmin','Manager','Engineer','Coordinator','Accounts','Divisional Manager','District Incharge'] },
+            { id: 'admin',     label: 'Admin Panel',     icon: ICONS.admin,     colorCls: 'c-pink',   href: 'admin.html',   roles: ['Admin','Superadmin'] },
+            { id: 'approval',  label: 'Approval Center', icon: ICONS.approval,  colorCls: 'c-green',  href: 'approval.html',  roles: ['Admin','Superadmin','Manager','Coordinator','Divisional Manager'] },
+            { id: 'expense',   label: 'Submit Claim',    icon: ICONS.expense,   colorCls: 'c-teal',   href: 'expense.html',   roles: ['Admin','Superadmin','Engineer'] },
+            { id: 'report',    label: 'Analytics',       icon: ICONS.report,    colorCls: 'c-blue',   href: 'dashboard.html', roles: ['Admin','Superadmin','Engineer','Manager','Coordinator','Divisional Manager','District Incharge'] },
+            { id: 'upload',    label: 'Data Sync',       icon: ICONS.upload,    colorCls: 'c-orange', href: 'upload.html',    roles: ['Admin','Superadmin'] },
+            { id: 'month',     label: 'Month Summary',   icon: ICONS.month,     colorCls: 'c-red',    href: 'month.html',     roles: ['Admin','Superadmin','Manager','Coordinator','Accounts','Divisional Manager'] }
+        ];
+
+        const BOTTOM_NAV_PRIORITY = {
+            Admin:       ['dashboard', 'admin',    'approval', 'expense',  'logout'],
+            Superadmin:  ['dashboard', 'admin',    'approval', 'expense',  'logout'],
+            Manager:     ['dashboard', 'approval', 'month',    'profile',  'logout'],
+            Engineer:    ['dashboard', 'expense',  'report',   'profile',   'logout'],
+            Coordinator: ['dashboard', 'approval', 'report',   'profile',  'logout'],
+            Accounts:    ['dashboard', 'report', 'month',   'profile',  'logout'],
+            'Divisional Manager': ['dashboard','approval','report','profile','logout'],
+            'District Incharge':  ['dashboard','report','month','profile','logout'],
+        };
+
+        function showLoader(msg = "Initializing...") {
+            const overlay = document.getElementById('loadingOverlay');
+            const txt = document.getElementById('loaderText');
+            if(!overlay) return;
+            txt.textContent = msg;
+            overlay.style.display = 'flex';
+            setTimeout(() => overlay.style.opacity = '1', 10);
+        }
+
+        function finishLoader() {
+            const overlay = document.getElementById('loadingOverlay');
+            if(!overlay) return;
+            setTimeout(() => {
+                overlay.style.opacity = '0';
+                setTimeout(() => { 
+                    overlay.style.display = 'none'; 
+                    document.getElementById('mainContainer').style.display = 'flex';
+                }, 500);
+            }, 500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoader("Checking Session...");
+            const role = localStorage.getItem('user_role');
+            if (!role) { window.location.href = 'index.html'; return; }
+            if (role !== 'Admin' && role !== 'Superadmin') { window.location.href = 'home.html'; return; }
+            
+            buildSidebar(role);
+            buildBottomNav(role);
+            loadDropdowns();
+            loadUsers();
+        });
+
+        function buildSidebar(role) {
+            const nav = document.getElementById('sidebarNav');
+            const bottomNav = document.getElementById('desktopSidebarBottom');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            nav.innerHTML = items.map(item => `
+                <li>
+                    <a href="${item.href}" class="nav-link-item ${item.id === CURRENT_PAGE ? 'active' : ''}">
+                        <div class="nav-icon-wrap">${item.icon}</div> ${item.label}
+                    </a>
+                </li>`).join('');
+                
+            bottomNav.innerHTML = `
+                <li><a href="profile.html" class="nav-link-item"><div class="nav-icon-wrap">${ICONS.profile}</div> My Profile</a></li>
+                <li><a href="#" class="nav-link-item nav-logout" onclick="logout()"><div class="nav-icon-wrap">${ICONS.logout}</div> Logout</a></li>
+            `;
+        }
+
+        // =========================================================================
+        // UPDATED: Scrollable Bottom Nav - Includes ALL accessible pages dynamically
+        // =========================================================================
+        function buildBottomNav(role) {
+            const nav = document.getElementById('bottom-nav');
+            if (!nav) return;
+            
+            // Filter all items the user has access to
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            
+            let html = items.map(item => {
+                const active = item.id === CURRENT_PAGE ? 'active' : '';
+                return `
+                    <a href="${item.href}" class="bn-item ${active}">
+                        <div class="bn-icon-wrap">${item.icon}</div>
+                        <div class="bn-label">${item.label.split(' ')[0]}</div>
+                    </a>`;
+            }).join('');
+
+            // Always add Profile and Logout at the end
+            const profileActive = CURRENT_PAGE === 'profile' ? 'active' : '';
+            html += `
+                <a href="profile.html" class="bn-item ${profileActive}">
+                    <div class="bn-icon-wrap">${ICONS.profile}</div>
+                    <div class="bn-label">Profile</div>
+                </a>
+                <div class="bn-item logout" onclick="logout()">
+                    <div class="bn-icon-wrap">${ICONS.logout}</div>
+                    <div class="bn-label">Logout</div>
+                </div>
+            `;
+            
+            nav.innerHTML = html;
+        }
+
+        // ─── API ────────────────────────────────────────────────────
+        const BASE_URL = "/api/admin";
+
+        async function loadDropdowns() {
+            try {
+                const res = await fetch(`${BASE_URL}/dropdowns`);
+                const data = await res.json();
+                if (data.success) {
+                    fillSelect('zone_select', data.zones);
+                    fillSelect('role_select', data.roles);
+                    fillSelect('grade_select', data.grades);
+                    window.nextId = data.next_id;
+                }
+            } catch (err) { console.error("Error loading dropdowns", err); }
+        }
+
+        async function loadDistricts(zone) {
+            try {
+                const res = await fetch(`${BASE_URL}/districts?zone=${encodeURIComponent(zone)}`);
+                const data = await res.json();
+                if (data.success) fillSelect('district_select', data.districts);
+            } catch (err) { console.error("Error loading districts", err); }
+        }
+
+        function fillSelect(id, list) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = '<option value="">Select</option>';
+            list.forEach(i => el.innerHTML += `<option value="${i}">${i}</option>`);
+        }
+
+        function populateApprovers() {
+            const l1 = document.getElementById('level_first_approver');
+            const l2 = document.getElementById('level_second_approver');
+            let opts = '<option value="">Select Approver / None</option>';
+            
+            // Filter users who can be approvers
+            const approvers = window.USERS_DATA.filter(u => 
+                ['Manager', 'Admin', 'Superadmin', 'Coordinator', 'Divisional Manager', 'District Incharge'].includes(u.role)
+            );
+            
+            approvers.forEach(m => {
+                opts += `<option value="${m.user_id}">${m.full_name} (${m.user_id}) - ${m.role}</option>`;
+            });
+            
+            l1.innerHTML = opts;
+            l2.innerHTML = opts;
+        }
+
+        async function loadUsers() {
+            const list = document.getElementById('userList');
+            try {
+                const res = await fetch(`${BASE_URL}/users`);
+                const data = await res.json();
+                window.USERS_DATA = data.users || [];
+                renderUsers('');
+                populateApprovers(); // Populate L1/L2 dropdowns after data is loaded
+                finishLoader();
+            } catch (err) { 
+                console.error("Error loading users", err); 
+                list.innerHTML = `<tr><td colspan="18" class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">Failed to load users. Connection Error.</div></td></tr>`;
+                finishLoader();
+            }
+        }
+
+        function filterUsers(query) {
+            document.getElementById('searchInputDesktop').value = query;
+            const mobileInput = document.getElementById('searchInputMobile');
+            if(mobileInput) mobileInput.value = query;
+            renderUsers(query);
+        }
+
+        function renderUsers(query = '') {
+            const list = document.getElementById('userList');
+            const q = query.toLowerCase().trim();
+            
+            const filteredUsers = window.USERS_DATA.filter(u => {
+                if(!q) return true;
+                return (u.user_id && u.user_id.toLowerCase().includes(q)) ||
+                       (u.full_name && u.full_name.toLowerCase().includes(q)) ||
+                       (u.e_code && u.e_code.toLowerCase().includes(q)) ||
+                       (u.mobile_number && u.mobile_number.includes(q)) ||
+                       (u.district_name && u.district_name.toLowerCase().includes(q)) ||
+                       (u.role && u.role.toLowerCase().includes(q));
+            });
+
+            document.getElementById('user-count').textContent = `${filteredUsers.length} users`;
+
+            if (filteredUsers.length === 0) {
+                list.innerHTML = `<tr><td colspan="18" class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No users found matching "${query}".</div></td></tr>`;
+                return;
+            }
+
+            list.innerHTML = filteredUsers.map((u) => {
+                const origIndex = window.USERS_DATA.findIndex(orig => orig.user_id === u.user_id);
+                return `
+                <tr onclick="viewUserDetails(${origIndex})">
+                    <td data-label="User ID"><div class="cell-val"><span class="user-id-tag">${u.user_id}</span></div></td>
+                    <td data-label="Full Name"><div class="cell-val"><strong>${u.full_name}</strong></div></td>
+                    <td data-label="E-Code"><div class="cell-val">${u.e_code}</div></td>
+                    <td data-label="Designation"><div class="cell-val">${u.designation}</div></td>
+                    <td data-label="Mobile"><div class="cell-val">${u.mobile_number}</div></td>
+                    <td data-label="Email"><div class="cell-val">${u.mail_id}</div></td>
+                    <td data-label="Upkaran ID"><div class="cell-val">${u.e_upkaran_id || '—'}</div></td>
+                    <td data-label="DOB"><div class="cell-val">${u.date_of_birth}</div></td>
+                    <td data-label="Joining"><div class="cell-val">${u.date_joining}</div></td>
+                    <td data-label="Zone"><div class="cell-val">${u.zone_name}</div></td>
+                    <td data-label="District"><div class="cell-val">${u.district_name}</div></td>
+                    <td data-label="Grade"><div class="cell-val">${u.grade}</div></td>
+                    <td data-label="Role"><div class="cell-val"><span style="background:var(--primary-50);color:var(--primary);padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;">${u.role}</span></div></td>
+                    <td data-label="L1 Approver"><div class="cell-val">${u.level_first_approver || '—'}</div></td>
+                    <td data-label="L2 Approver"><div class="cell-val">${u.level_second_approver || '—'}</div></td>
+                    <td data-label="Failed Attempts"><div class="cell-val"><span class="failed-count">${u.failed_attempts || 0}</span></div></td>
+                    <td data-label="Status" onclick="event.stopPropagation()">
+                        <div class="cell-val">
+                        <select class="status-select" onchange="updateAccountStatus('${u.user_id}', this.value)">
+                            <option value="Active" ${u.account_status === 'Active' ? 'selected' : ''}>✅ Active</option>
+                            <option value="Locked" ${u.account_status === 'Locked' ? 'selected' : ''}>🔒 Locked</option>
+                            <option value="In-Active" ${u.account_status === 'In-Active' ? 'selected' : ''}>⛔ In-Active</option>
+                        </select>
+                        </div>
+                    </td>
+                    <td data-label="Actions" onclick="event.stopPropagation()">
+                        <div class="cell-val" style="width:100%;">
+                        <div class="action-btns">
+                            <button class="btn-edit" onclick='openEditModal(${origIndex})'><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit</button>
+                            <button class="btn-delete" onclick="deleteUser('${u.user_id}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Delete</button>
+                        </div>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        async function updateAccountStatus(userId, newStatus) {
+            try {
+                const res = await fetch(`${BASE_URL}/users/${encodeURIComponent(userId)}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) { showToast(`User ${userId} status updated to ${newStatus}`, 'success'); loadUsers(); }
+                else showToast("Status update failed", 'danger');
+            } catch (err) { showToast("Error updating status", 'danger'); }
+        }
+
+        function viewUserDetails(index) {
+            const u = window.USERS_DATA[index];
+            if(!u) return;
+
+            const content = `
+                <div class="detail-item"><label>User ID</label><p>${u.user_id}</p></div>
+                <div class="detail-item"><label>Full Name</label><p>${u.full_name}</p></div>
+                <div class="detail-item"><label>E-Code</label><p>${u.e_code}</p></div>
+                <div class="detail-item"><label>Designation</label><p>${u.designation}</p></div>
+                <div class="detail-item"><label>Mobile</label><p>${u.mobile_number}</p></div>
+                <div class="detail-item"><label>Email</label><p>${u.mail_id}</p></div>
+                <div class="detail-item"><label>Upkaran ID</label><p>${u.e_upkaran_id || '—'}</p></div>
+                <div class="detail-item"><label>DOB</label><p>${u.date_of_birth}</p></div>
+                <div class="detail-item"><label>Joining Date</label><p>${u.date_joining}</p></div>
+                <div class="detail-item"><label>Grade</label><p>${u.grade}</p></div>
+                <div class="detail-item"><label>Role</label><p>${u.role}</p></div>
+                <div class="detail-item"><label>Zone</label><p>${u.zone_name}</p></div>
+                <div class="detail-item"><label>District</label><p>${u.district_name}</p></div>
+                <div class="detail-item"><label>L1 Approver</label><p>${u.level_first_approver || '—'}</p></div>
+                <div class="detail-item"><label>L2 Approver</label><p>${u.level_second_approver || '—'}</p></div>
+                <div class="detail-item"><label>Failed Attempts</label><p>${u.failed_attempts || 0}</p></div>
+                <div class="detail-item"><label>Status</label><p>${u.account_status}</p></div>
+            `;
+            document.getElementById('viewUserDetailsContent').innerHTML = content;
+            document.getElementById('viewUserModal').classList.add('active');
+        }
+
+        function closeViewModal() {
+            document.getElementById('viewUserModal').classList.remove('active');
+        }
+
+        function openAddModal() {
+            document.getElementById('adminForm').reset();
+            document.getElementById('editUserId').value = '';
+            document.getElementById('display_user_id').value = window.nextId || 'AUTO';
+            document.getElementById('account_status_hidden').value = "Active";
+            document.getElementById('modalTitle').innerText = "Add New User";
+            
+            document.getElementById('password').value = "";
+            document.getElementById('password').placeholder = "Enter new password";
+            document.getElementById('password').required = true;
+            
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function openEditModal(index) {
+            const u = window.USERS_DATA[index];
+            document.getElementById('editUserId').value = u.user_id;
+            document.getElementById('display_user_id').value = u.user_id;
+            document.getElementById('full_name').value = u.full_name;
+            document.getElementById('e_code').value = u.e_code;
+            document.getElementById('designation').value = u.designation;
+            document.getElementById('mobile_number').value = u.mobile_number;
+            document.getElementById('mail_id').value = u.mail_id;
+            document.getElementById('e_upkaran_id').value = u.e_upkaran_id || '';
+            document.getElementById('date_of_birth').value = u.date_of_birth;
+            document.getElementById('date_joining').value = u.date_joining;
+            document.getElementById('grade_select').value = u.grade;
+            document.getElementById('role_select').value = u.role;
+            document.getElementById('zone_select').value = u.zone_name;
+            document.getElementById('level_first_approver').value = u.level_first_approver || '';
+            document.getElementById('level_second_approver').value = u.level_second_approver || '';
+            document.getElementById('account_status_hidden').value = u.account_status;
+            
+            document.getElementById('password').value = "";
+            document.getElementById('password').placeholder = "Leave empty to keep current password";
+            document.getElementById('password').required = false;
+            
+            loadDistricts(u.zone_name).then(() => {
+                document.getElementById('district_select').value = u.district_name;
+            });
+            
+            document.getElementById('modalTitle').innerText = "Edit User: " + u.user_id;
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            btn.innerHTML = 'Saving...';
+            btn.disabled = true;
+
+            const editId = document.getElementById('editUserId').value;
+            const url = editId ? `${BASE_URL}/users/${encodeURIComponent(editId)}` : `${BASE_URL}/users`;
+            const method = editId ? 'PUT' : 'POST';
+            const formData = new FormData(e.target);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (res.ok) { 
+                    closeModal(); 
+                    showToast(editId ? "User updated successfully" : "User created successfully", 'success');
+                    loadUsers(); 
+                }
+                else showToast("Error saving user. Please try again.", 'danger');
+            } catch (err) { 
+                showToast("Request failed. Network error.", 'danger'); 
+            } finally {
+                btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save User';
+                btn.disabled = false;
+            }
+        });
+
+        async function deleteUser(id) {
+            if (confirm('Delete this user? This cannot be undone.')) {
+                try {
+                    await fetch(`${BASE_URL}/users/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                    showToast("User deleted successfully", 'success');
+                    loadUsers();
+                } catch (err) { showToast("Failed to delete user", 'danger'); }
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').classList.remove('active');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('desktopSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('sidebar-mobile-open');
+            overlay.classList.toggle('active');
+            if(overlay.classList.contains('active')){
+                overlay.style.display = 'block';
+            }else{
+                overlay.style.display = 'none';
+            }
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            let bg = 'var(--text)';
+            let icon = 'ℹ️';
+            if(type === 'success') { bg = 'var(--success)'; icon = '✅'; }
+            if(type === 'danger' || type === 'error') { bg = 'var(--danger)'; icon = '❌'; }
+            if(type === 'warning') { bg = 'var(--warning)'; icon = '⚠️'; }
+            
+            toast.style.cssText = `background:white;color:${bg};padding:14px 20px;border-radius:10px;margin-top:10px;font-size:14px;font-weight:600;box-shadow:var(--shadow-md);border-left:4px solid ${bg};animation: slideDown 0.3s ease;display:flex;align-items:center;gap:10px;pointer-events:auto;`;
+            toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function logout() {
+            document.getElementById('logoutOverlay').style.display = 'block';
+            document.getElementById('logoutPopup').style.display = 'block';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logoutOverlay').style.display = 'none';
+            document.getElementById('logoutPopup').style.display = 'none';
+        }
+
+        function confirmLogout() {
+            localStorage.clear(); 
+            window.location.href = 'index.html'; 
+        }
+    </script>
+</body>
+</html>

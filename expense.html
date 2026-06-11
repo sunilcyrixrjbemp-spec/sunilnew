@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Expense — Cyrix Healthcare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-dark: #002b5e;
+            --primary-light: #3b82f6;
+            --primary-50: #eff6ff;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --surface-2: #f1f5f9;
+            --surface-3: #e2e8f0;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-2: #475569;
+            --text-3: #94a3b8;
+            
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --info: #3b82f6;
+            --info-light: #dbeafe;
+            
+            --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+            --shadow-sm: 0 1px 3px rgba(15,23,42,0.08);
+            --shadow-md: 0 4px 16px rgba(15,23,42,0.1);
+            --shadow-lg: 0 8px 32px rgba(15,23,42,0.12);
+            
+            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-display: 'Inter', sans-serif;
+            
+            --sidebar-w: 240px;
+            --bottom-nav-h: 75px; 
+            --nav-radius: 12px;
+            --nav-transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+            --t-fast: 0.15s ease;
+            --t-slow: 0.4s ease;
+            --z-modal: 1000;
+        }
+
+        html, body {
+            overflow-x: clip;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background: var(--bg);
+        }
+
+        body.app-page {
+            font-family: var(--font);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.6;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            box-sizing: border-box;
+            display: block;
+            font-family: var(--font);
+        }
+
+        .svg-icon {
+            width: 100%; height: 100%;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        #loadingOverlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(4px);
+            display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
+            opacity: 1;
+        }
+
+        .loader-wrapper {
+            position: relative; width: 5em; height: 5em; margin-bottom: 20px;
+        }
+
+        .loader {
+            position: absolute; top: calc(50% - 1.25em); left: calc(50% - 1.25em); width: 2.5em; height: 2.5em; transform: rotate(165deg);
+        }
+
+        .loader:before, .loader:after {
+            content: ""; position: absolute; top: 50%; left: 50%; display: block; width: 0.5em; height: 0.5em; border-radius: 0.25em; transform: translate(-50%, -50%);
+        }
+
+        .loader:before { animation: before8 2s infinite; }
+        .loader:after  { animation: after6  2s infinite; }
+
+        @keyframes before8 {
+            0%   { width: 0.5em; box-shadow:  1em -0.5em rgba(225,20,98,0.75),  -1em  0.5em rgba(111,202,220,0.75); }
+            35%  { width: 2.5em; box-shadow:    0 -0.5em rgba(225,20,98,0.75),     0  0.5em rgba(111,202,220,0.75); }
+            70%  { width: 0.5em; box-shadow: -1em -0.5em rgba(225,20,98,0.75),   1em  0.5em rgba(111,202,220,0.75); }
+            100% {               box-shadow:  1em -0.5em rgba(225,20,98,0.75),  -1em  0.5em rgba(111,202,220,0.75); }
+        }
+
+        @keyframes after6 {
+            0%   { height: 0.5em; box-shadow:  0.5em  1em rgba(61,184,143,0.75), -0.5em  -1em rgba(233,169,32,0.75); }
+            35%  { height: 2.5em; box-shadow:  0.5em    0 rgba(61,184,143,0.75), -0.5em     0 rgba(233,169,32,0.75); }
+            70%  { height: 0.5em; box-shadow:  0.5em -1em rgba(61,184,143,0.75), -0.5em   1em rgba(233,169,32,0.75); }
+            100% {                box-shadow:  0.5em  1em rgba(61,184,143,0.75), -0.5em  -1em rgba(233,169,32,0.75); }
+        }
+
+        #loaderText { font-weight: 700; color: var(--primary-dark); font-size: 16px; letter-spacing: 0.5px; text-align: center; padding: 0 20px;}
+
+        .sidebar {
+            position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh; z-index: 1000;
+            background: var(--primary-dark); display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 4px 0 24px rgba(15,23,42,.1); transition: transform var(--nav-transition);
+        }
+        .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; gap: 12px; }
+        .sidebar-logo img { width: 44px; height: auto; border-radius: 8px; background: white; padding: 2px; }
+        .logo-text h2 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.2; letter-spacing: -0.3px; margin: 0; }
+        .logo-text span { font-size: 11px; color: rgba(255,255,255,.6); font-weight: 400; }
+        .nav-section { padding: 12px 0; }
+        .nav-section-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,.4); letter-spacing: 1.2px; text-transform: uppercase; padding: 8px 24px 8px; }
+        .nav-list { list-style: none; padding: 0; margin: 0; }
+        .nav-link-item { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: rgba(255,255,255,.7); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; transition: all var(--t-fast); cursor: pointer; text-decoration: none; }
+        .nav-link-item:hover { background: rgba(255,255,255,.05); color: #fff; border-left-color: rgba(255,255,255,.3); }
+        .nav-link-item.active { background: var(--primary); color: #fff; border-left-color: var(--accent); font-weight: 600; }
+        .nav-link-item.nav-logout { color: #f87171 !important; }
+        .nav-icon-wrap { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+        .nav-icon-wrap svg { stroke-width: 2px; }
+        .sidebar-bottom { padding: 12px 0 20px; border-top: 1px solid rgba(255,255,255,.08); }
+
+        .main-content {
+            margin-left: var(--sidebar-w);
+            width: calc(100% - var(--sidebar-w)); 
+            min-height: 100vh;
+            max-width: 100vw; 
+            overflow-x: hidden; 
+            transition: margin-left var(--nav-transition), width var(--nav-transition);
+            position: relative;
+        }
+
+        .expense-form { padding: 24px 32px; padding-bottom: 120px; }
+
+        .sticky-header-container { position: sticky; top: 0; z-index: 100; background: var(--surface); box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border); }
+        .bottom-nav { display: none; }
+
+        @media (max-width: 768px) {
+            body.app-page { display: block !important; }
+            .sidebar      { display: none !important; }
+            
+            .main-content { margin-left: 0 !important; width: 100% !important; padding: 0 !important; padding-top: 60px !important; padding-bottom: calc(var(--bottom-nav-h) + 20px) !important; }
+            .expense-form { padding: 16px 12px !important; padding-bottom: 220px !important; }
+            .desktop-only { display: none !important; }
+
+            .sticky-header-container { position: static !important; box-shadow: none !important; border-bottom: none !important; }
+
+            .mobile-topbar {
+                display: flex !important; background: var(--primary-dark) !important; padding: 0 20px !important; height: 60px !important;
+                align-items: center; justify-content: space-between; position: fixed !important; top: 0 !important; left: 0 !important; right: 0 !important; 
+                width: 100% !important; box-sizing: border-box !important; z-index: 9999 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            }
+            .mobile-topbar-left { display: flex; align-items: center; gap: 8px; }
+            .mobile-topbar h1 { color: #fff !important; font-size: 18px !important; font-weight: 700 !important; margin: 0; letter-spacing: -0.5px; white-space: nowrap;}
+            .mobile-topbar img { height: 32px !important; border-radius: 6px; background: white; padding: 2px; }
+
+            .bottom-nav {
+                display: flex !important; position: fixed; bottom: 0; left: 0; right: 0; height: var(--bottom-nav-h); background: white; border-top: 1px solid var(--border); 
+                align-items: center; justify-content: flex-start; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; z-index: 200; 
+                box-shadow: 0 -4px 20px rgba(15,23,42,.05); padding: 0 12px; gap: 8px; scrollbar-width: none;
+            }
+            .bottom-nav::-webkit-scrollbar { display: none; }
+            .bn-item { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 12px; min-width: 72px; color: var(--text-3); font-size: 10px; font-weight: 600; text-decoration: none; transition: all var(--t-fast); border-radius: 12px; cursor: pointer; }
+            .bn-item.active { color: var(--primary); }
+            .bn-item.logout { color: var(--danger); }
+            .bn-icon-wrap { padding: 4px 12px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+            .bn-icon-wrap svg { width: 22px; height: 22px; stroke-width: 2px; }
+            .bn-item.active .bn-icon-wrap { background: var(--primary-50); color: var(--primary); }
+            .bn-label { font-size: 10px; font-weight: 600; text-align: center; line-height: 1;}
+
+            .employee-strip { flex-wrap: nowrap !important; overflow-x: auto; padding: 12px 16px !important; background: white; border-bottom: 1px solid var(--border); }
+            .emp-field { padding: 0 16px !important; }
+            .emp-field:first-child { padding-left: 0 !important; }
+            
+            .form-grid-2, .form-grid-3, .form-grid-4 { grid-template-columns: 1fr !important; gap: 14px; }
+            .travel-type-toggle { flex-direction: column; }
+            
+            .totals-bar {
+                left: 0 !important; right: 0 !important; bottom: var(--bottom-nav-h) !important; display: grid !important; grid-template-columns: 1fr 1fr;
+                grid-template-areas: "km amt" "btns btns"; gap: 12px 10px !important; padding: 12px 16px !important; align-items: center !important; border-bottom: 1px solid var(--border);
+            }
+            .totals-left  { grid-area: km;   justify-content: flex-start !important; margin: 0 !important; }
+            .totals-center { grid-area: amt; text-align: right !important; margin: 0 !important; display: flex; flex-direction: column; align-items: flex-end; }
+            .totals-right { grid-area: btns; display: grid !important; grid-template-columns: 1fr 1fr 2fr; gap: 8px; width: 100%; }
+            .totals-right button { padding: 12px 8px !important; font-size: 12px !important; width: 100%; justify-content: center; }
+            .totals-right #btnSubmit { font-size: 13px !important; }
+            .total-amount { font-size: 20px !important; }
+            .total-pill   { font-size: 12px !important; padding: 6px 12px !important; }
+        }
+
+        @media (min-width: 769px) { .mobile-topbar { display: none !important; } .sidebar-overlay { display: none !important; } }
+
+        .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--nav-radius); padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 20px; }
+        @media (max-width: 768px) { .section-card { padding: 18px 16px; border-radius: 12px; } }
+
+        .section-badge  { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); background: var(--success-light); padding: 4px 10px; border-radius: 99px; margin-bottom: 8px; }
+        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .section-icon   { width: 36px; height: 36px; background: var(--primary-50); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0; }
+        .section-title  { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--primary-dark); margin:0; }
+        .req            { color: var(--danger); }
+        .total-amount   { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--success); line-height: 1; margin:0; }
+        .total-label    { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+        
+        .modal { background: var(--surface); border-radius: var(--nav-radius, 12px); padding: 28px; width: 100%; max-height: 90vh; overflow-y: auto; position: relative; max-width: 480px; box-shadow: var(--shadow-lg); }
+        @media (max-width: 768px) { .modal { max-width: calc(100vw - 32px) !important; padding: 20px 16px; } .modal-actions { display: flex; flex-direction: column-reverse; gap: 10px; } .modal-actions button { width: 100%; } }
+
+        .btn         { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; transition: all var(--t-fast); text-decoration: none; border: none; cursor: pointer; }
+        .btn-outline { background: white; color: var(--text-2); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm); }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+        
+        .form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
+        .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+        .form-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px; }
+
+        .travel-type-toggle { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .toggle-option { flex: 1; }
+        .toggle-label  { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 13px; }
+
+        input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; outline: none; box-shadow: 0 0 0 3px rgba(30,64,175,0.1); }
+        input:read-only, select:disabled { background-color: var(--surface-2); cursor: not-allowed; }
+
+        .custom-popup { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--surface); padding: 32px; border-radius: 20px; box-shadow: var(--shadow-lg); 
+            z-index: 10000; text-align: center; display: none; width: 90%; max-width: 380px; animation: popIn 0.3s cubic-bezier(0.4,0,0.2,1); border: 1px solid var(--border);
+        }
+        @keyframes popIn { from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); z-index: 9999; display: none; }
+        .icon-wrapper { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; }
+        .icon-wrapper.error   { background: var(--danger-light); color: var(--danger); }
+        .icon-wrapper.success { background: var(--success-light); color: var(--success); }
+        
+        .btn-ghost { background: white; color: var(--text-2); border: 1.5px solid var(--border); padding: 10px 20px; border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer; transition: all var(--t-fast); display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); }
+        .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: var(--surface-2); }
+        
+        .btn-primary { background: var(--primary); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; font-family: var(--font); font-size: 14px; font-weight: 600; cursor: pointer; transition: all var(--t-fast); display: inline-flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); }
+        .btn-primary:hover:not(:disabled) { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn-primary:disabled { background: var(--surface-3); color: var(--text-3); cursor: not-allowed; opacity: 0.8; box-shadow: none; transform: none; }
+
+        /* Image preview container styling */
+        .preview-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 80px;
+            border-radius: 6px;
+        }
+
+        .remove-img-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+            padding: 0;
+            font-weight: 600;
+        }
+
+        .remove-img-btn:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="app-page">
+
+    <div id="loadingOverlay">
+        <div class="loader-wrapper">
+            <div class="loader"></div>
+        </div>
+        <div id="loaderText">Loading...</div>
+    </div>
+
+    <div class="sidebar" id="desktopSidebar">
+        <div>
+            <div class="sidebar-logo">
+                <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+                <div class="logo-text">
+                    <h2>Cyrix Healthcare</h2>
+                    <span>Field Analytics</span>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-label">Main Menu</div>
+                <ul class="nav-list" id="sidebarNav"></ul>
+            </div>
+        </div>
+        <div class="sidebar-bottom">
+            <ul class="nav-list" id="desktopSidebarBottom"></ul>
+        </div>
+    </div>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <nav class="bottom-nav" id="bottom-nav"></nav>
+
+    <main class="main-content" id="mainContainer" style="display:none;">
+
+        <div class="sticky-header-container">
+            
+            <div class="mobile-topbar hide-desktop">
+                <div class="mobile-topbar-left">
+                    <h1>Submit Expense</h1>
+                    <span class="exp-id-badge" id="display_exp_id_mob" style="font-size:10px; background: var(--primary-light); padding: 2px 8px; border-radius: 99px; color: white; font-weight: 600;">...</span>
+                </div>
+                <img src="logo.png" alt="Cyrix Logo" onerror="this.style.display='none';">
+            </div>
+
+            <header class="page-header desktop-only" style="display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; border-bottom: 1px solid var(--border);">
+                <div>
+                    <p class="page-breadcrumb" style="font-size: 14px; color: var(--text-3); font-weight: 500; margin-bottom: 4px;">Cyrix Healthcare / Expenses</p>
+                    <h1 class="page-title" style="font-family: var(--font-display); font-size: 30px; font-weight: 800; color: var(--primary-dark); margin:0; letter-spacing: -0.5px;">Submit Expense</h1>
+                </div>
+                <span class="exp-id-badge d-none-mobile" id="display_exp_id" style="background: var(--primary-50); color: var(--primary); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: var(--font-mono);">Loading...</span>
+            </header>
+
+            <div class="employee-strip" style="background: var(--surface); padding: 16px 32px; display: flex; align-items: center; gap: 0;">
+                <div class="emp-field">
+                    <label style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">Employee Name</label>
+                    <strong id="ui_name" style="font-size: 14px; display: block; margin-top: 2px;">—</strong>
+                </div>
+                <div class="emp-divider" style="width: 1px; height: 30px; background: var(--border); margin: 0 20px;"></div>
+                <div class="emp-field">
+                    <label style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">E-Code</label>
+                    <strong id="ui_ecode" style="font-size: 14px; display: block; margin-top: 2px; font-family: var(--font-mono);">—</strong>
+                </div>
+                <div class="emp-divider" style="width: 1px; height: 30px; background: var(--border); margin: 0 20px;"></div>
+                <div class="emp-field">
+                    <label style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">Grade</label>
+                    <strong id="ui_grade" style="font-size: 14px; display: block; margin-top: 2px;">—</strong>
+                </div>
+                <div class="emp-divider" style="width: 1px; height: 30px; background: var(--border); margin: 0 20px;"></div>
+                <div class="emp-field">
+                    <label style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">Vehicle Allowance</label>
+                    <strong id="ui_vehicle_type" style="font-size: 14px; display: block; margin-top: 2px;">—</strong>
+                </div>
+                <div class="emp-divider" style="width: 1px; height: 30px; background: var(--border); margin: 0 20px;"></div>
+                <div class="emp-field">
+                    <label id="ui_limit_title" style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">KM Limit</label>
+                    <strong id="ui_km_limit" style="font-size: 14px; display: block; margin-top: 2px;">—</strong>
+                </div>
+                <div class="emp-divider" style="width: 1px; height: 30px; background: var(--border); margin: 0 20px;"></div>
+                <div class="emp-field">
+                    <label style="font-size: 11px; color: var(--text-3); font-weight: 700; text-transform: uppercase;">Auto Limit</label>
+                    <strong id="ui_auto_limit" style="font-size: 14px; display: block; margin-top: 2px; color: var(--warning);">—</strong>
+                </div>
+            </div>
+        </div>
+
+        <form id="expenseForm" class="expense-form">
+
+            <div class="section-card">
+                <div class="section-badge">Step 1</div>
+                <div class="section-header">
+                    <div class="section-icon">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="16" y1="2" x2="16" y2="6"/>
+                            <line x1="8"  y1="2" x2="8"  y2="6"/>
+                            <line x1="3"  y1="10" x2="21" y2="10"/>
+                        </svg>
+                    </div>
+                    <h2 class="section-title">Date of Expense</h2>
+                </div>
+                <div style="max-width:320px; width: 100%;">
+                    <div class="form-group" style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="font-size: 12px; font-weight: 600; color: var(--text-2);">Select Date <span class="req">*</span></label>
+                        <input type="date" id="exp_date" required onchange="checkExistingExpense()" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-family: var(--font);">
+                    </div>
+                    <div id="date_error" style="display:none;margin-top:8px;padding:10px 14px;background:var(--danger-light);color:var(--danger);border:1px solid rgba(239,68,68,0.3);border-radius:8px;font-size:13px;font-weight:500;">
+                        An expense for this date has already been submitted. Please select a different date.
+                    </div>
+                </div>
+            </div>
+
+            <div id="itineraryContainer"></div>
+
+            <button type="button" class="btn-add-location" id="btnAddIti" onclick="addItinerary()" style="display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; padding: 14px; background: transparent; border: 1.5px dashed var(--primary-light); border-radius: 12px; color: var(--primary); font-weight: 600; cursor: pointer; margin-bottom: 24px; transition: all 0.2s;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19"/>
+                    <line x1="5"  y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Another Location <span class="add-hint" style="color:var(--text-3); font-weight:500;">(Max 6)</span>
+            </button>
+
+            <div class="totals-bar" style="position: fixed; bottom: 0; left: var(--sidebar-w); right: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; z-index: 100; box-shadow: 0 -4px 24px rgba(15,23,42,0.05);">
+                <div class="totals-left" style="display: flex; align-items: center; gap: 10px;">
+                    <div class="total-pill" style="display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 99px; padding: 8px 16px; font-size: 14px; font-weight: 600;">
+                        <svg width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        Total KM: <strong><span id="display_km">0</span> km</strong>
+                    </div>
+                </div>
+                <div class="totals-center">
+                    <p class="total-label">Total Claim Amount</p>
+                    <p class="total-amount">₹<span id="display_amt">0.00</span></p>
+                </div>
+                <div class="totals-right" style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" class="btn btn-ghost" onclick="window.location.href='home.html'">Cancel</button>
+                    <button type="button" class="btn btn-outline" onclick="clearForm()">Clear Form</button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        <span id="btnSubmitText">Submit Expense</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- LIMIT APPROVAL REQUEST MODAL -->
+    <div class="modal-overlay" id="approvalModal" style="position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 20px;">
+        <div class="modal">
+            <div style="width: 56px; height: 56px; background: var(--warning-light); color: var(--warning); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    <line x1="12" y1="9"  x2="12"   y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <h3 style="text-align: center; margin-bottom: 8px; font-weight: 800; font-size: 20px; color: var(--primary-dark);">Request Limit Extension</h3>
+            <p id="approvalMsg" style="text-align: center; color: var(--text-2); font-size: 14px; margin-bottom: 20px; line-height: 1.5;"></p>
+            
+            <div style="margin-top:16px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:16px;">
+                <label style="display:block;font-size:12px;font-weight:700;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;">Required Extension Amount</label>
+                <input type="number" id="req_additional" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:var(--font-mono);font-size:16px; font-weight:700; color:var(--text); background: var(--surface);">
+                <small style="display: block; margin-top: 8px; color: var(--text-3); font-size: 12px;">This amount will be sent to your Level-1 Manager for approval. You can edit this value as needed.</small>
+            </div>
+            <div class="modal-actions" style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
+                <button type="button" class="btn btn-ghost" onclick="closeApprovalModal()" style="font-weight: 600;">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnSendApprovalModal" onclick="sendApprovalRequest()" style="background: var(--warning); color: white; border: none; font-weight: 600; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);">Send Request to Manager</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM SUBMISSION MODAL -->
+    <div class="modal-overlay" id="confirmModal" style="position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+        <div class="modal">
+            <div style="width: 56px; height: 56px; background: var(--success-light); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <h3 style="text-align: center; margin-bottom: 8px; font-weight: 800; font-size: 20px; color: var(--primary-dark);">Confirm Submission</h3>
+            <p style="text-align: center; color: var(--text-2); font-size: 14px;">You are about to submit this expense claim.</p>
+            <div style="margin-top:20px;background:var(--surface-2);border-radius:12px;padding:20px;border:1px solid var(--border);">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center;">
+                    <span style="font-size:13px;color:var(--text-3);font-weight:600;text-transform:uppercase;">Expense Date</span>
+                    <strong id="confirm_date" style="font-size:14px;color:var(--text);"></strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:13px;color:var(--text-3);font-weight:600;text-transform:uppercase;">Total Claim Amount</span>
+                    <strong id="confirm_amt" style="font-size:20px;color:var(--success);font-family:var(--font-mono);"></strong>
+                </div>
+            </div>
+            <div class="modal-actions" style="display: flex; gap: 12px; margin-top: 24px; justify-content: flex-end;">
+                <button type="button" class="btn btn-ghost" onclick="document.getElementById('confirmModal').style.display='none'">Go Back</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmSubmit" onclick="doSubmit()">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGOUT MODAL -->
+    <div class="popup-overlay" id="logoutOverlay"></div>
+    <div class="custom-popup" id="logoutPopup">
+        <div class="icon-wrapper error">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </div>
+        <h3 style="color: var(--primary-dark); font-size: 18px; margin-bottom: 8px; font-weight: 800; line-height: 1.2;">Log Out</h3>
+        <p style="color: var(--text-2); font-size: 14px; margin-bottom: 24px; font-weight: 500; line-height: 1.5;">Are you sure you want to securely log out of your account?</p>
+        <div style="display: flex; gap: 12px; justify-content: center; width: 100%;">
+            <button type="button" class="btn-ghost" onclick="closeLogoutModal()" style="margin: 0; flex: 1; justify-content: center; padding: 12px;">Cancel</button>
+            <button type="button" class="btn-primary" onclick="confirmLogout()" style="margin: 0; background: var(--danger); flex: 1; justify-content: center; padding: 12px; border: none; box-shadow: var(--shadow-sm); color: white;">Logout</button>
+        </div>
+    </div>
+
+    <div id="toastContainer" style="position: fixed; bottom: 80px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999;"></div>
+
+    <script>
+        const CURRENT_PAGE = 'expense';
+
+       const ICONS = {
+            dashboard: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>`,
+            admin: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+            approval: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            expense: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>`,
+            report: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+            upload: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>`,
+            month: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+            profile: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+            logout: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>`
+        };
+
+        const ALL_MENU_ITEMS = [
+            { id: 'dashboard', label: 'Dashboard',       icon: ICONS.dashboard, href: 'home.html',      roles: ['Admin','Superadmin','Manager','Engineer','Coordinator','Accounts','Divisional Manager','District Incharge'] },
+            { id: 'admin',     label: 'Admin Panel',     icon: ICONS.admin,     href: 'admin.html',     roles: ['Admin','Superadmin'] },
+            { id: 'approval',  label: 'Approval Center', icon: ICONS.approval,  href: 'approval.html',  roles: ['Admin','Superadmin','Manager','Coordinator','Divisional Manager'] },
+            { id: 'expense',   label: 'Submit Claim',    icon: ICONS.expense,   href: 'expense.html',   roles: ['Admin','Superadmin','Engineer'] },
+            { id: 'report',    label: 'Analytics',       icon: ICONS.report,    href: 'dashboard.html', roles: ['Admin','Superadmin','Engineer','Manager','Coordinator','Divisional Manager','District Incharge'] },
+            { id: 'upload',    label: 'Data Sync',       icon: ICONS.upload,    href: 'upload.html',    roles: ['Admin','Superadmin'] },
+            { id: 'month',     label: 'Month Summary',   icon: ICONS.month,     href: 'month.html',     roles: ['Admin','Superadmin','Manager','Coordinator','Accounts','Divisional Manager'] }
+        ];
+
+        function buildSidebar(role) {
+            const nav = document.getElementById('sidebarNav');
+            const bottomNav = document.getElementById('desktopSidebarBottom');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            nav.innerHTML = items.map(item => `
+                <li>
+                    <a href="${item.href}" class="nav-link-item ${item.id === CURRENT_PAGE ? 'active' : ''}">
+                        <div class="nav-icon-wrap">${item.icon}</div> ${item.label}
+                    </a>
+                </li>`).join('');
+            if (bottomNav) {
+                bottomNav.innerHTML = `
+                    <li><a href="profile.html" class="nav-link-item"><div class="nav-icon-wrap">${ICONS.profile}</div> My Profile</a></li>
+                    <li><a href="#" class="nav-link-item nav-logout" onclick="logout(); return false;"><div class="nav-icon-wrap">${ICONS.logout}</div> Logout</a></li>
+                `;
+            }
+        }
+
+        function buildBottomNav(role) {
+            const nav = document.getElementById('bottom-nav');
+            if (!nav) return;
+            const items = ALL_MENU_ITEMS.filter(m => m.roles.includes(role));
+            let html = items.map(item => `
+                <a href="${item.href}" class="bn-item ${item.id === CURRENT_PAGE ? 'active' : ''}">
+                    <div class="bn-icon-wrap">${item.icon}</div>
+                    <div class="bn-label">${item.label.split(' ')[0]}</div>
+                </a>`).join('');
+            html += `
+                <a href="profile.html" class="bn-item ${CURRENT_PAGE === 'profile' ? 'active' : ''}">
+                    <div class="bn-icon-wrap">${ICONS.profile}</div>
+                    <div class="bn-label">Profile</div>
+                </a>
+                <div class="bn-item logout" onclick="logout()">
+                    <div class="bn-icon-wrap">${ICONS.logout}</div>
+                    <div class="bn-label">Logout</div>
+                </div>`;
+            nav.innerHTML = html;
+        }
+
+        function logout()          { document.getElementById('logoutOverlay').style.display = 'block'; document.getElementById('logoutPopup').style.display = 'block'; }
+        function closeLogoutModal(){ document.getElementById('logoutOverlay').style.display = 'none';  document.getElementById('logoutPopup').style.display = 'none';  }
+        function confirmLogout()   { localStorage.clear(); window.location.href = 'index.html'; }
+
+        let rawUserId = localStorage.getItem('logged_in_user_id') || localStorage.getItem('user_id') || localStorage.getItem('userId') || sessionStorage.getItem('user_id') || sessionStorage.getItem('logged_in_user_id');
+        if (!rawUserId) {
+            const cookieMatch = document.cookie.match(/(?:^|; )(?:logged_in_user_id|user_id)=([^;]*)/);
+            if (cookieMatch) rawUserId = cookieMatch[1];
+        }
+        let currentUserId = "";
+        if (rawUserId && rawUserId !== 'null' && rawUserId !== 'undefined') {
+            currentUserId = rawUserId.replace(/['"]/g, '').trim();
+        }
+        if (!currentUserId) window.location.href = 'index.html';
+
+        const currentRole = localStorage.getItem('user_role') || '';
+
+        let USER = {}, RULES = {}, FACILITIES = {}, SUBMITTED_DATES = [], NEXT_EXP_ID = "";
+        let itineraryCount = 0;
+        const MAX_ITINERARY = 6;
+        let usedVehicle = false;
+        
+        // Modal Flags
+        let pendingApprovalType = null;
+        let hasLimitExceeded = false;
+        let wasExceededFlag = false;
+        
+        let approvedKmFromDB = 0;
+        let approvedAutoFromDB = 0;
+        let loadedMonth = new Date().toISOString().slice(0, 7);
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            buildSidebar(currentRole);
+            buildBottomNav(currentRole);
+            setupDateRules();
+            // Start fetch with current month from date input
+            loadedMonth = document.getElementById('exp_date').value.slice(0, 7) || loadedMonth;
+            await fetchMonthLimits(loadedMonth, true);
+        });
+
+        function setupDateRules() {
+            const dateInput = document.getElementById('exp_date');
+            const today = new Date();
+            dateInput.max = today.toISOString().split('T')[0];
+            let minDate = new Date();
+            if (today.getDate() > 2) {
+                minDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            } else {
+                minDate.setDate(today.getDate() - 15);
+            }
+            dateInput.min = minDate.toISOString().split('T')[0];
+            dateInput.value = today.toISOString().split('T')[0];
+        }
+
+        // Centralized fetch to easily swap months and limits
+        async function fetchMonthLimits(month, isInitialLoad = false) {
+            if (isInitialLoad) {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                document.getElementById('loadingOverlay').style.opacity = '1';
+                document.getElementById('loaderText').innerText = 'Loading...';
+                document.getElementById('loaderText').style.color = 'var(--primary-dark)';
+            }
+            try {
+                const res = await fetch(`/api/expense/init?user_id=${currentUserId}&month=${month}`);
+                
+                if (!res.ok) {
+                    const txt = await res.text();
+                    showLoadingError("Server Error: " + txt.substring(0, 100));
+                    return;
+                }
+                
+                const data = await res.json();
+                if (data.success === false) {
+                    showLoadingError(data.message || "Failed to load.");
+                    return;
+                }
+
+                loadedMonth = month;
+                USER            = data.user;
+                RULES           = data.allowance;
+                FACILITIES      = data.facilities;
+                NEXT_EXP_ID     = data.next_exp_id;
+                SUBMITTED_DATES = data.submitted_dates || [];
+                
+                approvedKmFromDB = data.approved_km || 0;
+                approvedAutoFromDB = data.approved_auto || 0;
+
+                window.existingKmReq = data.existing_km_req || null;
+                window.existingAutoReq = data.existing_auto_req || null;
+
+                const totalKmDisplay = (RULES.max_km_per_month || 2000) + approvedKmFromDB;
+                const totalAutoDisplay = (RULES.max_auto_per_month || 1000) + approvedAutoFromDB;
+
+                document.getElementById('ui_name').innerText         = USER.full_name || 'N/A';
+                document.getElementById('ui_ecode').innerText        = USER.e_code    || 'N/A';
+                document.getElementById('ui_grade').innerText        = USER.grade     || 'N/A';
+                document.getElementById('ui_vehicle_type').innerText = RULES.vehicle_type || 'None';
+                document.getElementById('ui_limit_title').innerText  = `${RULES.vehicle_type || 'Vehicle'} Limit`;
+                document.getElementById('ui_km_limit').innerText     = `${RULES.current_month_km} / ${totalKmDisplay} KM`;
+                document.getElementById('ui_auto_limit').innerText   = `₹${RULES.current_month_auto} / ₹${totalAutoDisplay}`;
+                document.getElementById('display_exp_id').innerText      = NEXT_EXP_ID;
+                document.getElementById('display_exp_id_mob').innerText  = NEXT_EXP_ID;
+
+                if (isInitialLoad) {
+                    addItinerary();
+                    const overlay = document.getElementById('loadingOverlay');
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        document.getElementById('mainContainer').style.display = 'flex';
+                    }, 500);
+                } else {
+                    calculateTotals();
+                }
+
+            } catch (e) {
+                if (isInitialLoad) showLoadingError("System Error: Check backend output.");
+                console.error(e);
+            }
+        }
+
+        function showLoadingError(msg) {
+            const lt = document.getElementById('loaderText');
+            lt.innerText = msg;
+            lt.style.color = "var(--danger)";
+            document.querySelectorAll('.loader').forEach(el => el.style.display = 'none');
+        }
+
+        function checkExistingExpense() {
+            const dateInput = document.getElementById('exp_date');
+            const errDiv    = document.getElementById('date_error');
+            if(!dateInput.value) return;
+
+            if (SUBMITTED_DATES.includes(dateInput.value)) {
+                errDiv.style.display = 'block';
+                dateInput.value = '';
+                setTimeout(() => { errDiv.style.display = 'none'; }, 5000);
+                return;
+            } else {
+                errDiv.style.display = 'none';
+            }
+
+            const selectedMonth = dateInput.value.slice(0, 7);
+            if (selectedMonth !== loadedMonth) {
+                fetchMonthLimits(selectedMonth, false);
+            }
+        }
+
+        function buildDataListOptions(district) {
+            let options = `<option value="Railway Station ${district}"><option value="Bus Station ${district}"><option value="Hotel">`;
+            if (district === 'Jodhpur') options += `<option value="Jodhpur Office">`;
+            if (FACILITIES[district]) {
+                FACILITIES[district].forEach(f => options += `<option value="${f}">`);
+            }
+            return options;
+        }
+
+        function getDistrictOptions(selectedDist) {
+            let opts = `<option value="">Select District</option>`;
+            Object.keys(FACILITIES).forEach(d => {
+                opts += `<option value="${d}" ${d === selectedDist ? 'selected' : ''}>${d}</option>`;
+            });
+            return opts;
+        }
+
+        function updateDA() {
+            const distTo  = document.getElementById('dist_to_1');
+            if (!distTo) return;
+            const distVal = distTo.value;
+            const hotelAmt = parseFloat(document.getElementById('hotel_1').value) || 0;
+            const daInp    = document.getElementById('da_1');
+
+            if (!distVal) {
+                daInp.value = 0;
+            } else if (distVal === USER.home_district) {
+                daInp.value = hotelAmt > 0 
+                    ? (RULES.daily_hotel || 350) 
+                    : (RULES.daily_in_district || 250);
+            } else {
+                daInp.value = hotelAmt > 0 
+                    ? (RULES.daily_out_state || 600) 
+                    : (RULES.daily_out_district || 400);
+            }
+            calculateTotals();
+        }
+
+        // IMAGE COMPRESSION FUNCTION
+        function compressImage(file, targetSizeKB = 30) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > 1024 || height > 1024) {
+                            const ratio = Math.min(1024 / width, 1024 / height);
+                            width = Math.round(width * ratio);
+                            height = Math.round(height * ratio);
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        let quality = 0.85;
+                        const targetBytes = targetSizeKB * 1024;
+                        
+                        const attemptCompress = () => {
+                            canvas.toBlob((blob) => {
+                                if (blob.size <= targetBytes || quality <= 0.1) {
+                                    const compressedFile = new File([blob], file.name, {
+                                        type: 'image/jpeg',
+                                        lastModified: Date.now()
+                                    });
+                                    const originalSizeKB = (file.size / 1024).toFixed(1);
+                                    const compressedSizeKB = (blob.size / 1024).toFixed(1);
+                                    resolve({ file: compressedFile, originalSize: originalSizeKB, compressedSize: compressedSizeKB });
+                                } else {
+                                    quality -= 0.05;
+                                    attemptCompress();
+                                }
+                            }, 'image/jpeg', quality);
+                        };
+                        attemptCompress();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleFile(input) {
+            const file   = input.files[0];
+            const baseId = input.id;
+            let prevId   = baseId.startsWith('comm_mail') ? baseId.replace('comm_mail', 'prev_comm_mail') : 'prev_' + baseId;
+            const wrapId = `wrap_${prevId}`;
+            const wrapperElement = document.getElementById(wrapId);
+            const uploadContent = document.getElementById(`upload_content_${baseId}`);
+            const img    = document.getElementById(prevId);
+            
+            if (file) {
+                if (!file.type.startsWith('image/')) { input.value = ""; return showToast("Only image files are allowed!", 'danger'); }
+                
+                showToast(`📦 Compressing image... (${(file.size / 1024).toFixed(1)} KB)`, 'info');
+                
+                try {
+                    const result = await compressImage(file, 30);
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(result.file);
+                    input.files = dataTransfer.files;
+                    
+                    if (img) { img.src = URL.createObjectURL(result.file); }
+                    if (wrapperElement) wrapperElement.style.display = 'block';
+                    if (uploadContent) uploadContent.style.display = 'none';
+                    
+                    showToast(`✓ Compressed: ${result.originalSize}KB → ${result.compressedSize}KB`, 'success');
+                } catch (err) {
+                    input.value = "";
+                    showToast("Image compression failed: " + err.message, 'danger');
+                }
+            } else {
+                if (wrapperElement) wrapperElement.style.display = 'none';
+                if (uploadContent) uploadContent.style.display = 'block';
+            }
+        }
+
+        function removeImage(inputId) {
+            const fileInput = document.getElementById(inputId);
+            const wrapperElement = document.getElementById(`wrap_prev_${inputId}`);
+            const uploadContent = document.getElementById(`upload_content_${inputId}`);
+            fileInput.value = '';
+            if (wrapperElement) wrapperElement.style.display = 'none';
+            if (uploadContent) uploadContent.style.display = 'block';
+        }
+
+        function addItinerary() {
+            if (itineraryCount >= MAX_ITINERARY) return;
+            itineraryCount++;
+            const i      = itineraryCount;
+            const isFirst = (i === 1);
+            const distOptions = getDistrictOptions(USER.home_district);
+
+            let modeOpts = `<option value="">Select Mode</option><option value="Auto">Auto</option><option value="Bus">Bus</option><option value="Train">Train</option>`;
+            if (RULES.vehicle_type === 'Bike') modeOpts += `<option value="Bike">Bike</option>`;
+            if (RULES.vehicle_type === 'Car')  modeOpts += `<option value="Car">Car</option>`;
+
+            const html = `
+<div class="section-card itinerary-block" id="iti_${i}" style="border-left: 4px solid var(--primary-light);">
+    <div class="iti-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;background:var(--primary);color:white;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;">${i}</div>
+            <div>
+                <div class="section-badge">Location Visit ${i}</div>
+                <h2 class="section-title" style="margin:2px 0 0;">Journey Details</h2>
+            </div>
+        </div>
+        ${!isFirst ? `<button type="button" style="background:var(--danger-light);color:var(--danger);border:1px solid rgba(239,68,68,0.3);padding:8px 16px;border-radius:8px;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer;" onclick="removeIti(${i})">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            Remove
+        </button>` : ''}
+    </div>
+
+    <div class="travel-type-toggle">
+        <label class="toggle-option">
+            <input type="radio" name="travel_type_${i}" value="In-District" checked onchange="toggleOutdoor(${i})" style="display:none;">
+            <span class="toggle-label">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+                In-District
+            </span>
+        </label>
+        <label class="toggle-option">
+            <input type="radio" name="travel_type_${i}" value="Outdoor" onchange="toggleOutdoor(${i})" style="display:none;">
+            <span class="toggle-label">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                Outdoor / Out-District
+            </span>
+        </label>
+    </div>
+    
+    <div class="form-grid-2">
+        <div class="form-group" id="wrap_dist_from_${i}" style="display:none; flex-direction:column; gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">From District <span class="req">*</span></label>
+            <select id="dist_from_${i}" onchange="handleDistChange(${i})" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">${distOptions}</select>
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">To District <span class="req">*</span></label>
+            <select id="dist_to_${i}" required onchange="handleDistChange(${i})" disabled style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface-2);font-family:inherit;">${distOptions}</select>
+        </div>
+    </div>
+    
+    <div class="form-grid-2">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">From Location <span class="req">*</span></label>
+            <input list="list_from_${i}" id="from_${i}" required placeholder="Type to search location..." onchange="handleLocationChange(${i}); return false;" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            <datalist id="list_from_${i}"></datalist>
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">To Location <span class="req">*</span></label>
+            <input list="list_to_${i}" id="to_${i}" required placeholder="Type to search location..." onchange="handleLocationChange(${i}); return false;" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            <datalist id="list_to_${i}"></datalist>
+        </div>
+    </div>
+    
+    <div class="upload-alert-row" id="wrap_comm_mail_${i}" style="display:none;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Outdoor Communication Mail <span class="req">*</span></div>
+        <div style="border:1.5px dashed var(--border);border-radius:8px;background:var(--surface-2);padding:16px;text-align:center;position:relative;cursor:pointer;min-height:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+            <input type="file" id="comm_mail_${i}" accept="image/*" onchange="handleFile(this)" style="width:100%;box-sizing:border-box;position:absolute;inset:0;opacity:0;cursor:pointer;">
+            <div id="upload_content_comm_mail_${i}">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span id="txt_comm_mail_${i}" style="font-size:12px;font-weight:600;color:var(--text-3);display:block;margin-top:6px;">Upload Required</span>
+            </div>
+            <div class="preview-wrapper" style="display:none;position:relative;width:100%;" id="wrap_prev_comm_mail_${i}">
+                <img class="preview-img" id="prev_comm_mail_${i}" style="max-width:100%;max-height:80px;border-radius:6px;">
+                <button type="button" class="remove-img-btn" onclick="removeImage('comm_mail_${i}')">×</button>
+            </div>
+        </div>
+    </div>
+    
+    <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:24px 0 16px;border-top:1px dashed var(--border);padding-top:16px;">Travel Information</div>
+    
+    <div class="form-grid-4">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Travel Mode <span class="req">*</span></label>
+            <select id="mode_${i}" class="mode-selector" required onchange="handleMode(${i}, 'main')" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">${modeOpts}</select>
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Distance (KM) <span class="req">*</span></label>
+            <input type="number" id="km_${i}" min="0" value="0" onchange="calculateTotals()" placeholder="Manually enter KM" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Amount (₹) <span class="req">*</span></label>
+            <input type="number" id="amt_${i}" min="0" value="0" onchange="calculateTotals()" placeholder="Manually enter amount" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label id="lbl_bill_${i}" style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Bill Image</label>
+            <div style="border:1.5px dashed var(--border);border-radius:8px;background:var(--surface-2);padding:10px;text-align:center;position:relative;cursor:pointer;min-height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                <input type="file" id="bill_${i}" accept="image/*" onchange="handleFile(this)" style="width:100%;box-sizing:border-box;position:absolute;inset:0;opacity:0;cursor:pointer;">
+                <div id="upload_content_bill_${i}">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span id="txt_bill_${i}" style="font-size:10px;font-weight:600;color:var(--text-3);display:block;margin-top:2px;">Optional</span>
+                </div>
+                <div class="preview-wrapper" style="display:none;position:relative;width:100%;" id="wrap_prev_bill_${i}">
+                    <img class="preview-img" id="prev_bill_${i}" style="max-width:100%;max-height:80px;border-radius:4px;">
+                    <button type="button" class="remove-img-btn" onclick="removeImage('bill_${i}')">×</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button type="button" id="btn_addsub_${i}" onclick="showSubLeg(${i})" style="display:none;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--primary-light);color:var(--primary);width:100%;box-sizing:border-box;padding:14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin:20px 0;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='var(--primary-50)'" onmouseout="this.style.background='transparent'">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Extra Connection (Auto / Bus / Train)
+    </button>
+    
+    <div id="sub_leg_${i}" style="display:none;background:var(--surface-2);border:1.5px dashed var(--border);border-radius:12px;padding:20px;margin:20px 0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <span style="font-weight:700;font-size:14px;color:var(--primary-dark);">Extra Travel Connection</span>
+            <button type="button" style="background:var(--danger-light);color:var(--danger);border:1px solid rgba(239,68,68,0.3);padding:8px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;" onclick="hideSubLeg(${i})">Remove</button>
+        </div>
+        <div class="form-grid-4">
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Mode <span class="req">*</span></label>
+                <select id="sub_mode_${i}" onchange="handleMode(${i}, 'sub')" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+                    <option value="">Select</option>
+                    <option value="Auto">Auto</option>
+                    <option value="Bus">Bus</option>
+                    <option value="Train">Train</option>
+                </select>
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">KM</label>
+                <input type="number" id="sub_km_${i}" value="0" readonly style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface-2);font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Amount (₹) <span class="req">*</span></label>
+                <input type="number" id="sub_amt_${i}" min="0" value="0" onchange="calculateTotals()" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label id="lbl_sub_bill_${i}" style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Bill Image</label>
+                <div style="border:1.5px dashed var(--border);border-radius:8px;background:var(--surface);padding:10px;text-align:center;position:relative;cursor:pointer;min-height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <input type="file" id="sub_bill_${i}" accept="image/*" onchange="handleFile(this)" style="width:100%;box-sizing:border-box;position:absolute;inset:0;opacity:0;cursor:pointer;">
+                    <div id="upload_content_sub_bill_${i}">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span id="txt_sub_bill_${i}" style="font-size:10px;font-weight:600;color:var(--text-3);display:block;margin-top:2px;">Optional</span>
+                    </div>
+                    <div class="preview-wrapper" style="display:none;position:relative;width:100%;" id="wrap_prev_sub_bill_${i}">
+                        <img class="preview-img" id="prev_sub_bill_${i}" style="max-width:100%;max-height:80px;border-radius:4px;">
+                        <button type="button" class="remove-img-btn" onclick="removeImage('sub_bill_${i}')">×</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    ${isFirst ? `
+    <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:24px 0 16px;border-top:1px dashed var(--border);padding-top:16px;">DA &amp; Hotel Information</div>
+    <div class="form-grid-3">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Daily Allowance (₹)</label>
+            <input type="number" id="da_${i}" readonly value="0" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface-2);font-family:inherit;">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Hotel Amount (₹)</label>
+            <input type="number" id="hotel_${i}" min="0" value="0" oninput="checkHotel(${i})" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+        </div>
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label id="lbl_hotel_bill_${i}" style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Hotel Bill (Max ₹${RULES.hotel_in_state_s || 0})</label>
+            <div style="border:1.5px dashed var(--border);border-radius:8px;background:var(--surface-2);padding:10px;text-align:center;position:relative;cursor:pointer;min-height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                <input type="file" id="hotel_bill_${i}" accept="image/*" onchange="handleFile(this)" style="width:100%;box-sizing:border-box;position:absolute;inset:0;opacity:0;cursor:pointer;">
+                <div id="upload_content_hotel_bill_${i}">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span id="txt_hotel_bill_${i}" style="font-size:10px;font-weight:600;color:var(--text-3);display:block;margin-top:2px;">Optional</span>
+                </div>
+                <div class="preview-wrapper" style="display:none;position:relative;width:100%;" id="wrap_prev_hotel_bill_${i}">
+                    <img class="preview-img" id="prev_hotel_bill_${i}" style="max-width:100%;max-height:80px;border-radius:4px;">
+                    <button type="button" class="remove-img-btn" onclick="removeImage('hotel_bill_${i}')">×</button>
+                </div>
+            </div>
+        </div>
+    </div>` : ''}
+    
+    <div id="wrapper_work_other_${i}">
+        <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:24px 0 16px;border-top:1px dashed var(--border);padding-top:16px;">Other Expenses</div>
+        <div class="form-grid-3">
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Other Expense Description</label>
+                <input type="text" id="oth_desc_${i}" oninput="toggleOtherAmt(${i})" placeholder="Describe the expense..." style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Other Amount (₹)</label>
+                <input type="number" id="oth_amt_${i}" min="0" value="0" disabled oninput="checkOtherBill(${i})" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;background:var(--surface-2);font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label id="lbl_oth_bill_${i}" style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Other Bill <small style="font-weight:400;text-transform:none;">(Req if ≥ ₹300)</small></label>
+                <div style="border:1.5px dashed var(--border);border-radius:8px;background:var(--surface-2);padding:10px;text-align:center;position:relative;cursor:pointer;min-height:46px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+                    <input type="file" id="oth_bill_${i}" accept="image/*" onchange="handleFile(this)" style="width:100%;box-sizing:border-box;position:absolute;inset:0;opacity:0;cursor:pointer;">
+                    <div id="upload_content_oth_bill_${i}">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span id="txt_oth_bill_${i}" style="font-size:10px;font-weight:600;color:var(--text-3);display:block;margin-top:2px;">Optional</span>
+                    </div>
+                    <div class="preview-wrapper" style="display:none;position:relative;width:100%;" id="wrap_prev_oth_bill_${i}">
+                        <img class="preview-img" id="prev_oth_bill_${i}" style="max-width:100%;max-height:80px;border-radius:4px;">
+                        <button type="button" class="remove-img-btn" onclick="removeImage('oth_bill_${i}')">×</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="font-size:11px;font-weight:700;color:var(--text-3);text-transform:uppercase;margin:24px 0 16px;border-top:1px dashed var(--border);padding-top:16px;">Work Summary</div>
+        <div class="form-grid-4">
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Assigned Calls</label>
+                <input type="number" id="ws_assign_${i}" min="0" value="0" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Closed Calls</label>
+                <input type="number" id="ws_close_${i}" min="0" value="0" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">PMS Completed</label>
+                <input type="number" id="ws_pms_${i}" min="0" value="0" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+            <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">Asset Tagging</label>
+                <input type="number" id="ws_asset_${i}" min="0" value="0" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top:24px;border-top:1px dashed var(--border);padding-top:20px;">
+        <div class="form-group" style="display:flex;flex-direction:column;gap:6px;">
+            <label style="font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="vertical-align:-2px;margin-right:4px;"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1" ry="1"/></svg>
+                Purpose of Visit <span class="req">*</span>
+            </label>
+            <input type="text" id="purpose_${i}" required placeholder="Describe the purpose of this visit..." style="width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;">
+        </div>
+    </div>
+</div>`;
+
+            document.getElementById('itineraryContainer').insertAdjacentHTML('beforeend', html);
+            
+            document.querySelectorAll(`input[name="travel_type_${i}"]`).forEach(radio => {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll(`input[name="travel_type_${i}"]`).forEach(r => {
+                        if (r.checked) {
+                            r.nextElementSibling.style.borderColor = 'var(--primary-light)';
+                            r.nextElementSibling.style.background  = 'var(--primary-50)';
+                            r.nextElementSibling.style.color       = 'var(--primary)';
+                        } else {
+                            r.nextElementSibling.style.borderColor = 'var(--border)';
+                            r.nextElementSibling.style.background  = 'var(--surface-2)';
+                            r.nextElementSibling.style.color       = 'inherit';
+                        }
+                    });
+                });
+            });
+            document.querySelector(`input[name="travel_type_${i}"]:checked`).dispatchEvent(new Event('change'));
+
+            document.getElementById(`dist_to_${i}`).value = USER.home_district;
+            handleDistChange(i);
+            if (itineraryCount >= MAX_ITINERARY) document.getElementById('btnAddIti').style.display = 'none';
+            updateGlobalVehicleStatus();
+        }
+
+        function clearForm() {
+            document.getElementById('expenseForm').reset();
+            itineraryCount = 0;
+            document.getElementById('itineraryContainer').innerHTML = '';
+            document.getElementById('btnAddIti').style.display = 'flex';
+            addItinerary();
+            calculateTotals();
+        }
+
+        function removeIti(i) {
+            document.getElementById(`iti_${i}`).remove();
+            itineraryCount--;
+            document.getElementById('btnAddIti').style.display = 'flex';
+            updateGlobalVehicleStatus();
+            calculateTotals();
+        }
+
+        function toggleOutdoor(i) {
+            const type       = document.querySelector(`input[name="travel_type_${i}"]:checked`).value;
+            const distFromWrap = document.getElementById(`wrap_dist_from_${i}`);
+            const distTo     = document.getElementById(`dist_to_${i}`);
+            const commWrap   = document.getElementById(`wrap_comm_mail_${i}`);
+            const commFile   = document.getElementById(`comm_mail_${i}`);
+            const modeSelect = document.getElementById(`mode_${i}`);
+            if (type === 'Outdoor') {
+                distFromWrap.style.display = 'flex';
+                distTo.disabled = false;
+                distTo.style.background = 'transparent';
+                commWrap.style.display = 'flex';
+                commFile.required = true;
+                Array.from(modeSelect.options).forEach(opt => {
+                    if (opt.value === 'Bike' || opt.value === 'Car') opt.style.display = 'none';
+                });
+                if (modeSelect.value === 'Bike' || modeSelect.value === 'Car') modeSelect.value = '';
+            } else {
+                distFromWrap.style.display = 'none';
+                distTo.disabled = true;
+                distTo.style.background = 'var(--surface-2)';
+                distTo.value = USER.home_district;
+                commWrap.style.display = 'none';
+                commFile.required = false;
+                Array.from(modeSelect.options).forEach(opt => {
+                    if (opt.value === 'Bike' || opt.value === 'Car') opt.style.display = 'block';
+                });
+            }
+            handleDistChange(i);
+            updateGlobalVehicleStatus();
+        }
+
+        function handleDistChange(i) {
+            const distTo   = document.getElementById(`dist_to_${i}`).value;
+            const distFrom = document.getElementById(`dist_from_${i}`)?.value || USER.home_district;
+            let fromOpts   = buildDataListOptions(distFrom);
+            if (i === 1) fromOpts += `<option value="Home">`;
+            let toOpts = buildDataListOptions(distTo);
+            toOpts += `<option value="Home">`;
+            document.getElementById(`list_from_${i}`).innerHTML = fromOpts;
+            document.getElementById(`list_to_${i}`).innerHTML   = toOpts;
+            if (i === 1) updateDA();
+        }
+
+        function handleLocationChange(i) {
+            const toVal   = document.getElementById(`to_${i}`).value;
+            const fromVal = document.getElementById(`from_${i}`).value;
+            const isTransit = toVal.includes('Home') || toVal.includes('Railway Station') || toVal.includes('Bus Station') || toVal.includes('Hotel');
+            document.getElementById(`wrapper_work_other_${i}`).style.display = isTransit ? 'none' : 'block';
+            if (toVal.includes('Home') || fromVal.includes('Home')) {
+                document.getElementById('btnAddIti').style.display = 'none';
+            } else if (itineraryCount < MAX_ITINERARY) {
+                document.getElementById('btnAddIti').style.display = 'flex';
+            }
+        }
+
+        function toggleOtherAmt(i) {
+            const desc  = document.getElementById(`oth_desc_${i}`).value.trim();
+            const amtInp = document.getElementById(`oth_amt_${i}`);
+            amtInp.disabled = !desc;
+            amtInp.style.background = amtInp.disabled ? 'var(--surface-2)' : 'transparent';
+            if (!desc) { amtInp.value = 0; checkOtherBill(i); }
+        }
+
+        function checkOtherBill(i) {
+            const amt  = parseFloat(document.getElementById(`oth_amt_${i}`).value) || 0;
+            const txt  = document.getElementById(`txt_oth_bill_${i}`);
+            const bill = document.getElementById(`oth_bill_${i}`);
+            const lbl  = document.getElementById(`lbl_oth_bill_${i}`);
+            if (amt >= 300) { txt.innerText = "Required"; lbl.style.color = "var(--danger)"; bill.required = true; }
+            else            { txt.innerText = "Optional";  lbl.style.color = "";              bill.required = false; }
+            calculateTotals();
+        }
+
+        function checkHotel(i) {
+            if (i !== 1) return;
+            const hotelInp = document.getElementById('hotel_1');
+            let hotelAmt   = parseFloat(hotelInp.value) || 0;
+            const maxHotel = parseFloat(RULES.hotel_in_state_s) || 1500;
+            const txt  = document.getElementById('txt_hotel_bill_1');
+            const bill = document.getElementById('hotel_bill_1');
+            const lbl  = document.getElementById('lbl_hotel_bill_1');
+
+            if (hotelAmt > maxHotel) {
+                showToast(`Maximum hotel limit is ₹${maxHotel}`, 'warning');
+                hotelInp.value = maxHotel;
+                hotelAmt = maxHotel;
+            }
+
+            if (hotelAmt > 0) { txt.innerText = "Required"; lbl.style.color = "var(--danger)"; bill.required = true; }
+            else               { txt.innerText = "Optional";  lbl.style.color = "";              bill.required = false; }
+            updateDA();
+        }
+
+        function showSubLeg(i) {
+            document.getElementById(`sub_leg_${i}`).style.display = 'block';
+            document.getElementById(`btn_addsub_${i}`).style.display = 'none';
+        }
+
+        function hideSubLeg(i) {
+            document.getElementById(`sub_leg_${i}`).style.display = 'none';
+            document.getElementById(`sub_mode_${i}`).value = '';
+            document.getElementById(`sub_amt_${i}`).value  = 0;
+            document.getElementById(`btn_addsub_${i}`).style.display = 'flex';
+            calculateTotals();
+        }
+
+        function handleMode(i, type) {
+            updateGlobalVehicleStatus();
+            const prefix = type === 'sub' ? 'sub_' : '';
+            const mode  = document.getElementById(`${prefix}mode_${i}`).value;
+            const km    = document.getElementById(`${prefix}km_${i}`);
+            const amt   = document.getElementById(`${prefix}amt_${i}`);
+            const amtGroup = amt.closest('.form-group'); // Amount field ka parent
+            const billGroup = document.getElementById(`lbl_${prefix}bill_${i}`).closest('.form-group'); // Bill field ka parent
+            const txt   = document.getElementById(`txt_${prefix}bill_${i}`);
+            const bill  = document.getElementById(`${prefix}bill_${i}`);
+            const lbl   = document.getElementById(`lbl_${prefix}bill_${i}`);
+            lbl.innerText = `${mode || 'Bill'} Image`;
+            if (type === 'main') {
+                const btnSub = document.getElementById(`btn_addsub_${i}`);
+                btnSub.style.display = (mode === 'Bus' || mode === 'Train') ? 'flex' : 'none';
+                if (mode !== 'Bus' && mode !== 'Train') hideSubLeg(i);
+            }
+            if (mode === 'Bike' || mode === 'Car') {
+                // Amount field hide karo Bike/Car ke liye
+                amtGroup.style.display = 'none';
+                // Bill field hide karo Bike/Car ke liye
+                billGroup.style.display = 'none';
+                bill.required = false;
+                // KM field editable
+                km.readOnly = false;
+                km.style.background = 'transparent';
+                km.value = 0;
+                // KM change pe auto-calculate karo
+                km.onchange = () => {
+                    const kmValue = parseFloat(km.value) || 0;
+                    const multiplier = mode === 'Bike' ? 4.5 : 9;
+                    amt.value = (kmValue * multiplier).toFixed(2);
+                    calculateTotals();
+                };
+            } else {
+                // Amount field show karo dusre modes ke liye
+                amtGroup.style.display = 'flex';
+                // Bill field show karo dusre modes ke liye
+                billGroup.style.display = 'flex';
+                km.value = 0;
+                km.readOnly = true;
+                km.style.background = 'var(--surface-2)';
+                amt.readOnly = false;
+                amt.value = 0;
+                amt.style.background = 'transparent';
+                km.onchange = null;
+                if (mode === 'Train')               { txt.innerText = "Required"; lbl.style.color = "var(--danger)"; bill.required = true; }
+                else if (mode === 'Bus' || mode === 'Auto') { txt.innerText = "Req ≥ ₹300"; lbl.style.color = ""; bill.required = false; }
+                else                                { txt.innerText = "Optional"; lbl.style.color = ""; bill.required = false; }
+            }
+            calcAmt(i, type, km);
+        }
+
+       function updateGlobalVehicleStatus() {
+    const selectors = document.querySelectorAll('.mode-selector');
+    let usedBike = false, usedCar = false;
+    selectors.forEach(sel => {
+        if (sel.value === 'Bike') usedBike = true;
+        if (sel.value === 'Car')  usedCar  = true;
+    });
+    usedVehicle = usedBike || usedCar;
+
+    selectors.forEach(sel => {
+        Array.from(sel.options).forEach(opt => {
+            // Bike disable hogi SIRF tab jab Car already use ho rahi ho (aur vice versa)
+            if (opt.value === 'Bike') opt.disabled = usedCar;
+            if (opt.value === 'Car')  opt.disabled = usedBike;
+        });
+    });
+}
+
+        function calcAmt(i, type, triggerInput) {
+            const prefix = type === 'sub' ? 'sub_' : '';
+            const mode   = document.getElementById(`${prefix}mode_${i}`).value;
+            const km     = parseFloat(document.getElementById(`${prefix}km_${i}`).value) || 0;
+            const amt    = document.getElementById(`${prefix}amt_${i}`);
+            const bill   = document.getElementById(`${prefix}bill_${i}`);
+            const txt    = document.getElementById(`txt_${prefix}bill_${i}`);
+            const lbl    = document.getElementById(`lbl_${prefix}bill_${i}`);
+            if (mode === 'Bus' || mode === 'Auto') {
+                if (parseFloat(amt.value) >= 300) { txt.innerText = "Required"; lbl.style.color = "var(--danger)"; bill.required = true; }
+                else                              { txt.innerText = "Req ≥ ₹300"; lbl.style.color = ""; bill.required = false; }
+            }
+            calculateTotals();
+        }
+
+        function calculateTotals() {
+            let tKm = 0, tAmt = 0, autoAmt = 0;
+            for (let i = 1; i <= itineraryCount; i++) {
+                if (document.getElementById(`iti_${i}`)) {
+                    const mode   = document.getElementById(`mode_${i}`).value;
+                    const km     = parseFloat(document.getElementById(`km_${i}`).value)  || 0;
+                    const amt    = parseFloat(document.getElementById(`amt_${i}`).value) || 0;
+                    if (mode === 'Bike' || mode === 'Car') tKm += km;
+                    if (mode === 'Auto') autoAmt += amt;
+                    tAmt += amt;
+                    const subMode = document.getElementById(`sub_mode_${i}`).value;
+                    const subAmt  = parseFloat(document.getElementById(`sub_amt_${i}`).value) || 0;
+                    if (subMode === 'Auto') autoAmt += subAmt;
+                    tAmt += subAmt;
+                    if (i === 1) {
+                        tAmt += parseFloat(document.getElementById('da_1').value)    || 0;
+                        tAmt += parseFloat(document.getElementById('hotel_1').value) || 0;
+                    }
+                    tAmt += parseFloat(document.getElementById(`oth_amt_${i}`).value) || 0;
+                }
+            }
+            document.getElementById('display_km').innerText  = tKm.toFixed(1);
+            document.getElementById('display_amt').innerText = tAmt.toFixed(2);
+
+            hasLimitExceeded = false;
+            let exceededType = null;
+            let missingAmount = 0;
+            
+            const maxKmAllowed = (RULES.max_km_per_month || 2000) + approvedKmFromDB;
+            const maxAutoAllowed = (RULES.max_auto_per_month || 1000) + approvedAutoFromDB;
+
+            if ((RULES.current_month_km + tKm) > maxKmAllowed) {
+                missingAmount = (RULES.current_month_km + tKm) - maxKmAllowed;
+                exceededType = 'KM';
+                hasLimitExceeded = true;
+            } else if ((RULES.current_month_auto + autoAmt) > maxAutoAllowed) {
+                missingAmount = (RULES.current_month_auto + autoAmt) - maxAutoAllowed;
+                exceededType = 'AUTO';
+                hasLimitExceeded = true;
+            }
+
+            const btnSubmit = document.getElementById('btnSubmit');
+            const submitText = document.getElementById('btnSubmitText');
+            
+            if (hasLimitExceeded) {
+                btnSubmit.classList.add('btn-locked');
+                btnSubmit.disabled = false; // Intentionally left enabled to trigger popup on click
+                submitText.innerText = 'Submission Locked';
+                
+                pendingApprovalType = exceededType;
+                const unit = exceededType === 'KM' ? 'km' : '';
+                const prefix = exceededType === 'AUTO' ? '₹' : '';
+                
+                const existingReq = exceededType === 'KM' ? window.existingKmReq : window.existingAutoReq;
+                
+                if (existingReq) {
+                    if (existingReq.status.toLowerCase() === 'rejected') {
+                        document.getElementById('approvalMsg').innerHTML = `Your manager has <b style="color:var(--danger);">Rejected</b> your limit extension request. You cannot claim expenses exceeding your limit for this month.`;
+                    } else if (existingReq.status.toLowerCase() === 'approved') {
+                        document.getElementById('approvalMsg').innerHTML = `You have already used your <b>one-time limit extension</b> for this month. You cannot exceed the limit further.`;
+                    } else {
+                        document.getElementById('approvalMsg').innerHTML = `You have already submitted a ${exceededType} limit request this month. Status: <b>${existingReq.status.toUpperCase()}</b>.`;
+                    }
+                    document.getElementById('req_additional').value = existingReq.requested_value || missingAmount.toFixed(2);
+                    document.getElementById('btnSendApprovalModal').style.display = 'none'; 
+                } else {
+                    document.getElementById('approvalMsg').innerText = `You have exceeded your officially available ${exceededType} limit. You must request a temporary limit extension of at least ${prefix}${missingAmount.toFixed(2)} ${unit} to submit this expense.`;
+                    document.getElementById('req_additional').value = missingAmount.toFixed(2);
+                    document.getElementById('btnSendApprovalModal').style.display = 'block'; 
+                    document.getElementById('btnSendApprovalModal').disabled = false;
+                }
+
+                // Show modal automatically ONCE per session/exceed transition
+                if (!wasExceededFlag) {
+                    wasExceededFlag = true;
+                    document.getElementById('approvalModal').style.display = 'flex';
+                }
+
+            } else {
+                btnSubmit.classList.remove('btn-locked');
+                btnSubmit.disabled = false;
+                submitText.innerText = 'Submit Expense';
+                wasExceededFlag = false; // Reset if user fixes the amount below limit
+            }
+        }
+
+        function closeApprovalModal() {
+            document.getElementById('approvalModal').style.display = 'none';
+        }
+
+        async function sendApprovalRequest() {
+            const reqAmt = document.getElementById('req_additional').value;
+            if (!reqAmt) return showToast("Please enter the requested amount.", 'warning');
+            
+            const btn = document.getElementById('btnSendApprovalModal');
+            btn.disabled = true;
+            btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Sending...`;
+            
+            try {
+                const response = await fetch('/api/expense/limit-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUserId,
+                        type: pendingApprovalType,
+                        amount: parseFloat(reqAmt)
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    document.getElementById('approvalModal').style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerHTML = 'Send Request to Manager';
+                    
+                    if (pendingApprovalType === 'KM') window.existingKmReq = { status: 'Pending', requested_value: reqAmt };
+                    if (pendingApprovalType === 'AUTO') window.existingAutoReq = { status: 'Pending', requested_value: reqAmt };
+                    calculateTotals();
+                } else {
+                    showToast("Error: " + data.message, 'danger');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Send Request to Manager';
+                }
+            } catch (err) {
+                showToast("Network Error: " + err.message, 'danger');
+                btn.disabled = false;
+                btn.innerHTML = 'Send Request to Manager';
+            }
+        }
+
+        document.getElementById('expenseForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            if (hasLimitExceeded) {
+                document.getElementById('approvalModal').style.display = 'flex';
+                return;
+            }
+
+            document.getElementById('confirm_date').innerText = document.getElementById('exp_date').value;
+            document.getElementById('confirm_amt').innerText  = `₹${document.getElementById('display_amt').innerText}`;
+            document.getElementById('confirmModal').style.display = 'flex';
+        });
+
+        async function doSubmit() {
+            if (hasLimitExceeded) return;
+            
+            const btn = document.getElementById('btnConfirmSubmit');
+            btn.disabled  = true;
+            btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="animation:spin 1s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Submitting...`;
+            try {
+                const formData = new FormData();
+                formData.append('user_id',      currentUserId);
+                formData.append('exp_date',     document.getElementById('exp_date').value);
+                formData.append('total_amount', document.getElementById('display_amt').innerText);
+                const itineraries = [];
+                for (let i = 1; i <= itineraryCount; i++) {
+                    if (document.getElementById(`iti_${i}`)) {
+                        const type     = document.querySelector(`input[name="travel_type_${i}"]:checked`).value;
+                        const distFrom = document.getElementById(`dist_from_${i}`)?.value || USER.home_district;
+                        itineraries.push({
+                            leg: i, travel_type: type, district_from: distFrom,
+                            district:     document.getElementById(`dist_to_${i}`).value,
+                            from:         document.getElementById(`from_${i}`).value,
+                            to:           document.getElementById(`to_${i}`).value,
+                            mode:         document.getElementById(`mode_${i}`).value,
+                            km:           document.getElementById(`km_${i}`).value,
+                            amount:       document.getElementById(`amt_${i}`).value,
+                            sub_mode:     document.getElementById(`sub_mode_${i}`).value,
+                            sub_amount:   document.getElementById(`sub_amt_${i}`).value,
+                            da:           i === 1 ? document.getElementById('da_1').value    : 0,
+                            hotel:        i === 1 ? document.getElementById('hotel_1').value : 0,
+                            oth_desc:     document.getElementById(`oth_desc_${i}`).value,
+                            oth_amount:   document.getElementById(`oth_amt_${i}`).value,
+                            ws_assigned:  document.getElementById(`ws_assign_${i}`)?.value || 0,
+                            ws_closed:    document.getElementById(`ws_close_${i}`)?.value  || 0,
+                            ws_pms:       document.getElementById(`ws_pms_${i}`)?.value    || 0,
+                            ws_asset:     document.getElementById(`ws_asset_${i}`)?.value  || 0,
+                            visit_purpose: document.getElementById(`purpose_${i}`).value
+                        });
+                        const mBill = document.getElementById(`bill_${i}`).files[0];
+                        if (mBill) formData.append(`main_bill_${i}`, mBill);
+                        const sBill = document.getElementById(`sub_bill_${i}`).files[0];
+                        if (sBill) formData.append(`sub_bill_${i}`, sBill);
+                        const oBill = document.getElementById(`oth_bill_${i}`)?.files[0];
+                        if (oBill) formData.append(`oth_bill_${i}`, oBill);
+                        if (type === 'Outdoor') {
+                            const cMail = document.getElementById(`comm_mail_${i}`).files[0];
+                            if (cMail) formData.append(`comm_mail_${i}`, cMail);
+                        }
+                    }
+                }
+                if (document.getElementById('hotel_bill_1')?.files[0]) {
+                    formData.append('hotel_bill_1', document.getElementById('hotel_bill_1').files[0]);
+                }
+                formData.append('itineraries', JSON.stringify(itineraries));
+
+                const response = await fetch('/api/expense', { method: 'POST', body: formData });
+                const data     = await response.json();
+                
+                if (response.ok && data.success) {
+                    document.getElementById('confirmModal').style.display = 'none';
+                    showToast(`Expense ${data.exp_id} submitted successfully!`, 'success');
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    document.getElementById('confirmModal').style.display = 'none';
+                    showToast("Submission failed: " + (data.message || "Unknown error"), 'danger');
+                    btn.disabled  = false;
+                    btn.innerHTML = 'Yes, Submit';
+                }
+            } catch (err) {
+                document.getElementById('confirmModal').style.display = 'none';
+                showToast("Submission failed: " + err.message, 'danger');
+                btn.disabled  = false;
+                btn.innerHTML = 'Yes, Submit';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('desktopSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('sidebar-mobile-open');
+            overlay.classList.toggle('active');
+            overlay.style.display = overlay.classList.contains('active') ? 'block' : 'none';
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast     = document.createElement('div');
+            const icons = {
+                success: `<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`,
+                danger:  `<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+                warning: `<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+                info:    `<svg style="width:18px;height:18px;flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
+            };
+            const col = type === 'error' ? 'danger' : type;
+            toast.style.cssText = `background:white;color:var(--${col});padding:14px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:var(--shadow-md);border-left:4px solid var(--${col});display:flex;align-items:center;gap:10px;pointer-events:auto;`;
+            toast.innerHTML = `${icons[type] || icons.info}<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.3s';
+                toast.style.opacity    = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
