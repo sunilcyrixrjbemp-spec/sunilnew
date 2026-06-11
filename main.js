@@ -11,12 +11,12 @@ import uploadHtml from './upload.html';
 import monthHtml from './month.html';
 
 import styleCss from './style.css';
-import adminCss from './style.css';
-import profileCss from './style.css';
-import expenseCss from './style.css';
-import resetCss from './style.css';
-import retrieveCss from './style.css';
-import homeCss from './style.css';
+import adminCss from './admin.css';
+import profileCss from './profile.css';
+import expenseCss from './expense.css';
+import resetCss from './reset.css';
+import retrieveCss from './retrieve.css';
+import homeCss from './home.css';
 import approvalCss from './style.css';
 import dashboardCss from './style.css';
 import uploadCss from './style.css';
