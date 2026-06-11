@@ -36,26 +36,6 @@ function generateSalt() {
     return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
 }
 
-async function sendEmail(to, subject, body) {
-    const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            "Authorization": "Bearer re_i7WRWahS_GbcGT7C65PH4fkAvez4DyYiS",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            from: "Cyrix Healthcare <noreply@sunilbishnoi.co.in>",
-            to: [to],
-            subject: subject,
-            html: body
-        })
-    });
-    if (!res.ok) {
-        const errText = await res.text();
-        console.error("Resend email error:", errText);
-    }
-}
-
 async function getNextId(env) {
     const result = await env.DB.prepare("SELECT user_id FROM user WHERE user_id LIKE 'RJ%' ORDER BY user_id DESC LIMIT 1").first();
     if (!result || !result.user_id) return "RJ001";
@@ -127,35 +107,6 @@ export default async function adminHandler(request, env, corsHeaders) {
                     d.grade, d.role, d.level_first_approver || null, d.level_second_approver || null, 
                     hashedPassword, salt
                 ).run();
-
-                // Send Welcome Email to the new user
-                if (d.mail_id) {
-                    const welcomeEmail = `
-                    <div style="font-family: 'Segoe UI', Tahoma, sans-serif; max-width: 550px; margin: auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
-                        <div style="background-color: #1e3a8a; padding: 25px; text-align: center;">
-                            <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 600;">Cyrix Healthcare</h1>
-                        </div>
-                        <div style="padding: 40px; background-color: #ffffff;">
-                            <p style="font-size: 16px; color: #1e293b;">Dear <b>${d.full_name}</b>,</p>
-                            <p style="font-size: 15px; color: #475569; line-height: 1.6;">Welcome to <b>Cyrix Healthcare</b>! Your account has been created successfully. Below are your login credentials:</p>
-                            <div style="background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 24px; margin: 25px 0;">
-                                <table style="width: 100%; border-collapse: collapse;">
-                                    <tr><td style="padding: 8px 0; font-size: 14px; color: #64748b; font-weight: 600;">User ID</td><td style="padding: 8px 0; font-size: 15px; color: #1e293b; font-weight: 700;">${nextId}</td></tr>
-                                    <tr><td style="padding: 8px 0; font-size: 14px; color: #64748b; font-weight: 600;">Password</td><td style="padding: 8px 0; font-size: 15px; color: #1e293b; font-weight: 700;">${plainPassword}</td></tr>
-                                    <tr><td style="padding: 8px 0; font-size: 14px; color: #64748b; font-weight: 600;">Role</td><td style="padding: 8px 0; font-size: 15px; color: #1e293b; font-weight: 700;">${d.role}</td></tr>
-                                    <tr><td style="padding: 8px 0; font-size: 14px; color: #64748b; font-weight: 600;">Zone</td><td style="padding: 8px 0; font-size: 15px; color: #1e293b; font-weight: 700;">${d.zone_name}</td></tr>
-                                </table>
-                            </div>
-                            <p style="font-size: 14px; color: #ef4444; font-weight: 600;">⚠️ Please change your password after first login for security.</p>
-                            <p style="font-size: 14px; color: #64748b; margin-top: 15px;">If you have any questions, please contact your administrator.</p>
-                            <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 30px 0;">
-                            <div style="text-align: center; font-size: 11px; color: #94a3b8;">&copy; 2026 Cyrix Healthcare Pvt. Ltd. | Secure Access</div>
-                        </div>
-                    </div>`;
-                    
-                    // Fire-and-forget: don't block user creation on email delivery
-                    sendEmail(d.mail_id, "Welcome to Cyrix Healthcare — Your Account Details", welcomeEmail).catch(() => {});
-                }
                 
                 return new Response(JSON.stringify({ success: true }), { headers });
             }
