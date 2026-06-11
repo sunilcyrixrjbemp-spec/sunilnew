@@ -63,6 +63,21 @@ body {
   vertical-align: middle;
 }
 
+/* Glassmorphism definition mapped to standard white card design */
+.glassmorphism {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: var(--text) !important;
+  transition: all var(--t-fast) !important;
+}
+
+.glassmorphism:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: var(--primary-light) !important;
+}
+
 /* Common Modal Styles */
 .popup-overlay {
   position: fixed;

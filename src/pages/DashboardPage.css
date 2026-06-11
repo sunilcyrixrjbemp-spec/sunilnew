@@ -2,13 +2,15 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
-  background-color: var(--bg-color);
+  background-color: var(--bg);
 }
 
 /* ── Sidebar Styling ── */
 .sidebar {
   padding: 30px;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background-color: var(--primary-dark);
+  color: white;
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   gap: 40px;
@@ -21,6 +23,7 @@
   font-size: 20px;
   font-weight: 800;
   letter-spacing: -0.5px;
+  color: white;
 }
 
 .brand-logo {
@@ -50,7 +53,7 @@
   background: none;
   border: none;
   border-radius: 12px;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
   font-weight: 600;
   text-align: left;
@@ -63,7 +66,7 @@
 }
 
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
 }
 
@@ -72,8 +75,7 @@
 }
 
 .menu-item.active {
-  background: rgba(37, 99, 235, 0.15);
-  border: 1px solid rgba(37, 99, 235, 0.3);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
@@ -99,11 +101,12 @@
   font-size: 22px;
   font-weight: 700;
   margin-bottom: 4px;
+  color: var(--text);
 }
 
 .navbar-title p {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .user-profile-summary {
@@ -165,7 +168,7 @@
 .metric-info h3 {
   font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 4px;
@@ -205,7 +208,7 @@
 .chart-label {
   font-size: 14px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-2);
 }
 
 .chart-bar-track {
@@ -251,7 +254,7 @@
 .tabs {
   display: flex;
   gap: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.05);
   padding: 4px;
   border-radius: 12px;
 }
@@ -261,7 +264,7 @@
   background: none;
   border: none;
   border-radius: 8px;
-  color: var(--text-secondary);
+  color: var(--text-2);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -269,13 +272,13 @@
 }
 
 .tab-btn:hover {
-  color: #fff;
+  color: var(--text);
 }
 
 .tab-btn.active {
   background: var(--surface);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: var(--primary-dark);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .filters-bar {
@@ -284,18 +287,18 @@
 }
 
 .filter-input {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px 16px;
-  color: #fff;
+  color: var(--text);
   font-size: 14px;
   outline: none;
   cursor: pointer;
 }
 
 .filter-input:focus {
-  border-color: var(--primary);
+  border-color: var(--primary-light);
 }
 
 /* Data Table */
@@ -313,20 +316,20 @@
   padding: 16px 20px;
   font-size: 13px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-2);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border);
 }
 
 .data-table td {
   padding: 16px 20px;
   font-size: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border);
 }
 
 .data-table tr:hover td {
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--surface-2);
 }
 
 .font-mono { font-family: monospace; }
