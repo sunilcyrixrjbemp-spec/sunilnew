@@ -1,3 +1,32 @@
+// PBKDF2 hash function — matches admin.js exactly
+async function hashPassword(password, salt) {
+    const encoder = new TextEncoder();
+    const passwordKey = await crypto.subtle.importKey(
+        'raw', 
+        encoder.encode(password), 
+        { name: 'PBKDF2' }, 
+        false, 
+        ['deriveBits']
+    );
+    
+    const derivedBits = await crypto.subtle.deriveBits(
+        {
+            name: 'PBKDF2',
+            salt: encoder.encode(salt),
+            iterations: 100000,
+            hash: 'SHA-256'
+        },
+        passwordKey,
+        256
+    );
+
+    return btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
+}
+
+function generateSalt() {
+    return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+}
+
 async function sendEmail(to, subject, body) {
     const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
@@ -87,7 +116,12 @@ export default async function forgotHandler(request, env, corsHeaders) {
                 return new Response(JSON.stringify({ success: false, message: "Invalid or expired OTP." }), { status: 400, headers });
             }
 
-            await env.DB.prepare("UPDATE user SET password = ?, failed_attempts = 0, account_status = 'Active' WHERE user_id = ?").bind(new_password, user_id).run();
+            // Hash the new password before storing
+            const newSalt = generateSalt();
+            const hashedPassword = await hashPassword(new_password, newSalt);
+
+            await env.DB.prepare("UPDATE user SET password = ?, password_salt = ?, failed_attempts = 0, account_status = 'Active' WHERE user_id = ?")
+                .bind(hashedPassword, newSalt, user_id).run();
             await env.DB.prepare("DELETE FROM otp_verifications WHERE user_id = ?").bind(user_id).run();
             
             return new Response(JSON.stringify({ success: true, message: "Password reset successful. Account activated." }), { status: 200, headers });
@@ -96,3 +130,4 @@ export default async function forgotHandler(request, env, corsHeaders) {
         return new Response(JSON.stringify({ success: false, message: "Server Error: " + e.message }), { status: 500, headers }); 
     }
 }
+

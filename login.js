@@ -5,6 +5,31 @@ const corsHeaders = {
     "Access-Control-Max-Age": "86400",
 };
 
+// PBKDF2 hash function — matches admin.js exactly
+async function hashPassword(password, salt) {
+    const encoder = new TextEncoder();
+    const passwordKey = await crypto.subtle.importKey(
+        'raw', 
+        encoder.encode(password), 
+        { name: 'PBKDF2' }, 
+        false, 
+        ['deriveBits']
+    );
+    
+    const derivedBits = await crypto.subtle.deriveBits(
+        {
+            name: 'PBKDF2',
+            salt: encoder.encode(salt),
+            iterations: 100000,
+            hash: 'SHA-256'
+        },
+        passwordKey,
+        256
+    );
+
+    return btoa(String.fromCharCode(...new Uint8Array(derivedBits)));
+}
+
 export default async function loginHandler(request, env) {
     if (request.method === "OPTIONS") {
         return new Response(null, { headers: corsHeaders });
@@ -22,7 +47,7 @@ export default async function loginHandler(request, env) {
             }
 
             const user = await env.DB.prepare(
-                "SELECT user_id, password, full_name, account_status, failed_attempts, role FROM user WHERE user_id = ?"
+                "SELECT user_id, password, password_salt, full_name, account_status, failed_attempts, role FROM user WHERE user_id = ?"
             ).bind(user_id).first();
 
             if (!user) {
@@ -47,8 +72,18 @@ export default async function loginHandler(request, env) {
                 }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
             }
 
-            if (password !== user.password) {
-                // 💡 यहाँ parseInt का इस्तेमाल किया है ताकि 0+1=1 और 1+1=2 हो, न कि 01
+            // Password verification: supports both hashed (PBKDF2) and legacy plain text
+            let passwordMatch = false;
+            if (user.password_salt) {
+                // Hashed password — compare using PBKDF2
+                const hashedInput = await hashPassword(password, user.password_salt);
+                passwordMatch = (hashedInput === user.password);
+            } else {
+                // Legacy plain text password
+                passwordMatch = (password === user.password);
+            }
+
+            if (!passwordMatch) {
                 const currentAttempts = parseInt(user.failed_attempts || 0, 10);
                 const attempts = currentAttempts + 1;
 
@@ -84,3 +119,4 @@ export default async function loginHandler(request, env) {
     }
     return new Response(JSON.stringify({ success: false, message: "Method not allowed" }), { status: 405, headers: corsHeaders });
 }
+
