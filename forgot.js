@@ -6,7 +6,7 @@ async function sendEmail(to, subject, body) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            from: "Cyrix Healthcare <noreply@sunilbishnoi.co.in>",
+            from: "Sunil Bishnoi <rjbemp-bikaner@cyrix.in>",
             to: [to],
             subject: subject,
             html: body
